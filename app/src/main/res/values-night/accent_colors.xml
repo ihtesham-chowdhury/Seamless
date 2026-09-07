@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Dark-mode accent tones: a light pastel as the "primary" (so it reads against a dark
+      background) and a deep, muted version as the "container". Same names as the light
+      file in res/values/ — the resource system swaps this set in automatically once the
+      app is in dark mode, so nothing in the overlay styles needs to know which mode is
+      active.
+    -->
+    <color name="accent_on_primary">#FF1B1B1F</color>
+    <color name="accent_on_container">#FFF3F3F7</color>
+
+    <color name="accent_red_primary">#FFEF9A9A</color>
+    <color name="accent_red_container">#FFD32F2F</color>
+
+    <color name="accent_orange_primary">#FFFFAB91</color>
+    <color name="accent_orange_container">#FFE64A19</color>
+
+    <color name="accent_amber_primary">#FFFFE082</color>
+    <!-- Amber's usual 700 container reads as bright orange, not "deep"; 900 is used instead. -->
+    <color name="accent_amber_container">#FFFF6F00</color>
+
+    <color name="accent_green_primary">#FFA5D6A7</color>
+    <color name="accent_green_container">#FF388E3C</color>
+
+    <color name="accent_teal_primary">#FF80CBC4</color>
+    <color name="accent_teal_container">#FF00796B</color>
+
+    <color name="accent_cyan_primary">#FF80DEEA</color>
+    <color name="accent_cyan_container">#FF0097A7</color>
+
+    <color name="accent_blue_primary">#FF90CAF9</color>
+    <color name="accent_blue_container">#FF1976D2</color>
+
+    <color name="accent_indigo_primary">#FF9FA8DA</color>
+    <color name="accent_indigo_container">#FF303F9F</color>
+
+    <color name="accent_purple_primary">#FFB39DDB</color>
+    <color name="accent_purple_container">#FF512DA8</color>
+
+    <color name="accent_pink_primary">#FFF48FB1</color>
+    <color name="accent_pink_container">#FFC2185B</color>
+
+    <color name="accent_default_preview">#FFD0BCFF</color>
+</resources>

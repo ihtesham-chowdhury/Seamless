@@ -1,0 +1,24 @@
+# Normalise to LF in the repository regardless of the platform committing.
+* text=auto eol=lf
+
+# gradlew is executed by a Unix shell on CI and on F-Droid's build servers. With CRLF
+# endings it fails with a misleading "bad interpreter" error, so pin it explicitly.
+gradlew text eol=lf
+*.sh text eol=lf
+
+# Windows batch files need CRLF or cmd.exe misparses them.
+*.bat text eol=crlf
+
+# Never touch these.
+*.jar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.keystore binary
+*.jks binary
+*.apk binary
+*.aab binary
+
+# Keeps diffs of the licence out of review noise.
+LICENSE -diff

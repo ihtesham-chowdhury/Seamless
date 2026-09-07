@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      One overlay per accent, applied at runtime with Activity.theme.applyStyle(id, true)
+      on top of Theme.Seamless. Each just swaps the four attributes that actually show up in
+      this app's chrome: colorPrimary/colorOnPrimary drive buttons, switches and the
+      seek bar in Settings; colorSecondaryContainer/colorOnSecondaryContainer drive the
+      bottom navigation bar's selected-item pill.
+
+      parent="" is required, not decorative. A dotted style name with no parent attribute
+      makes AAPT2 infer one by dropping the last segment — it would look for a style called
+      "ThemeOverlay.Seamless", not find it, and fail resource linking. The empty parent opts
+      out of that inference and gives a genuinely parentless overlay, which is what an
+      overlay should be: it merges its items into whatever theme it is applied to rather
+      than replacing it.
+    -->
+
+    <style name="ThemeOverlay.Seamless.Red" parent="">
+        <item name="colorPrimary">@color/accent_red_primary</item>
+        <item name="colorOnPrimary">@color/accent_on_primary</item>
+        <item name="colorSecondaryContainer">@color/accent_red_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_on_container</item>
+    </style>
+
+    <style name="ThemeOverlay.Seamless.Orange" parent="">
+        <item name="colorPrimary">@color/accent_orange_primary</item>
+        <item name="colorOnPrimary">@color/accent_on_primary</item>
+        <item name="colorSecondaryContainer">@color/accent_orange_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_on_container</item>
+    </style>
+
+    <style name="ThemeOverlay.Seamless.Amber" parent="">
+        <item name="colorPrimary">@color/accent_amber_primary</item>
+        <item name="colorOnPrimary">@color/accent_on_primary</item>
+        <item name="colorSecondaryContainer">@color/accent_amber_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_on_container</item>
+    </style>
+
+    <style name="ThemeOverlay.Seamless.Green" parent="">
+        <item name="colorPrimary">@color/accent_green_primary</item>
+        <item name="colorOnPrimary">@color/accent_on_primary</item>
+        <item name="colorSecondaryContainer">@color/accent_green_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_on_container</item>
+    </style>
+
+    <style name="ThemeOverlay.Seamless.Teal" parent="">
+        <item name="colorPrimary">@color/accent_teal_primary</item>
+        <item name="colorOnPrimary">@color/accent_on_primary</item>
+        <item name="colorSecondaryContainer">@color/accent_teal_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_on_container</item>
+    </style>
+
+    <style name="ThemeOverlay.Seamless.Cyan" parent="">
+        <item name="colorPrimary">@color/accent_cyan_primary</item>
+        <item name="colorOnPrimary">@color/accent_on_primary</item>
+        <item name="colorSecondaryContainer">@color/accent_cyan_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_on_container</item>
+    </style>
+
+    <style name="ThemeOverlay.Seamless.Blue" parent="">
+        <item name="colorPrimary">@color/accent_blue_primary</item>
+        <item name="colorOnPrimary">@color/accent_on_primary</item>
+        <item name="colorSecondaryContainer">@color/accent_blue_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_on_container</item>
+    </style>
+
+    <style name="ThemeOverlay.Seamless.Indigo" parent="">
+        <item name="colorPrimary">@color/accent_indigo_primary</item>
+        <item name="colorOnPrimary">@color/accent_on_primary</item>
+        <item name="colorSecondaryContainer">@color/accent_indigo_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_on_container</item>
+    </style>
+
+    <style name="ThemeOverlay.Seamless.Purple" parent="">
+        <item name="colorPrimary">@color/accent_purple_primary</item>
+        <item name="colorOnPrimary">@color/accent_on_primary</item>
+        <item name="colorSecondaryContainer">@color/accent_purple_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_on_container</item>
+    </style>
+
+    <style name="ThemeOverlay.Seamless.Pink" parent="">
+        <item name="colorPrimary">@color/accent_pink_primary</item>
+        <item name="colorOnPrimary">@color/accent_on_primary</item>
+        <item name="colorSecondaryContainer">@color/accent_pink_container</item>
+        <item name="colorOnSecondaryContainer">@color/accent_on_container</item>
+    </style>
+</resources>

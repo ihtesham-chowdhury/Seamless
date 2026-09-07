@@ -1,0 +1,8 @@
+First release.
+
+A gapless swipeable feed for short vertical videos, plus a full-featured ordinary player.
+Shuffle that does not repeat, folder and whole-device sources, gesture controls, screen
+lock, resume for long videos, library search and sorting, file management, hidden and
+biometrically locked folders, themes and accent colours.
+
+No internet permission, no tracking.

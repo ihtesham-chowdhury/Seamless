@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The favourite mark on a thumbnail.
+
+  Untinted, and carrying its own shadow: a tile has whatever frame the video happened to
+  start on behind it, and a plain white heart disappears against a pale one. The offset copy
+  underneath costs one more path and works on every frame, which a drop shadow set on the
+  ImageView would not — that would need a layer.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp" android:height="20dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <group android:translateY="0.9">
+        <path
+            android:fillColor="#FF000000"
+            android:fillAlpha="0.45"
+            android:pathData="M12,21.1l-1.4,-1.3C5.4,15.1 2,12 2,8.2 2,5.1 4.4,2.7 7.5,2.7c1.8,0 3.4,0.8 4.5,2.1 1.1,-1.3 2.7,-2.1 4.5,-2.1 3.1,0 5.5,2.4 5.5,5.5 0,3.8 -3.4,6.9 -8.6,11.6z" />
+    </group>
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,21.1l-1.4,-1.3C5.4,15.1 2,12 2,8.2 2,5.1 4.4,2.7 7.5,2.7c1.8,0 3.4,0.8 4.5,2.1 1.1,-1.3 2.7,-2.1 4.5,-2.1 3.1,0 5.5,2.4 5.5,5.5 0,3.8 -3.4,6.9 -8.6,11.6z" />
+</vector>

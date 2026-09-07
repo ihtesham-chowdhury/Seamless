@@ -1,0 +1,11 @@
+<resources>
+    <!--
+      The floating navigation capsule, and the room a scrolling list has to leave for it.
+
+      The reserve is the pill's height plus its margin plus a little air, so the last row of
+      a list can be scrolled clear of the glass rather than stopping underneath it.
+    -->
+    <dimen name="nav_pill_height">62dp</dimen>
+    <dimen name="nav_pill_margin">12dp</dimen>
+    <dimen name="nav_pill_reserve">86dp</dimen>
+</resources>

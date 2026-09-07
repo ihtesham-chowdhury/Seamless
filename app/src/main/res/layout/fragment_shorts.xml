@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Shorts tab, in its two shapes.
+
+  Whole-device mode is a wall of clips: the tab shows what it found and you pick one. It used
+  to throw you straight into the feed on arrival, which made the tab impossible to leave —
+  backing out of the feed landed here and was immediately sent back in.
+
+  Folder mode is the checklist it has always been, because there the choosing is the point.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:title="@string/tab_shorts">
+
+        <LinearLayout
+            android:id="@+id/toolbar_actions"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/glass_pill_bg"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="3dp"
+            android:paddingEnd="3dp">
+
+            <!--
+              This one carries the current layout's own glyph rather than the library's
+              sliders, because here there are three layouts rather than two and which one you
+              are in is worth saying without opening anything.
+            -->
+            <ImageButton
+                android:id="@+id/btn_view_options"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:background="@drawable/ripple_toolbar_icon"
+                android:contentDescription="@string/view_options"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_view_masonry" />
+
+            <ImageButton
+                android:id="@+id/btn_shuffle_all"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:background="@drawable/ripple_toolbar_icon"
+                android:contentDescription="@string/shorts_play"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_shuffle" />
+        </LinearLayout>
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <!--
+      The quick views. Scrolls sideways rather than wrapping, so the row is always one line
+      tall whatever it ends up holding, and the title above it never moves.
+    -->
+    <HorizontalScrollView
+        android:id="@+id/filter_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="4dp"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/filters"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:chipSpacingHorizontal="8dp"
+            app:selectionRequired="true"
+            app:singleLine="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_all"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/filter_all" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_recent"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_recent" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_favourites"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_favourites" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_longest"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_longest" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/sources_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="4dp"
+        android:text="@string/shorts_sources_title"
+        android:textAppearance="?attr/textAppearanceTitleSmall" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp" />
+
+        <ProgressBar
+            android:id="@+id/loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+        <!-- Says what the tab collects and where to widen it, rather than only that it is
+             empty. "No videos" on a device full of videos is a puzzle, not a message. -->
+        <LinearLayout
+            android:id="@+id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:alpha="0.35"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_shorts" />
+
+            <TextView
+                android:id="@+id/empty_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/shorts_empty_title"
+                android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+            <TextView
+                android:id="@+id/empty_body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:alpha="0.7"
+                android:gravity="center"
+                android:text="@string/shorts_empty_body"
+                android:textAppearance="?attr/textAppearanceBodyMedium" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Folder mode only. Grouped so the room left for the floating navigation capsule can
+         be given to the whole footer rather than to each piece of it. -->
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="8dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/play"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/shorts_play" />
+    </LinearLayout>
+</LinearLayout>

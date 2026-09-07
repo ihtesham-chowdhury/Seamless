@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A short gradient at the foot of a thumbnail, so the duration stays readable over a bright
+  frame without putting a box on the picture.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient
+        android:angle="90"
+        android:endColor="#00000000"
+        android:startColor="#8C000000" />
+</shape>

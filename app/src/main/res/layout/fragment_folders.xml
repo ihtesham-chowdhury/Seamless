@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:title="@string/tab_library">
+
+    <!--
+      A child of the toolbar rather than its menu. A menu gives flat icons in a row; the
+      capsule behind them is the whole point of this treatment, and there is no way to put a
+      shared background behind menu items. Selection mode still uses the menu, and hides
+      this — a selection is a different mode, not the same one with more buttons.
+    -->
+    <LinearLayout
+        android:id="@+id/toolbar_actions"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:layout_gravity="end|center_vertical"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/glass_pill_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="3dp"
+        android:paddingEnd="3dp">
+
+        <ImageButton
+            android:id="@+id/btn_search"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/ripple_toolbar_icon"
+            android:contentDescription="@string/action_search"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_search" />
+
+        <!--
+          Layout and order behind one button. Two icons for two halves of the same question
+          is one icon too many in a row this small, and neither half is used often enough to
+          hold a permanent place of its own.
+        -->
+        <ImageButton
+            android:id="@+id/btn_view_options"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/ripple_toolbar_icon"
+            android:contentDescription="@string/view_options"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_view_options" />
+
+        <ImageButton
+            android:id="@+id/btn_last_played"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/ripple_toolbar_icon"
+            android:contentDescription="@string/last_played"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_play_circle" />
+    </LinearLayout>
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <include
+        android:id="@+id/search_bar"
+        layout="@layout/view_search_field" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:paddingBottom="8dp" />
+
+        <ProgressBar
+            android:id="@+id/loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+        <LinearLayout
+            android:id="@+id/permission_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/permission_needed" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/grant"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/grant_permission" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/no_videos"
+            android:visibility="gone" />
+    </FrameLayout>
+</LinearLayout>

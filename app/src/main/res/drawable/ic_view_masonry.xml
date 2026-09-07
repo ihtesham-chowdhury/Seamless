@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Masonry: two columns whose blocks do not line up.
+
+  The unevenness is the whole message. A grid icon and a masonry icon that both showed
+  four equal blocks would be the same icon twice.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24"
+    android:tint="?attr/colorControlNormal">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M4.5,3h5a1.5,1.5 0 0 1 1.5,1.5v8a1.5,1.5 0 0 1 -1.5,1.5h-5a1.5,1.5 0 0 1 -1.5,-1.5v-8a1.5,1.5 0 0 1 1.5,-1.5zM4.5,15.5h5a1.5,1.5 0 0 1 1.5,1.5v2.5a1.5,1.5 0 0 1 -1.5,1.5h-5a1.5,1.5 0 0 1 -1.5,-1.5v-2.5a1.5,1.5 0 0 1 1.5,-1.5zM14.5,3h5a1.5,1.5 0 0 1 1.5,1.5v2.5a1.5,1.5 0 0 1 -1.5,1.5h-5a1.5,1.5 0 0 1 -1.5,-1.5v-2.5a1.5,1.5 0 0 1 1.5,-1.5zM14.5,10h5a1.5,1.5 0 0 1 1.5,1.5v8a1.5,1.5 0 0 1 -1.5,1.5h-5a1.5,1.5 0 0 1 -1.5,-1.5v-8a1.5,1.5 0 0 1 1.5,-1.5z" />
+</vector>

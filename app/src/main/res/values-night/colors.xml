@@ -1,0 +1,13 @@
+<resources>
+    <!-- See values/colors.xml. Light on dark, and a little stronger: a translucent white
+         needs more of itself than a translucent black to read at the same weight. -->
+    <color name="glass_fill_top">#26FFFFFF</color>
+    <color name="glass_fill_bottom">#14FFFFFF</color>
+    <color name="glass_stroke">#2EFFFFFF</color>
+
+    <!-- See values/colors.xml. A dark pane rather than a light one, lifted just off the
+         background so the capsule has an edge without needing a hard border. -->
+    <color name="nav_fill_top">#F52E2E36</color>
+    <color name="nav_fill_bottom">#EB23232A</color>
+    <color name="nav_stroke">#33FFFFFF</color>
+</resources>

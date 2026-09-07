@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_pin"
+        android:title="@string/action_pin"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_change_cover"
+        android:title="@string/action_change_cover"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_lock"
+        android:title="@string/action_lock_folder"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_hide"
+        android:icon="@drawable/ic_hide"
+        android:title="@string/hide_folders"
+        app:showAsAction="ifRoom" />
+</menu>

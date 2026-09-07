@@ -1,0 +1,7 @@
+<!--
+  Placeholder fill — always overwritten at runtime via
+  (view.background.mutate() as GradientDrawable).setColor(...), once per accent swatch.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="#FFFFFFFF" />
+</shape>

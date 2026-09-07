@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+      Transparent on purpose. An adaptive icon is always masked, but a mask over nothing
+      shows nothing, so what reaches the home screen is the mark's own silhouette rather
+      than a coloured circle or squircle with the mark inside it. The foreground is drawn
+      well within the safe zone so the mask never bites into the shape itself.
+    -->
+    <background android:drawable="@android:color/transparent" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <!-- Android 13+ themed icons. Ignored on older releases, which use the pair above. -->
+    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />
+</adaptive-icon>

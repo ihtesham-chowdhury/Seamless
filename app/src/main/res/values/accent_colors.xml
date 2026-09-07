@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Light-mode accent tones. Each accent has a saturated "primary" and a pastel
+      "container" (the same pairing Material uses for a selected pill / active state).
+      The "on_" colours are shared across every accent rather than tuned per hue: white
+      reads fine on any of these saturated primaries, and a fixed dark neutral reads fine
+      on any of these pastel containers, so there is no need for ten more colours.
+    -->
+    <color name="accent_on_primary">#FFFFFFFF</color>
+    <color name="accent_on_container">#FF1B1B1F</color>
+
+    <color name="accent_red_primary">#FFF44336</color>
+    <color name="accent_red_container">#FFFFCDD2</color>
+
+    <color name="accent_orange_primary">#FFFF5722</color>
+    <color name="accent_orange_container">#FFFFCCBC</color>
+
+    <!-- Amber's usual 500 tone is too light for white text, so this one uses 700 instead. -->
+    <color name="accent_amber_primary">#FFFFA000</color>
+    <color name="accent_amber_container">#FFFFECB3</color>
+
+    <color name="accent_green_primary">#FF4CAF50</color>
+    <color name="accent_green_container">#FFC8E6C9</color>
+
+    <color name="accent_teal_primary">#FF009688</color>
+    <color name="accent_teal_container">#FFB2DFDB</color>
+
+    <color name="accent_cyan_primary">#FF00BCD4</color>
+    <color name="accent_cyan_container">#FFB2EBF2</color>
+
+    <color name="accent_blue_primary">#FF2196F3</color>
+    <color name="accent_blue_container">#FFBBDEFB</color>
+
+    <color name="accent_indigo_primary">#FF3F51B5</color>
+    <color name="accent_indigo_container">#FFC5CAE9</color>
+
+    <color name="accent_purple_primary">#FF673AB7</color>
+    <color name="accent_purple_container">#FFD1C4E9</color>
+
+    <color name="accent_pink_primary">#FFE91E63</color>
+    <color name="accent_pink_container">#FFF8BBD0</color>
+
+    <!-- Preview swatch only for "Default" — the app's baseline Material colour, unapplied. -->
+    <color name="accent_default_preview">#FF6750A4</color>
+</resources>

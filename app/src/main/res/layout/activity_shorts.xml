@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" />
+
+    <!-- Leaves the feed. Part of the overlay, so it is absent until the screen is touched. -->
+    <ImageButton
+        android:id="@+id/btn_close"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/circle_control_bg"
+        android:contentDescription="@string/action_close"
+        android:padding="12dp"
+        android:src="@drawable/ic_close"
+        android:visibility="gone" />
+
+    <!--
+      Nothing here is on screen while a clip plays. A tap brings the row up along with the
+      close button, and it withdraws again on its own — the same bargain the ordinary
+      player makes, so the feed is never covered by chrome you did not ask for.
+    -->
+    <LinearLayout
+        android:id="@+id/actions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <!-- The same action as a double tap in the middle of the picture, and the only
+             place the current state is visible without performing it. -->
+        <ImageButton
+            android:id="@+id/btn_favourite"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/circle_control_bg"
+            android:contentDescription="@string/action_favourite"
+            android:padding="12dp"
+            android:src="@drawable/ic_heart_outline" />
+
+        <ImageButton
+            android:id="@+id/btn_resize"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/circle_control_bg"
+            android:contentDescription="@string/resize_mode"
+            android:padding="12dp"
+            android:src="@drawable/ic_aspect_ratio" />
+
+        <ImageButton
+            android:id="@+id/btn_lock"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/circle_control_bg"
+            android:contentDescription="@string/lock"
+            android:padding="12dp"
+            android:src="@drawable/ic_lock" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/hud"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/hud_background"
+        android:paddingStart="20dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="12dp"
+        android:textColor="#FFFFFFFF"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:id="@+id/empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="32dp"
+        android:gravity="center"
+        android:text="@string/no_shorts_sources"
+        android:textColor="#FFFFFFFF"
+        android:visibility="gone" />
+
+    <!-- No background: a lock must not put a grey wash over the video. -->
+    <com.seamless.player.ui.common.LockOverlayView
+        android:id="@+id/lock_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+</FrameLayout>

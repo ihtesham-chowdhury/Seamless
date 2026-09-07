@@ -1,0 +1,21 @@
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="scrim">#99000000</color>
+
+    <!--
+      The frosted capsule behind the toolbar icons. Dark and translucent on a light
+      background; the values-night file inverts this. The two fill colours are the ends of a
+      vertical gradient, and the difference between them is what suggests a lit surface.
+    -->
+    <color name="glass_fill_top">#14000000</color>
+    <color name="glass_fill_bottom">#0A000000</color>
+    <color name="glass_stroke">#1A000000</color>
+
+    <!--
+      The floating navigation capsule. Denser than the toolbar's: the list scrolls underneath
+      this one, so the labels have to stay readable over whatever happens to be passing.
+    -->
+    <color name="nav_fill_top">#F7FFFFFF</color>
+    <color name="nav_fill_bottom">#EDF2EEF6</color>
+    <color name="nav_stroke">#1F000000</color>
+</resources>

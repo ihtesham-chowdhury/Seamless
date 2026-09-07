@@ -1,0 +1,33 @@
+# Build output — note these are unanchored so they match app/build too, not just the root.
+build/
+.gradle/
+.kotlin/
+/captures
+.externalNativeBuild
+.cxx
+
+# IDE
+*.iml
+.idea/
+*.hprof
+
+# Machine-specific: points at this computer's SDK.
+local.properties
+
+# Signing material. None of this may ever be committed.
+keystore.properties
+*.jks
+*.keystore
+release/
+
+# Build artifacts
+*.apk
+*.aab
+*.ap_
+*.dex
+
+.DS_Store
+Thumbs.db
+
+# Python bytecode from the scripts in tools/.
+__pycache__/

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.seamless.player.ui.shorts.GestureOverlayLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/gesture_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/player_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:use_controller="false"
+        app:resize_mode="fit"
+        app:shutter_background_color="@color/black"
+        app:surface_type="texture_view" />
+    <!--
+      texture_view, not surface_view, and this is the fix for pages that came up black.
+      A SurfaceView owns a separate window layer whose creation and destruction are
+      asynchronous to the view tree. Inside ViewPager2 the pages are recycled fast enough
+      that a pooled player could attach to a surface that was already being torn down,
+      and render into nothing — no error, no frames, just black, on a fraction of clips.
+      A TextureView is an ordinary view drawn in the normal pass, so recycling cannot race
+      it. It costs a little more GPU, which is a fair trade for correctness.
+    -->
+
+    <!--
+      The clip's own thumbnail, held over the picture until the first frame is decoded and
+      hidden the moment it is.
+
+      This is a safety net as much as a nicety. A page with no first frame — for any reason,
+      including ones not yet met — used to be an unexplained black rectangle. Now the worst
+      case is a still image of the right video, which reads as "loading" rather than "broken",
+      and the ordinary case is that the swipe lands on a picture instead of on black.
+    -->
+    <ImageView
+        android:id="@+id/poster"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:scaleType="fitCenter" />
+
+    <!-- Position indicator only. Deliberately not draggable: no swipe-to-seek in this mode. -->
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_gravity="bottom"
+        android:max="1000"
+        android:progressBackgroundTint="#40FFFFFF"
+        android:progressTint="#FFFFFFFF" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="12dp"
+        android:ellipsize="middle"
+        android:maxLines="2"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:shadowColor="#FF000000"
+        android:shadowRadius="6"
+        android:textColor="#FFFFFFFF"
+        android:textSize="13sp" />
+
+    <!--
+      The volume / brightness level. Sits against whichever edge the gesture came from, so
+      it appears under the thumb rather than across the middle of the picture.
+    -->
+    <com.seamless.player.ui.common.LevelHudView
+        android:id="@+id/level_hud"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:visibility="gone" />
+
+    <!-- Shown instead of a silent black page when a clip cannot be decoded. -->
+    <TextView
+        android:id="@+id/error_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="24dp"
+        android:background="@drawable/hud_background"
+        android:gravity="center"
+        android:padding="16dp"
+        android:textColor="#FFFFFFFF"
+        android:textSize="13sp"
+        android:visibility="gone" />
+
+    <!--
+      The favourite mark, shown for a moment where a double tap in the middle of the picture
+      put it. Sized generously and then animated down, which is what makes it read as a
+      stamp rather than as a control that has appeared.
+    -->
+    <ImageView
+        android:id="@+id/favourite_burst"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_gravity="center"
+        android:alpha="0"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_heart_badge" />
+
+    <TextView
+        android:id="@+id/speed_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="48dp"
+        android:background="@drawable/speed_badge_bg"
+        android:drawableEnd="@drawable/ic_fast_forward"
+        android:drawablePadding="6dp"
+        android:gravity="center_vertical"
+        android:paddingStart="18dp"
+        android:paddingTop="9dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="9dp"
+        android:text="@string/speed_boost"
+        android:textColor="#FFFFFFFF"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+</com.seamless.player.ui.shorts.GestureOverlayLayout>

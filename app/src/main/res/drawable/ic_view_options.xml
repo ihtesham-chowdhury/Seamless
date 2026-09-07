@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The library's one display button: layout and order behind a single tap.
+
+  Three rails with a knob apiece, each knob at a different stop. It reads as "settings for
+  what you are looking at" rather than either half on its own — a grid icon promises only a
+  grid, and a sort icon promises only sorting.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24"
+    android:tint="?attr/colorControlNormal">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M4,5h5a1,1 0 0 1 0,2h-5a1,1 0 0 1 0,-2zM17,5h3a1,1 0 0 1 0,2h-3a1,1 0 0 1 0,-2zM4,11h1a1,1 0 0 1 0,2h-1a1,1 0 0 1 0,-2zM12,11h8a1,1 0 0 1 0,2h-8a1,1 0 0 1 0,-2zM4,17h8a1,1 0 0 1 0,2h-8a1,1 0 0 1 0,-2zM19,17h1a1,1 0 0 1 0,2h-1a1,1 0 0 1 0,-2zM13,3.5a2.5,2.5 0 1 0 0,5a2.5,2.5 0 1 0 0,-5zM8.5,9.5a2.5,2.5 0 1 0 0,5a2.5,2.5 0 1 0 0,-5zM15.5,15.5a2.5,2.5 0 1 0 0,5a2.5,2.5 0 1 0 0,-5z" />
+</vector>

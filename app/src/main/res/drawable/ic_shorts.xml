@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The shorts tab.
+
+  A tall rounded frame with a play triangle inside it: the shape says "vertical video" before
+  the glyph says "play", which is the distinction this tab exists to make. The two clipped
+  corners hint at the card behind the card — the feed you swipe through rather than a single
+  file.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24"
+    android:tint="?attr/colorControlNormal">
+    <!-- The card behind, peeking out on both sides. -->
+    <path
+        android:fillColor="#FF000000"
+        android:fillAlpha="0.45"
+        android:pathData="M5.6,5.2a1,1 0 0 1 1,1v11.6a1,1 0 0 1 -2,0V6.2a1,1 0 0 1 1,-1zM18.4,5.2a1,1 0 0 1 1,1v11.6a1,1 0 0 1 -2,0V6.2a1,1 0 0 1 1,-1z" />
+    <!-- The clip in front. -->
+    <path
+        android:fillColor="#FF000000"
+        android:fillType="evenOdd"
+        android:pathData="M10.2,2.6h3.6a3.4,3.4 0 0 1 3.4,3.4v12a3.4,3.4 0 0 1 -3.4,3.4h-3.6a3.4,3.4 0 0 1 -3.4,-3.4V6a3.4,3.4 0 0 1 3.4,-3.4zM10.6,8.3v7.4l5.1,-3.7z" />
+</vector>

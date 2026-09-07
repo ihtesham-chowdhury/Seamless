@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Fully rounded, near-opaque black. The badge sits over moving picture and has to be read in
+  a glance, so it gets more contrast than the other transient overlays rather than less.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#D9000000" />
+    <corners android:radius="100dp" />
+</shape>

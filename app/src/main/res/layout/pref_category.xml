@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A settings section heading.
+
+  Small, spaced and in the accent colour, with real air above it: the gap is what separates
+  one group of cards from the next, and it does more of the work than the words do.
+
+  PreferenceCategory binds only @android:id/title, so the heading can be the TextView itself
+  rather than a layout wrapped around one.
+-->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/title"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="34dp"
+    android:layout_marginTop="26dp"
+    android:layout_marginEnd="34dp"
+    android:layout_marginBottom="8dp"
+    android:letterSpacing="0.07"
+    android:textAllCaps="true"
+    android:textAppearance="?attr/textAppearanceLabelMedium"
+    android:textColor="?attr/colorPrimary" />

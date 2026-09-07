@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Nothing here is permanently visible except the slide bar, and that only in slider mode.
+  The overlay itself is transparent: locking must not put a wall in front of the video.
+-->
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <!-- Slide-to-unlock. Sits low so it never covers the picture. -->
+    <FrameLayout
+        android:id="@+id/slide_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="40dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/slide_label"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center"
+            android:text="@string/lock_slide_label"
+            android:textColor="#B3FFFFFF"
+            android:textSize="14sp" />
+
+        <SeekBar
+            android:id="@+id/lock_slider"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@null"
+            android:max="100"
+            android:maxHeight="56dp"
+            android:minHeight="56dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:progressDrawable="@drawable/slide_track"
+            android:splitTrack="false"
+            android:thumb="@drawable/slide_thumb"
+            android:thumbOffset="0dp" />
+    </FrameLayout>
+
+    <!-- Transient nudge, shown only after repeated attempts. Never blocks the view. -->
+    <TextView
+        android:id="@+id/lock_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/hud_background"
+        android:gravity="center"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp"
+        android:textColor="#FFFFFFFF"
+        android:textSize="13sp"
+        android:visibility="gone" />
+</merge>

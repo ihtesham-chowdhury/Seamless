@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Layout and order in one sheet, opened by the single display button in the toolbar.
+
+  Sorting used to be an AlertDialog with a radio list and a neutral button that flipped the
+  direction without saying which direction it had flipped to. Everything the list can be
+  arranged into is visible here at once, and each control shows its own state.
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="24dp">
+
+        <View
+            android:layout_width="32dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/sheet_grabber" />
+
+        <TextView
+            android:id="@+id/layout_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:letterSpacing="0.06"
+            android:text="@string/view_mode"
+            android:textAllCaps="true"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="?attr/colorPrimary" />
+
+        <!-- Filled at runtime, one button per layout the screen offers. -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/view_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:selectionRequired="true"
+            app:singleSelection="true" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:letterSpacing="0.06"
+            android:text="@string/sort_by"
+            android:textAllCaps="true"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="?attr/colorPrimary" />
+
+        <!-- Filled at runtime: which keys apply depends on whether the list holds folders
+             or videos, and hard-coding both lists here would put the answer in two places. -->
+        <RadioGroup
+            android:id="@+id/sort_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="vertical" />
+
+        <TextView
+            android:id="@+id/order_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:letterSpacing="0.06"
+            android:text="@string/sort_order"
+            android:textAllCaps="true"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="?attr/colorPrimary" />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/order_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/order_ascending"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/sort_ascending"
+                app:icon="@drawable/ic_arrow_up" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/order_descending"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/sort_descending"
+                app:icon="@drawable/ic_arrow_down" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <!--
+          Shown in place of the direction control when the order is Random, which has no
+          direction to offer. It exists because a radio button that is already selected
+          swallows a second tap — RadioGroup fires nothing when the checked item is checked
+          again — so "pick Random again for a different order" would have been a promise the
+          control could not keep.
+        -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/shuffle_again"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/sort_shuffle_again"
+            android:visibility="gone"
+            app:icon="@drawable/ic_shuffle" />
+    </LinearLayout>
+</ScrollView>

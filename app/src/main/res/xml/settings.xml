@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Settings, in groups.
+
+  This screen used to be one flat run of rows under thin headings, which made it read as a
+  list of every switch in the app rather than as a set of decisions about particular things.
+  Each group is now a card: the heading says what it is for, and the card's edge says where
+  it ends. The order runs from what people change often to what they change once.
+
+  android:layout on every entry is what draws those cards — the row layouts differ only in
+  which corners they round, and each preference names the one that matches its place in its
+  group. Adding, removing or moving a row means fixing its neighbours' layouts too. That is
+  the price of a static answer, and it is cheaper than the alternative, which is teaching the
+  adapter to work out group boundaries it already has written down here.
+-->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:layout="@layout/pref_category"
+        android:title="@string/settings_appearance">
+
+        <ListPreference
+            android:defaultValue="SYSTEM"
+            android:entries="@array/theme_entries"
+            android:entryValues="@array/theme_values"
+            android:key="theme_mode"
+            android:layout="@layout/pref_row_top"
+            android:title="@string/settings_theme_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <Preference
+            android:key="accent_color"
+            android:layout="@layout/pref_row_bottom"
+            android:title="@string/settings_accent_title" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:layout="@layout/pref_category"
+        android:title="@string/settings_shorts">
+
+        <!--
+          The source lives here rather than on the Shorts tab. Choosing it is a decision you
+          make once; being asked again on the way into every session is a toll, not a choice.
+        -->
+        <ListPreference
+            android:defaultValue="WHOLE_DEVICE"
+            android:entries="@array/shorts_source_entries"
+            android:entryValues="@array/shorts_source_values"
+            android:key="shorts_source"
+            android:layout="@layout/pref_row_top"
+            android:title="@string/settings_shorts_source_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="shorts_include_short_landscape"
+            android:layout="@layout/pref_row_middle"
+            android:summary="@string/settings_shorts_landscape_summary"
+            android:title="@string/shorts_filter_landscape" />
+
+        <!--
+          Deliberately not keyed on shorts_max_landscape_seconds. A ListPreference stores a
+          String and Prefs reads that setting as an Int, so sharing the key would put a
+          String where an Int is expected and throw the moment anything read it back. The
+          fragment mirrors this into the real key instead.
+        -->
+        <ListPreference
+            android:defaultValue="30"
+            android:entries="@array/shorts_length_entries"
+            android:entryValues="@array/shorts_length_values"
+            android:key="shorts_max_landscape_label"
+            android:layout="@layout/pref_row_middle"
+            android:title="@string/shorts_max_length_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="shorts_auto_advance"
+            android:layout="@layout/pref_row_middle"
+            android:summary="@string/settings_autoadvance_summary"
+            android:title="@string/settings_autoadvance_title" />
+
+        <ListPreference
+            android:defaultValue="FIT"
+            android:entries="@array/resize_entries"
+            android:entryValues="@array/resize_values"
+            android:key="shorts_resize_mode"
+            android:layout="@layout/pref_row_bottom"
+            android:title="@string/settings_shorts_resize_title"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:layout="@layout/pref_category"
+        android:title="@string/settings_playback">
+
+        <ListPreference
+            android:defaultValue="FIT"
+            android:entries="@array/resize_entries"
+            android:entryValues="@array/resize_values"
+            android:key="player_resize_mode"
+            android:layout="@layout/pref_row_top"
+            android:title="@string/settings_player_resize_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:defaultValue="FOLLOW_VIDEO"
+            android:entries="@array/orientation_entries"
+            android:entryValues="@array/orientation_values"
+            android:key="orientation_mode"
+            android:layout="@layout/pref_row_middle"
+            android:title="@string/settings_orientation_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <!--
+          Same String-versus-Int split as the shorts length above, and mirrored the same way.
+          This was a SeekBarPreference, which brings its own row layout with the slider built
+          into it and so could not join a card without forking that layout as well. A handful
+          of sensible values is a better question anyway: nobody wants seventeen minutes.
+
+          No useSimpleSummaryProvider here, deliberately: the fragment writes a summary that
+          says what the number means rather than repeating it, and setSummary throws outright
+          on a preference that has a summary provider. Having both is what crashed this
+          screen on open.
+        -->
+        <ListPreference
+            android:defaultValue="10"
+            android:entries="@array/resume_entries"
+            android:entryValues="@array/resume_values"
+            android:key="resume_minutes_label"
+            android:layout="@layout/pref_row_middle"
+            android:title="@string/settings_resume_title" />
+
+        <Preference
+            android:key="clear_resume"
+            android:layout="@layout/pref_row_bottom"
+            android:title="@string/settings_clear_resume" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:layout="@layout/pref_category"
+        android:title="@string/settings_gestures">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="swipe_down_to_close"
+            android:layout="@layout/pref_row_top"
+            android:summary="@string/settings_swipe_close_summary"
+            android:title="@string/settings_swipe_close_title" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="external_portrait"
+            android:layout="@layout/pref_row_middle"
+            android:summary="@string/settings_external_portrait_summary"
+            android:title="@string/settings_external_portrait_title" />
+
+        <!-- How you get *out* of the player's screen lock: a gesture, so it belongs with the
+             other gestures rather than with the privacy locks, which it has nothing to do
+             with. -->
+        <ListPreference
+            android:defaultValue="SLIDER"
+            android:entries="@array/unlock_entries"
+            android:entryValues="@array/unlock_values"
+            android:key="unlock_method"
+            android:layout="@layout/pref_row_bottom"
+            android:summary="@string/settings_unlock_summary"
+            android:title="@string/settings_unlock_title" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:layout="@layout/pref_category"
+        android:title="@string/settings_privacy">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="app_lock"
+            android:layout="@layout/pref_row_top"
+            android:summary="@string/settings_app_lock_summary"
+            android:title="@string/settings_app_lock_title" />
+
+        <Preference
+            android:key="locked_folders"
+            android:layout="@layout/pref_row_middle"
+            android:title="@string/settings_locked_folders_title" />
+
+        <Preference
+            android:key="hidden_folders"
+            android:layout="@layout/pref_row_bottom"
+            android:title="@string/settings_hidden_folders_title" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:layout="@layout/pref_category"
+        android:title="@string/settings_help_title">
+
+        <Preference
+            android:key="help"
+            android:layout="@layout/pref_row_top"
+            android:summary="@string/settings_help_summary"
+            android:title="@string/settings_help_title" />
+
+        <Preference
+            android:key="reset_tips"
+            android:layout="@layout/pref_row_middle"
+            android:title="@string/settings_reset_tips" />
+
+        <Preference
+            android:key="version"
+            android:layout="@layout/pref_row_bottom"
+            android:selectable="false"
+            android:title="@string/settings_version_title" />
+    </PreferenceCategory>
+</PreferenceScreen>

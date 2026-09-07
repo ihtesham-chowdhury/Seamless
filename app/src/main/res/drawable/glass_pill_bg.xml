@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The capsule behind the toolbar's action icons.
+
+  This is a frosted surface, not a true backdrop blur. Android has no public API for blurring
+  what is behind an in-app view — RenderEffect blurs a view's own content, and
+  Window.setBackgroundBlurRadius applies to a whole window — so a real blur here is not
+  available at any price. What carries the effect instead is the vertical gradient: a touch
+  lighter at the top than the bottom, which is what makes a flat translucent shape read as a
+  pane of glass catching the light rather than as a grey rectangle.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <corners android:radius="100dp" />
+    <gradient
+        android:angle="270"
+        android:endColor="@color/glass_fill_bottom"
+        android:startColor="@color/glass_fill_top" />
+    <stroke
+        android:width="1dp"
+        android:color="@color/glass_stroke" />
+</shape>

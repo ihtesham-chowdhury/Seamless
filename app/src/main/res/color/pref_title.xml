@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The title in a settings row.
+
+  Its own colour list rather than the one a textAppearance brings, because a Material3 text
+  appearance sets a flat colour with no disabled state — and two of these rows are disabled
+  whenever the shorts feed is reading from chosen folders. Preference dims a row by calling
+  setEnabled down the view tree, which does nothing visible unless the colour has something
+  to say about it.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:alpha="0.38" android:color="?attr/colorOnSurface" android:state_enabled="false" />
+    <item android:color="?attr/colorOnSurface" />
+</selector>

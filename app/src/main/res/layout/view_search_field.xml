@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Shared by the folder list and the folder contents, so search looks the same in both.
+
+  Hidden until the toolbar's search button asks for it. It used to stand permanently under
+  the toolbar, which spent a whole row of every screen on a control that is used
+  occasionally and made the header look like a form.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="6dp"
+    android:background="@drawable/search_field_bg"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingEnd="4dp">
+
+    <ImageView
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_search" />
+
+    <EditText
+        android:id="@+id/search"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_weight="1"
+        android:autofillHints=""
+        android:background="@null"
+        android:hint="@string/search_hint"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:maxLines="1"
+        android:paddingStart="8dp"
+        android:paddingEnd="0dp"
+        android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+    <!-- Empties the field without closing search, for starting a second query. -->
+    <ImageButton
+        android:id="@+id/clear"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/action_close"
+        android:padding="8dp"
+        android:src="@drawable/ic_close"
+        android:visibility="gone" />
+</LinearLayout>

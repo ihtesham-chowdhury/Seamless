@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Touch feedback with nothing behind it.
+
+  ?attr/selectableItemBackgroundBorderless would do the same job, but its ripple is bounded
+  by the view's rectangle, so a round icon in a square button flashes a square. The oval mask
+  here clips it to a circle. Requires the view to be laid out square — a 48x40 box would draw
+  an ellipse.
+-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#40FFFFFF">
+    <item android:id="@android:id/mask">
+        <shape android:shape="oval">
+            <solid android:color="#FFFFFFFF" />
+        </shape>
+    </item>
+</ripple>

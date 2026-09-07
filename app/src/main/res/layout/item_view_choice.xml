@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One layout option in the view-options sheet. Inflated per choice, because how many
+     there are depends on the screen: two in the library, three on the shorts tab. -->
+<com.google.android.material.button.MaterialButton
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="?attr/materialButtonOutlinedStyle"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:insetTop="0dp"
+    android:insetBottom="0dp"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp" />

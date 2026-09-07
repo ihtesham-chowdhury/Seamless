@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="orientation_entries">
+        <item>Follow the video</item>
+        <item>Follow the sensor</item>
+        <item>Always portrait</item>
+        <item>Always landscape</item>
+    </string-array>
+    <string-array name="orientation_values">
+        <item>FOLLOW_VIDEO</item>
+        <item>SENSOR</item>
+        <item>PORTRAIT</item>
+        <item>LANDSCAPE</item>
+    </string-array>
+
+    <string-array name="resize_entries">
+        <item>@string/resize_fit</item>
+        <item>@string/resize_crop</item>
+        <item>@string/resize_stretch</item>
+    </string-array>
+    <string-array name="resize_values">
+        <item>FIT</item>
+        <item>CROP</item>
+        <item>STRETCH</item>
+    </string-array>
+
+    <string-array name="unlock_entries">
+        <item>Slide to unlock</item>
+        <item>Tap the four corners, clockwise</item>
+    </string-array>
+    <string-array name="unlock_values">
+        <item>SLIDER</item>
+        <item>CORNERS</item>
+    </string-array>
+
+    <string-array name="theme_entries">
+        <item>Follow system</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+    <string-array name="theme_values">
+        <item>SYSTEM</item>
+        <item>LIGHT</item>
+        <item>DARK</item>
+    </string-array>
+
+    <!-- Shorts source. Values match the ShortsSource enum's constant names. -->
+    <string-array name="shorts_source_entries">
+        <item>@string/shorts_source_folders</item>
+        <item>@string/shorts_source_device</item>
+    </string-array>
+    <string-array name="shorts_source_values">
+        <item>SELECTED_FOLDERS</item>
+        <item>WHOLE_DEVICE</item>
+    </string-array>
+
+    <!-- How long a video has to be before its position is worth remembering, in minutes. -->
+    <string-array name="resume_entries">
+        <item>@string/minutes_1</item>
+        <item>@string/minutes_5</item>
+        <item>@string/minutes_10</item>
+        <item>@string/minutes_20</item>
+        <item>@string/minutes_30</item>
+        <item>@string/minutes_60</item>
+    </string-array>
+    <string-array name="resume_values">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+
+    <!-- The landscape length cut-off, in seconds. -->
+    <string-array name="shorts_length_entries">
+        <item>@string/length_10s</item>
+        <item>@string/length_30s</item>
+        <item>@string/length_1m</item>
+        <item>@string/length_5m</item>
+    </string-array>
+    <string-array name="shorts_length_values">
+        <item>10</item>
+        <item>30</item>
+        <item>60</item>
+        <item>300</item>
+    </string-array>
+</resources>

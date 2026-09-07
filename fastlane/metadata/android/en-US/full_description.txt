@@ -1,0 +1,47 @@
+Seamless turns a folder of short vertical videos into a continuous, swipeable feed — and
+still plays ordinary long-form video properly.
+
+<b>Why it exists</b>
+
+Offline short-form video is badly served. Fast players tend to open only one file at a
+time; folder players tend to show a black frame between every clip.
+
+That gap is not a tuning problem. A conventional player owns a single decoder and, for
+every file, tears it down and sets it up again. That costs a fraction of a second even
+from local storage, and no amount of cache tweaking removes it.
+
+Seamless keeps several players alive at once and prepares the neighbouring clips while the
+current one is still playing, so swiping simply changes which one you see.
+
+<b>The feed</b>
+
+* Swipe up and down between clips with no perceptible gap
+* True shuffle — nothing repeats until everything has played, and the order differs next time
+* Play from folders you choose, or scan the whole device and filter by shape and length
+* Brightness and volume by dragging sideways, double tap to skip, hold for double speed
+
+<b>The player</b>
+
+* Clean floating controls, with elapsed and remaining time
+* Portrait clips roll into the next one; landscape and long videos return to the list
+* Fit, crop or stretch
+* Resume where you left off, for long videos only
+* Screen lock, so a phone in a pocket cannot skip ahead
+* Drag down from the top to close
+* Opening a video from another app returns you to that app
+
+<b>The library</b>
+
+* Grid or list, with search and sorting
+* Rename, move, delete and share
+* Hide folders you would rather not see
+* Lock folders behind your fingerprint, face or device PIN — a locked folder shows no
+  preview and is kept out of the feed
+
+<b>Privacy</b>
+
+Seamless has no internet permission at all. It cannot send anything anywhere, so there is
+no analytics, no advertising, no accounts and no tracking. It reads your videos for the
+only reason a video player would: to list them and play them.
+
+Free software, licensed under the GPLv3.

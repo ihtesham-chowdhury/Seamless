@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Translucent disc behind a floating control, so icons stay legible over any frame.
+
+  A ripple with an oval mask rather than a bare shape: the mask clips the touch feedback to
+  the disc, so pressing a round button no longer flashes a square. Every control that uses
+  this must be laid out square — the oval takes the view's bounds, and a 48x44 box would
+  quietly draw an ellipse.
+-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#33FFFFFF">
+    <item android:id="@android:id/mask">
+        <shape android:shape="oval">
+            <solid android:color="#FFFFFFFF" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#66000000" />
+        </shape>
+    </item>
+</ripple>
