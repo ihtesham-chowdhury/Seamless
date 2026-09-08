@@ -28,8 +28,8 @@ android {
         // 0.2.0 adds subtitles, and with them the INTERNET permission — a change to what this
         // app can do that PRIVACY.md and the manifest both name by version, so the number has to
         // be real rather than pending. The tag is still the maintainer's to push.
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.2.1"
     }
 
     signingConfigs {

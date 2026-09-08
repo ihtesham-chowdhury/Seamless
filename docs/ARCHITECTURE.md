@@ -183,6 +183,18 @@ finger and springs back if released early. Toggle in Settings → Gestures.
   in along the bottom after three failed attempts, then fades. In slider mode the
   slide-to-unlock bar is the one permanent element, because a control has to be visible to
   be usable, and it sits low and out of the way.
+- **Background work delivers its failures.** `Background` used to catch a throwable, log it and
+  return — which is fine for a query whose caller has nothing on screen waiting, and was quietly
+  catastrophic for one that has. A subtitle search that threw left its panel saying "Searching…"
+  until the app was closed: nothing was broken about the panel, it was simply never told. Every
+  lane now has an `onFailure`, it is required on the network lane, and the rule is that anything
+  showing progress must pass one. The two lanes are separate for a related reason: a request
+  sitting on a timeout must not hold up a MediaStore query queued behind it.
+- **Errors carry a technical half as well as a human one.** `SubtitleProviderException` has a
+  `detail`, and a search builds a trace as it goes — parsed title, hash, every HTTP status. The
+  panel shows the sentence and hides the trace behind Copy details. A subtitle search fails on
+  someone else's phone, network and account, and without the exchange in hand there is nothing
+  to debug from but a description.
 - **A subtitle track's id says where it came from.** Every subtitle file this app attaches to
   a media item is given an id like `seamless-sub:SAVED:0`, which Media3 hands back as
   `Format.id`; anything without that prefix came out of the container. Once subtitles are

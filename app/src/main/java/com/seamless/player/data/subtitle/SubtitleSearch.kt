@@ -2,6 +2,7 @@ package com.seamless.player.data.subtitle
 
 import android.content.Context
 import android.net.Uri
+import com.seamless.player.R
 import com.seamless.player.data.Prefs
 import com.seamless.player.data.Video
 import com.seamless.player.util.Log
@@ -47,8 +48,15 @@ class SubtitleSearch(
             val besideVideo: Uri?,
         ) : Outcome
 
-        /** Plausible candidates, best first, for the user to choose from. */
-        data class Choices(val candidates: List<SubtitleCandidate>) : Outcome
+        /**
+         * Plausible candidates, best first, for the user to choose from. [note] is set when we
+         * got here after something went wrong — an automatic download that failed — so the list
+         * does not appear out of nowhere.
+         */
+        data class Choices(
+            val candidates: List<SubtitleCandidate>,
+            val note: String? = null,
+        ) : Outcome
 
         /** The search ran and found nothing worth offering. */
         data object NoMatch : Outcome
@@ -56,8 +64,12 @@ class SubtitleSearch(
         /** Not configured, or switched off. [reason] is shown as written. */
         data class Unavailable(val reason: String) : Outcome
 
-        /** It went wrong. [message] is the provider's words where it gave any. */
-        data class Failed(val message: String) : Outcome
+        /**
+         * It went wrong. [message] is the provider's words where it gave any; [detail] is the
+         * trace behind the Copy button, which is how a failure on someone else's phone,
+         * network and account gets reported rather than described.
+         */
+        data class Failed(val message: String, val detail: String) : Outcome
     }
 
     /** A candidate turned into a file on disk. */
@@ -78,13 +90,41 @@ class SubtitleSearch(
 
     // ---- searching ----
 
+    /**
+     * Runs a search and comes back with one of five answers. Never throws.
+     *
+     * That last part is not defensive habit, it is the fix for the bug this method had: an
+     * IOException from a timed-out connection used to travel out of here, past a catch that
+     * could not see it, into an executor that logged it and returned — so the panel waiting on
+     * the result waited for ever, saying "Searching…". Everything is caught now, and everything
+     * caught becomes an outcome the caller can put on screen.
+     */
     fun find(video: Video): Outcome {
+        val trace = Trace(context, video)
+        return try {
+            search(video, trace)
+        } catch (error: Throwable) {
+            Log.e(TAG, "search failed", error)
+            trace += "unexpected: ${error.javaClass.simpleName} ${error.message.orEmpty()}"
+            Outcome.Failed(
+                context.getString(R.string.subtitle_search_failed),
+                trace.toString(),
+            )
+        }
+    }
+
+    private fun search(video: Video, trace: Trace): Outcome {
         unavailableReason()?.let { return Outcome.Unavailable(it) }
-        val provider = provider()
+        val provider = provider().also { it.trace = { line -> trace += line } }
 
         val release = ReleaseName.parse(video.name)
+        trace += "as: ${release.title}" +
+            (release.year?.let { " ($it)" } ?: "") +
+            (if (release.isEpisode) " S${release.season ?: 0}E${release.episode}" else "")
+
         val hash = OsdbHash.of(context, video.uri)
-        Log.d(TAG, "searching for '${release.title}' hash=${hash ?: "none"}")
+        trace += "hash: ${hash ?: "none — file too small, or unreadable"}"
+        trace += "want: ${prefs.subtitleSearchLanguages.joinToString(", ")}"
 
         val query = SubtitleQuery(
             release = release,
@@ -95,24 +135,33 @@ class SubtitleSearch(
         val ranked = try {
             SubtitleScoring.rank(provider.search(query), release, prefs.subtitleLanguage)
         } catch (error: SubtitleProviderException) {
-            return Outcome.Failed(error.message ?: "The subtitle search failed")
-        } catch (error: Exception) {
-            Log.e(TAG, "search failed", error)
-            return Outcome.Failed("The subtitle search could not be completed")
+            error.detail?.let { trace += it }
+            return Outcome.Failed(
+                error.message ?: context.getString(R.string.subtitle_search_failed),
+                trace.toString(),
+            )
         }
 
-        if (ranked.isEmpty()) return Outcome.NoMatch
+        if (ranked.isEmpty()) {
+            trace += "result: nothing came back"
+            return Outcome.NoMatch
+        }
 
         val best = ranked.first()
+        trace += "best: ${best.language ?: "?"} ${best.score}%" +
+            (if (best.hashMatch) " (hash match)" else "")
+
         if (prefs.subtitleAutoApply && best.isSafeToApplyAutomatically(prefs.subtitleLanguage)) {
             return try {
                 val fetched = fetch(video, best)
                 Outcome.Applied(fetched.saved, best, fetched.besideVideo)
             } catch (error: SubtitleProviderException) {
-                // The match was right; only the download failed. Fall back to the list rather
-                // than reporting nothing found, which would be a lie about what we know.
+                // The match was right; only the download failed. Offer the list rather than
+                // reporting nothing found, which would be a lie about what we know — but say
+                // what went wrong, because "here is a list" after a silent failure is confusing.
                 Log.w(TAG, "automatic download failed: ${error.message}")
-                Outcome.Choices(ranked.take(MAX_CHOICES))
+                error.detail?.let { trace += it }
+                Outcome.Choices(ranked.take(MAX_CHOICES), error.message)
             }
         }
 
@@ -121,6 +170,26 @@ class SubtitleSearch(
         if (best.confidence == Confidence.WEAK) return Outcome.NoMatch
 
         return Outcome.Choices(ranked.take(MAX_CHOICES))
+    }
+
+    /**
+     * What was tried, in order, ready to be copied into a message.
+     *
+     * Written as it goes rather than assembled at the end, so a failure half way through still
+     * carries everything that led to it. The header names the build and the provider, because
+     * the first question about any report is which version it came from.
+     */
+    private class Trace(context: Context, video: Video) {
+        private val lines = mutableListOf(
+            "Seamless ${context.appVersionName()} · OpenSubtitles",
+            "file: ${video.name}",
+        )
+
+        operator fun plusAssign(line: String) {
+            lines += line
+        }
+
+        override fun toString() = lines.joinToString("\n")
     }
 
     /**

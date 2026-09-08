@@ -52,6 +52,8 @@ The name is the goal.
 - A header that says "Shorts" and how many clips there are, and quick views for All, Recent,
   Favourites and Longest — and the view you are in is the feed you get: play from Favourites
   and the next clip is a favourite too
+- Each quick view keeps its own order. Recent by date, Longest by length, Favourites shuffled,
+  all at once — or one tap to level them
 - The tab itself is a wall of clips in three presentations: masonry, where every tile is its
   clip's own shape; a uniform two-column grid; or the list, with names and sizes. Tap one and
   the feed opens on it, with everything else still shuffled behind

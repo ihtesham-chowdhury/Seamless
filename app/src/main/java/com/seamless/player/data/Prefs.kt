@@ -312,23 +312,64 @@ class Prefs(context: Context) {
      * A single global order is wrong the moment you have two kinds of folder: the library
      * reads best by name, a camera roll by date, a folder of clips in no order at all. So
      * every screen carries its own key, direction and shuffle seed, addressed by a scope
-     * string — [SCOPE_LIBRARY] for the folder list, [SCOPE_SHORTS] for the shorts grid, and
-     * a folder's own MediaStore RELATIVE_PATH for the videos inside it.
+     * string — [SCOPE_LIBRARY] for the folder list, one per quick view on the shorts tab (see
+     * [shortsScope]), and a folder's own MediaStore RELATIVE_PATH for the videos inside it.
      *
-     * Those three namespaces cannot collide: a RELATIVE_PATH always ends in a separator,
-     * and neither constant contains one.
+     * "Screen" is finer-grained than it first looks. The shorts tab is four screens by this
+     * measure, because its four quick views are four ways of looking at the same clips and an
+     * order that suits one rarely suits the next.
+     *
+     * The namespaces cannot collide: a RELATIVE_PATH always ends in a separator, and no
+     * constant here contains one.
      *
      * A screen that has never been given an order falls back to the old global setting,
      * which is what anyone upgrading already chose, and to a sensible default beyond that.
      */
     fun sortFor(scope: String): SortSetting {
         val stored = settings.getString(KEY_SORT_KEY_PREFIX + scope, null)
+            ?: inheritsFrom(scope)?.let { settings.getString(KEY_SORT_KEY_PREFIX + it, null) }
         val key = if (stored != null) SortKey.from(stored) else defaultSortKey(scope)
-        val ascending = settings.getBoolean(
-            KEY_SORT_ASC_PREFIX + scope,
-            settings.getBoolean(KEY_SORT_ASC, false),
-        )
+
+        val fallbackAscending = inheritsFrom(scope)?.let {
+            settings.getBoolean(KEY_SORT_ASC_PREFIX + it, settings.getBoolean(KEY_SORT_ASC, false))
+        } ?: settings.getBoolean(KEY_SORT_ASC, false)
+        val ascending = settings.getBoolean(KEY_SORT_ASC_PREFIX + scope, fallbackAscending)
+
         return SortSetting(key, ascending, settings.getLong(KEY_SORT_SEED_PREFIX + scope, 0L))
+    }
+
+    /**
+     * Copies one screen's order onto others. The sheet's "use this everywhere" button.
+     *
+     * A fresh seed is drawn per scope when the key is Random, rather than copying one: four
+     * lists that shuffle identically are not four shuffles, and "apply everywhere" means the
+     * same *instruction*, not the same deal.
+     */
+    fun copySortTo(from: String, to: Collection<String>) {
+        val setting = sortFor(from)
+        settings.edit {
+            to.forEach { scope ->
+                putString(KEY_SORT_KEY_PREFIX + scope, setting.key.name)
+                putBoolean(KEY_SORT_ASC_PREFIX + scope, setting.ascending)
+                if (setting.key == SortKey.RANDOM) {
+                    putLong(KEY_SORT_SEED_PREFIX + scope, System.nanoTime() + scope.hashCode())
+                }
+            }
+        }
+    }
+
+    /**
+     * Where a scope with nothing of its own looks next.
+     *
+     * Only the shorts quick views, and only two of them. Before each view had its own order,
+     * the whole tab shared one setting under [SCOPE_SHORTS] — so All and Favourites, which
+     * genuinely used it, should carry it over rather than silently reverting to a default the
+     * user never chose. Recent and Longest did not: their order was hard-coded, and
+     * [defaultSortKey] reproduces exactly what they used to do.
+     */
+    private fun inheritsFrom(scope: String): String? = when (scope) {
+        shortsScope(ShortsFilter.ALL), shortsScope(ShortsFilter.FAVOURITES) -> SCOPE_SHORTS
+        else -> null
     }
 
     /**
@@ -346,6 +387,9 @@ class Prefs(context: Context) {
 
     private fun defaultSortKey(scope: String): SortKey = when (scope) {
         SCOPE_LIBRARY -> SortKey.from(settings.getString(KEY_FOLDER_SORT, SortKey.COUNT.name))
+        // The only quick view whose name is a claim about order. Longest first is what it
+        // meant when the order was hard-coded, and it is what it still means until changed.
+        shortsScope(ShortsFilter.LONGEST) -> SortKey.DURATION
         else -> SortKey.from(settings.getString(KEY_VIDEO_SORT, SortKey.DATE.name))
     }
 
@@ -675,8 +719,29 @@ class Prefs(context: Context) {
         /** The folder list. */
         const val SCOPE_LIBRARY = "library"
 
-        /** The shorts tab's grid of clips. */
+        /**
+         * The shorts tab, before its quick views had orders of their own.
+         *
+         * Kept as the thing [sortFor] falls back to for All and Favourites, so an order chosen
+         * under the old single setting is not lost on upgrade. Nothing writes to it any more.
+         */
         const val SCOPE_SHORTS = "shorts"
+
+        /**
+         * One order per quick view, which is the point.
+         *
+         * Sharing a single setting across All, Recent, Favourites and Longest meant sorting
+         * Favourites by date also sorted the other three by date — and the four views exist
+         * precisely because they are looked at differently. Date makes sense for Recent and not
+         * for Longest; a shuffle makes sense for Favourites and not for either.
+         *
+         * The scope strings cannot collide with a folder's, which always ends in a separator,
+         * nor with [SCOPE_LIBRARY].
+         */
+        fun shortsScope(filter: ShortsFilter) = "shorts:${filter.name}"
+
+        /** Every quick view's scope, for "use this order everywhere". */
+        fun allShortsScopes() = ShortsFilter.entries.map { shortsScope(it) }
 
         private const val KEY_THEME_MODE = "theme_mode"
         private const val KEY_ACCENT_COLOR = "accent_color"

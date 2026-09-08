@@ -6,7 +6,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.zip.GZIPInputStream
 
 /**
  * The whole of this app's networking.
@@ -34,9 +33,26 @@ object Http {
     private const val CONNECT_TIMEOUT_MS = 12_000
     private const val READ_TIMEOUT_MS = 20_000
 
-    /** A finished request: the status line and the body, whatever the status was. */
-    data class Response(val code: Int, val body: String) {
+    /** For flattening a response body onto one line in a diagnostic. */
+    private val WHITESPACE = Regex("""\s+""")
+
+    /**
+     * A finished request: the status, the body, and where it came from.
+     *
+     * [url] is carried so a failure can be reported in full without the caller having to
+     * remember what it asked for. That matters more than it sounds — the difference between
+     * "403" and "403 from /subtitles?query=the+matrix" is the difference between a bug report
+     * and a guess.
+     */
+    data class Response(val code: Int, val message: String, val body: String, val url: String) {
         val isSuccess: Boolean get() = code in 200..299
+
+        /** One line, fit for a diagnostic panel. Truncated: a body can be a whole page. */
+        fun summarise(): String {
+            val where = url.substringAfter("://").substringAfter('/')
+            val what = body.trim().replace(WHITESPACE, " ").take(180)
+            return "HTTP $code $message  /$where" + if (what.isEmpty()) "" else "  $what"
+        }
     }
 
     fun get(url: String, headers: Map<String, String> = emptyMap()): Response =
@@ -58,7 +74,7 @@ object Http {
             if (code !in 200..299) {
                 throw IOException("download failed with HTTP $code")
             }
-            return readCapped(bodyStream(connection))
+            return readCapped(connection.inputStream)
         } finally {
             connection.disconnect()
         }
@@ -79,11 +95,12 @@ object Http {
                 connection.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
             }
             val code = connection.responseCode
-            // The error stream carries the provider's own explanation of what went wrong,
-            // which is far more use to the user than "HTTP 403" on its own.
-            val stream = if (code in 200..299) bodyStream(connection) else errorStream(connection)
+            // The error stream carries the provider's own explanation, which is far more use
+            // than "HTTP 403" on its own.
+            val stream =
+                if (code in 200..299) connection.inputStream else connection.errorStream
             val text = stream?.let { String(readCapped(it), Charsets.UTF_8) }.orEmpty()
-            return Response(code, text)
+            return Response(code, connection.responseMessage.orEmpty(), text, url)
         } finally {
             connection.disconnect()
         }
@@ -100,25 +117,14 @@ object Http {
         connection.connectTimeout = CONNECT_TIMEOUT_MS
         connection.readTimeout = READ_TIMEOUT_MS
         connection.instanceFollowRedirects = true
-        connection.setRequestProperty("Accept-Encoding", "gzip")
+        // Deliberately no Accept-Encoding. HttpURLConnection adds gzip itself and decodes the
+        // response transparently — but only while the header is its own. Setting it here hands
+        // the compressed bytes back undecoded, and whether `contentEncoding` then admits to it
+        // varies by server and by CDN. Decoding it ourselves worked in the cases we could see
+        // and produced unreadable JSON in the ones we could not; letting the platform own both
+        // halves removes the question.
         headers.forEach { (name, value) -> connection.setRequestProperty(name, value) }
         return connection
-    }
-
-    private fun bodyStream(connection: HttpURLConnection): InputStream =
-        if (connection.contentEncoding.equals("gzip", ignoreCase = true)) {
-            GZIPInputStream(connection.inputStream)
-        } else {
-            connection.inputStream
-        }
-
-    private fun errorStream(connection: HttpURLConnection): InputStream? {
-        val stream = connection.errorStream ?: return null
-        return if (connection.contentEncoding.equals("gzip", ignoreCase = true)) {
-            GZIPInputStream(stream)
-        } else {
-            stream
-        }
     }
 
     private fun readCapped(stream: InputStream): ByteArray {

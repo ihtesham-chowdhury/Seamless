@@ -47,6 +47,7 @@
             app:singleSelection="true" />
 
         <TextView
+            android:id="@+id/sort_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
@@ -119,5 +120,24 @@
             android:text="@string/sort_shuffle_again"
             android:visibility="gone"
             app:icon="@drawable/ic_shuffle" />
+
+        <!--
+          Only on screens that have more than one list to apply an order to — the shorts tab,
+          whose four quick views each keep their own. Absent everywhere else, because a button
+          offering to copy a setting to nowhere is worse than no button.
+
+          A text button rather than a switch: this is an action taken once, not a mode. A switch
+          would have to mean "keep these in step from now on", which is a different and much
+          more surprising promise.
+        -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/apply_all"
+            style="?attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="6dp"
+            android:textColor="?attr/colorPrimary"
+            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>

@@ -5,6 +5,7 @@ import com.seamless.player.util.Log
 import org.json.JSONObject
 import java.io.IOException
 import java.net.URLEncoder
+import java.util.Locale
 
 /**
  * Subtitles from opensubtitles.com.
@@ -45,6 +46,43 @@ class OpenSubtitlesProvider(
 
     override val id = ID
     override val label = "OpenSubtitles"
+    override var trace: ((String) -> Unit)? = null
+
+    private fun note(line: String) {
+        trace?.invoke(line)
+        Log.d(TAG, line)
+    }
+
+    /**
+     * Every call goes through here, and every failure comes back as ours.
+     *
+     * The version before this let an IOException from a timed-out connection travel all the way
+     * out of the provider, past a `catch (SubtitleProviderException)` that could not see it, and
+     * into a background executor that logged it and returned — leaving the panel that was waiting
+     * on a result saying "Searching…" for ever. Everything the network can throw is converted at
+     * the point it is thrown, and the message says which step it was.
+     */
+    private inline fun <T> attempt(step: String, block: () -> T): T = try {
+        block()
+    } catch (error: SubtitleProviderException) {
+        throw error
+    } catch (error: IOException) {
+        // The message on a socket timeout is often just the host name, which on its own reads
+        // like nonsense; saying which step timed out is the useful half.
+        note("$step failed: ${error.javaClass.simpleName} ${error.message.orEmpty()}")
+        throw SubtitleProviderException(
+            "Could not reach OpenSubtitles. Check the connection and try again.",
+            detail = "$step: ${error.javaClass.simpleName} ${error.message.orEmpty()}",
+            cause = error,
+        )
+    } catch (error: Exception) {
+        note("$step failed: ${error.javaClass.simpleName} ${error.message.orEmpty()}")
+        throw SubtitleProviderException(
+            "The subtitle search went wrong at the $step step.",
+            detail = "$step: ${error.javaClass.simpleName} ${error.message.orEmpty()}",
+            cause = error,
+        )
+    }
 
     override fun unavailableReason(): String? =
         if (apiKey.isBlank()) "No OpenSubtitles API key yet" else null
@@ -54,18 +92,25 @@ class OpenSubtitlesProvider(
     override fun search(query: SubtitleQuery): List<SubtitleCandidate> {
         if (apiKey.isBlank()) throw SubtitleProviderException("No OpenSubtitles API key yet")
 
-        val response = Http.get(searchUrl(query), headers(authenticated = false))
-        if (!response.isSuccess) throw SubtitleProviderException(explain(response))
+        val url = searchUrl(query)
+        val response = attempt("search") { Http.get(url, headers(authenticated = false)) }
+        note("search  ${response.summarise()}")
+        if (!response.isSuccess) {
+            throw SubtitleProviderException(explain(response), detail = response.summarise())
+        }
 
         val data = runCatching { JSONObject(response.body).optJSONArray("data") }.getOrNull()
-            ?: return emptyList()
+            ?: throw SubtitleProviderException(
+                "OpenSubtitles sent something this app could not read.",
+                detail = "search returned no data array: ${response.summarise()}",
+            )
 
         val candidates = mutableListOf<SubtitleCandidate>()
         for (index in 0 until data.length()) {
             val attributes = data.optJSONObject(index)?.optJSONObject("attributes") ?: continue
             candidates += parse(attributes) ?: continue
         }
-        Log.d(TAG, "search returned ${candidates.size} candidates")
+        note("search  ${data.length()} rows, ${candidates.size} usable")
         return candidates
     }
 
@@ -81,7 +126,10 @@ class OpenSubtitlesProvider(
         if (languages.isNotEmpty()) parameters["languages"] = languages.joinToString(",")
 
         query.movieHash?.let { parameters["moviehash"] = it }
-        parameters["query"] = query.release.queryText
+        // Lower-cased because the API asks for it: its edge cache keys on the literal query
+        // string, and a request that differs only in capitalisation is a guaranteed miss — and
+        // has been reported as an outright refusal on some accounts.
+        parameters["query"] = query.release.queryText.lowercase(Locale.ROOT)
 
         if (query.release.isEpisode) {
             query.release.season?.let { parameters["season_number"] = it.toString() }
@@ -132,14 +180,8 @@ class OpenSubtitlesProvider(
      */
     override fun download(candidate: SubtitleCandidate): SubtitleDownload {
         val link = requestLink(candidate, retryOnAuthFailure = true)
-        val bytes = try {
-            Http.download(link.first, mapOf("User-Agent" to userAgent))
-        } catch (error: IOException) {
-            throw SubtitleProviderException(
-                error.message ?: "The subtitle could not be downloaded",
-                error,
-            )
-        }
+        val bytes = attempt("fetch") { Http.download(link.first, mapOf("User-Agent" to userAgent)) }
+        note("fetch   ${bytes.size} bytes")
         return SubtitleDownload(link.second, bytes)
     }
 
@@ -148,19 +190,28 @@ class OpenSubtitlesProvider(
         retryOnAuthFailure: Boolean,
     ): Pair<String, String> {
         val body = JSONObject().put("file_id", candidate.fileId).toString()
-        val response = Http.postJson("$BASE/download", headers(authenticated = true), body)
+        val response = attempt("link") {
+            Http.postJson("$BASE/download", headers(authenticated = true), body)
+        }
+        note("link    ${response.summarise()}")
 
         if (response.code == 401 && retryOnAuthFailure && credentials != null) {
             tokens.write(null)
             return requestLink(candidate, retryOnAuthFailure = false)
         }
-        if (!response.isSuccess) throw SubtitleProviderException(explain(response))
+        if (!response.isSuccess) {
+            throw SubtitleProviderException(explain(response), detail = response.summarise())
+        }
 
         val json = runCatching { JSONObject(response.body) }.getOrNull()
-            ?: throw SubtitleProviderException("The provider sent something unreadable")
+            ?: throw SubtitleProviderException(
+                "OpenSubtitles sent something this app could not read.",
+                detail = "link: ${response.summarise()}",
+            )
         val link = json.optString("link").takeIf { it.startsWith("https://") }
             ?: throw SubtitleProviderException(
                 json.optString("message").ifBlank { "The provider refused the download" },
+                detail = "link: ${response.summarise()}",
             )
         val name = json.optString("file_name").ifBlank { candidate.fileName }
         return link to name
@@ -172,6 +223,9 @@ class OpenSubtitlesProvider(
         val headers = mutableMapOf(
             "Api-Key" to apiKey,
             "Accept" to "application/json",
+            // On a GET this looks redundant and is not: the API has been observed refusing
+            // requests that do not declare it, including ones with no body to describe.
+            "Content-Type" to "application/json",
             // Required, and required to identify the application rather than a browser. A
             // request without it is refused.
             "User-Agent" to userAgent,
@@ -189,14 +243,17 @@ class OpenSubtitlesProvider(
             .put("username", account.username)
             .put("password", account.password)
             .toString()
-        val response = Http.postJson("$BASE/login", headers(authenticated = false), body)
-        if (!response.isSuccess) {
-            // Not fatal. Anonymous downloads still work, at a lower daily limit, and telling
-            // the user their sign-in failed in the middle of a subtitle search would be
-            // answering a question they did not ask.
-            Log.w(TAG, "sign-in failed: ${explain(response)}")
+        val response = runCatching {
+            Http.postJson("$BASE/login", headers(authenticated = false), body)
+        }.getOrElse { error ->
+            // Not fatal, and deliberately not thrown: anonymous downloads still work at a lower
+            // daily limit, so a sign-in that fails should cost the user a quota rather than the
+            // subtitle they asked for.
+            note("login   failed: ${error.javaClass.simpleName} ${error.message.orEmpty()}")
             return null
         }
+        note("login   ${response.summarise()}")
+        if (!response.isSuccess) return null
         val fresh = runCatching { JSONObject(response.body).optString("token") }.getOrNull()
             ?.takeIf { it.isNotBlank() }
         tokens.write(fresh)

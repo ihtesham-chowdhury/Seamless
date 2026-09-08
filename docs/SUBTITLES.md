@@ -170,6 +170,39 @@ accumulates. After the first download, playback never needs the network again.
 
 ---
 
+## When it does not work
+
+The panel says what happened, and **Copy details** puts the whole exchange on the clipboard.
+That is the thing to paste into a bug report; it looks like this:
+
+```
+Seamless 0.2.1 · OpenSubtitles
+file: The.Matrix.1999.1080p.BluRay.x264-AMIABLE.mkv
+as: The Matrix (1999)
+hash: 8e245d9679d31e12
+want: en, bn
+search  HTTP 200 OK  /api/v1/subtitles?languages=bn,en&moviehash=…  12 rows, 12 usable
+best: en 98% (hash match)
+link    HTTP 406 Not Acceptable  /api/v1/download  {"message":"download limit reached"}
+```
+
+Every line is a step, in order, so the one that failed is the one to read. A few that come up:
+
+| What it says | What it means |
+|---|---|
+| `HTTP 403` on search | The API key was refused. Check it in Settings → Subtitles. |
+| `HTTP 406` or `429` on link | The daily download limit. Anonymous is five a day per address; signing in raises it. |
+| `hash: none` | The file is under 128 KiB, or could not be opened. Matching falls back to the name, so nothing will be applied automatically. |
+| `as:` naming the wrong film | The file name did not parse. Renaming it closer to the original release is the fix; the title and the year are all a search has to go on. |
+| `SocketTimeoutException` | The connection stalled. Nothing is wrong with the setup. |
+
+**Nothing can leave the panel spinning.** Every path out of a search — success, no match, a
+refusal, a timeout, or an exception nobody predicted — ends in something on screen. That was
+not true before, and the bug it caused is the reason this section exists: `Background` used to
+log a failure and return, so the panel it was feeding was simply never told.
+
+---
+
 ## What it remembers
 
 - **Per video**: the exact track, or "off". So a film watched without subtitles stays that way.

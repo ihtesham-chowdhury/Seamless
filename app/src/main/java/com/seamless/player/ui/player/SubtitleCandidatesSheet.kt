@@ -1,8 +1,13 @@
 package com.seamless.player.ui.player
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
+import androidx.core.content.getSystemService
 import com.seamless.player.R
 import com.seamless.player.data.subtitle.Confidence
 import com.seamless.player.data.subtitle.SubtitleCandidate
@@ -21,7 +26,11 @@ import com.seamless.player.databinding.SheetSubtitleCandidatesBinding
  * results are wrong it is almost always because the file name parsed into the wrong title, and
  * seeing "The Matrix 1999" at the top of the panel explains a bad list immediately.
  */
-class SubtitleCandidatesSheet(context: Context, heading: String, searchedFor: String) {
+class SubtitleCandidatesSheet(
+    private val context: Context,
+    heading: String,
+    searchedFor: String,
+) {
 
     private val binding = SheetSubtitleCandidatesBinding.inflate(LayoutInflater.from(context))
     private val dialog = FloatingSheet.create(context, binding.root)
@@ -33,12 +42,29 @@ class SubtitleCandidatesSheet(context: Context, heading: String, searchedFor: St
         binding.subheading.visibility = if (searchedFor.isBlank()) View.GONE else View.VISIBLE
     }
 
+    /**
+     * Says so if the search has been going long enough to look stuck.
+     *
+     * The bug this replaces was a panel that said "Searching…" until the app was closed, because
+     * the failure that ended the search was never delivered. That cannot happen now — every path
+     * comes back with an outcome — but a spinner with no upper bound is a bad shape regardless,
+     * and a slow network can still leave one up for half a minute. This puts a floor under how
+     * long silence can last.
+     */
+    private val watchdog = Runnable {
+        if (binding.searching.visibility != View.VISIBLE) return@Runnable
+        binding.subheading.text = context.getString(R.string.subtitle_still_searching)
+        binding.subheading.visibility = View.VISIBLE
+    }
+
     /** Opens the panel in its searching state. */
     fun show() {
         dialog.show()
+        binding.root.postDelayed(watchdog, SLOW_MS)
     }
 
     fun dismiss() {
+        binding.root.removeCallbacks(watchdog)
         if (dialog.isShowing) dialog.dismiss()
     }
 
@@ -54,12 +80,19 @@ class SubtitleCandidatesSheet(context: Context, heading: String, searchedFor: St
      */
     fun showCandidates(
         candidates: List<SubtitleCandidate>,
+        note: String? = null,
         onPick: (SubtitleCandidate, (String?) -> Unit) -> Unit,
     ) {
+        binding.root.removeCallbacks(watchdog)
         binding.searching.visibility = View.GONE
-        binding.message.visibility = View.GONE
+        binding.copyDetails.visibility = View.GONE
         binding.listScroll.visibility = View.VISIBLE
         binding.list.removeAllViews()
+
+        // A list that appears after something failed needs to say so, or it reads as the search
+        // having simply decided not to choose.
+        binding.message.text = note.orEmpty()
+        binding.message.visibility = if (note == null) View.GONE else View.VISIBLE
 
         candidates.forEach { candidate ->
             val item = ItemSubtitleCandidateBinding.inflate(inflater, binding.list, false)
@@ -91,12 +124,32 @@ class SubtitleCandidatesSheet(context: Context, heading: String, searchedFor: St
         }
     }
 
-    /** No match, not configured, or a failure. The panel stays open so it can be read. */
-    fun showMessage(text: String) {
+    /**
+     * No match, not configured, or a failure. The panel stays open so it can be read.
+     *
+     * [detail] is the exchange behind it, offered under a Copy button rather than printed: it is
+     * the most useful thing on the panel for exactly one person and noise for everyone else.
+     */
+    fun showMessage(text: String, detail: String? = null) {
+        binding.root.removeCallbacks(watchdog)
         binding.searching.visibility = View.GONE
         binding.listScroll.visibility = View.GONE
         binding.message.visibility = View.VISIBLE
         binding.message.text = text
+
+        binding.copyDetails.visibility = if (detail == null) View.GONE else View.VISIBLE
+        if (detail != null) {
+            binding.copyDetails.setOnClickListener {
+                context.getSystemService<ClipboardManager>()?.setPrimaryClip(
+                    ClipData.newPlainText(context.getString(R.string.subtitles), detail),
+                )
+                // Android 13 and newer show their own copy confirmation; saying it twice would
+                // cover the one the system already put on screen.
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    Toast.makeText(context, R.string.info_copied, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     /** A row being fetched: its spinner replaces the information button, and taps stop. */
@@ -131,5 +184,10 @@ class SubtitleCandidatesSheet(context: Context, heading: String, searchedFor: St
             if (candidate.hearingImpaired) add(context.getString(R.string.subtitle_sdh))
         }
         return parts.joinToString(" · ")
+    }
+
+    private companion object {
+        /** Long enough that an ordinary search never reaches it. */
+        const val SLOW_MS = 12_000L
     }
 }

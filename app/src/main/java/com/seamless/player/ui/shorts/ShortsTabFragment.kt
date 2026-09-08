@@ -16,8 +16,6 @@ import com.seamless.player.data.ShortsFilter
 import com.seamless.player.data.ShortsLayout
 import com.seamless.player.data.ShortsQuery
 import com.seamless.player.data.ShortsSource
-import com.seamless.player.data.SortKey
-import com.seamless.player.data.SortSetting
 import com.seamless.player.data.Video
 import com.seamless.player.data.VideoFolder
 import com.seamless.player.databinding.FragmentShortsBinding
@@ -238,9 +236,13 @@ class ShortsTabFragment : Fragment() {
     }
 
     private fun showViewOptions() {
+        // The sheet is built per opening, so it can be scoped to whichever quick view is
+        // selected right now. In folder mode there are no quick views, and All is the scope
+        // the folder list has always been sorted by.
+        val scope = Prefs.shortsScope(if (wholeDevice) prefs.shortsFilter else ShortsFilter.ALL)
         ViewOptionsSheet(
             prefs = prefs,
-            scope = Prefs.SCOPE_SHORTS,
+            scope = scope,
             keys = SortLabels.VIDEO_KEYS,
             views = listOf(
                 ViewChoice(
@@ -260,17 +262,12 @@ class ShortsTabFragment : Fragment() {
                 showClips()
                 if (first > 0) binding?.list?.scrollToPosition(first)
             },
-            onSortChanged = {
-                // Recent and Longest carry their own order, so a sort chosen here would have
-                // nowhere to land. Snap back to the view the sheet actually governs.
-                if (prefs.shortsFilter == ShortsFilter.RECENT ||
-                    prefs.shortsFilter == ShortsFilter.LONGEST
-                ) {
-                    prefs.shortsFilter = ShortsFilter.ALL
-                    binding?.filters?.check(R.id.chip_all)
-                }
-                showClips()
-            },
+            onSortChanged = { showClips() },
+            // Only in whole-device mode: there is nothing to apply "everywhere" to when the
+            // chips are not on screen.
+            applyToAll = if (wholeDevice) Prefs.allShortsScopes() else emptyList(),
+            applyToAllLabel = R.string.sort_apply_all_views,
+            scopeLabel = if (wholeDevice) chipLabel(prefs.shortsFilter) else 0,
         ).show(requireContext())
     }
 
@@ -342,13 +339,10 @@ class ShortsTabFragment : Fragment() {
     private fun quickView(all: List<Video>): List<Video> {
         val filter = prefs.shortsFilter
         val kept = ShortsQuery.narrow(all, filter, prefs)
-        // A view that dictates an order gets it; the other two take the sheet's.
-        val sort = when (filter) {
-            ShortsFilter.RECENT -> SortSetting(SortKey.DATE, ascending = false, seed = 0L)
-            ShortsFilter.LONGEST -> SortSetting(SortKey.DURATION, ascending = false, seed = 0L)
-            ShortsFilter.ALL, ShortsFilter.FAVOURITES -> prefs.sortFor(Prefs.SCOPE_SHORTS)
-        }
-        return MediaLibrary.sortVideos(kept, sort)
+        // Each view's own order. Longest still starts longest-first and Recent newest-first —
+        // that is their default, not a rule — and either can be re-sorted without dragging the
+        // other three along, which is what sharing one setting used to do.
+        return MediaLibrary.sortVideos(kept, prefs.sortFor(Prefs.shortsScope(filter)))
     }
 
     /** An empty wall means different things depending on which chip emptied it. */
@@ -370,6 +364,14 @@ class ShortsTabFragment : Fragment() {
                 b.emptyBody.setText(R.string.shorts_empty_body)
             }
         }
+    }
+
+    /** The quick view's own name, for the heading of the sheet that sorts it. */
+    private fun chipLabel(filter: ShortsFilter): Int = when (filter) {
+        ShortsFilter.ALL -> R.string.filter_all
+        ShortsFilter.RECENT -> R.string.filter_recent
+        ShortsFilter.FAVOURITES -> R.string.filter_favourites
+        ShortsFilter.LONGEST -> R.string.filter_longest
     }
 
     private fun chipFor(filter: ShortsFilter): Int = when (filter) {

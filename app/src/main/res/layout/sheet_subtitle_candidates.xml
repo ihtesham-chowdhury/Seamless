@@ -104,5 +104,22 @@
             android:textColor="#C7FFFFFF"
             android:textSize="14sp"
             android:visibility="gone" />
+
+        <!--
+          Only appears when something actually went wrong, and it is the difference between a
+          bug that can be fixed and one that can only be described. A subtitle search fails on
+          someone else's phone, network and account; without the exchange in hand there is
+          nothing to go on but "it did not work".
+        -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/copy_details"
+            style="@style/Widget.Seamless.SheetToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="4dp"
+            android:text="@string/subtitle_copy_details"
+            android:visibility="gone" />
     </LinearLayout>
 </FrameLayout>

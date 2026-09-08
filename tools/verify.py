@@ -278,6 +278,9 @@ def check_network_isolation() -> list[str]:
     """
     problems = []
     allowed = "Http.kt"
+    # A call into the one networking file. Plain substrings rather than a
+    # pattern: there is nothing here a regex would express better.
+    http_calls = ("Http.get(", "Http.postJson(", "Http.download(")
     openers = (
         r"\bHttpURLConnection\b", r"\bHttpsURLConnection\b", r"\bopenConnection\b",
         r"\bjava\.net\.Socket\b", r"\bOkHttpClient\b", r"\bURL\(",
@@ -294,6 +297,19 @@ def check_network_isolation() -> list[str]:
                     f"util/{allowed}, which enforces https, a size cap and no main thread")
                 break
 
+    # Networking stays behind the subtitle providers. The player, the library and the feed
+    # have no business making a request, and an import here would be the first step of one
+    # arriving somewhere it cannot be reasoned about.
+    callers = "data/subtitle"
+    for path in kotlin_files():
+        if callers.replace("/", os.sep) in path or os.path.basename(path) == allowed:
+            continue
+        text = read(path)
+        if any(call in text for call in http_calls):
+            problems.append(
+                f"{os.path.basename(path)}: calls util/Http directly; requests belong in a "
+                f"subtitle provider, behind SubtitleSearch")
+
     manifest = read(os.path.join(ROOT, "app/src/main/AndroidManifest.xml"))
     if "android.permission.INTERNET" in manifest:
         if 'android:usesCleartextTraffic="false"' not in manifest:
@@ -305,6 +321,35 @@ def check_network_isolation() -> list[str]:
                 problems.append(
                     f"AndroidManifest.xml: INTERNET is declared but android:{rules} is not set, "
                     f"so the subtitle provider's credentials would be included in backups")
+    return problems
+
+
+def check_control_characters() -> list[str]:
+    """No stray control bytes in anything that ships.
+
+    Earned its place the day it was written. A patch script building Kotlin source through a
+    shell heredoc had its backslash escapes collapsed one layer too far, and a regex meant to
+    contain the two characters backslash-b ended up containing one backspace byte instead. The
+    file still parsed, the check it belonged to still reported success, and it had silently
+    stopped testing anything. Nothing about that was visible in a diff.
+
+    Tabs and newlines are fine; everything else in the C0 range is not.
+    """
+    problems = []
+    allowed = {chr(9), chr(10), chr(13)}
+    suffixes = (".kt", ".kts", ".xml", ".py", ".md", ".pro")
+    roots = (SRC, RES, os.path.join(ROOT, "tools"), os.path.join(ROOT, "docs"))
+    for root in roots:
+        for dirpath, _, files in os.walk(root):
+            for name in files:
+                if not name.endswith(suffixes):
+                    continue
+                path = os.path.join(dirpath, name)
+                for number, line in enumerate(read(path).split(chr(10)), 1):
+                    stray = [c for c in line if ord(c) < 32 and c not in allowed]
+                    if stray:
+                        codes = ", ".join("0x%02x" % ord(c) for c in sorted(set(stray)))
+                        problems.append(f"{name}:{number}: control character(s) {codes}")
     return problems
 
 
@@ -371,6 +416,7 @@ def main() -> int:
         ("Light/dark colour parity", check_night_colour_parity()),
         ("Preference summaries", check_summary_providers()),
         ("Network isolation", check_network_isolation()),
+        ("Control characters", check_control_characters()),
     ]
     warnings = [("Unused strings", check_dead_strings(declared))]
 

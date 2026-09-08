@@ -9,6 +9,32 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+- **A subtitle search that failed said "Searching…" instead of saying what went wrong.** Not a
+  slow search — a lost one. `Background` logged any exception its work threw and returned, so a
+  caller waiting on a result waited for ever; and the download step let an `IOException` from a
+  timed-out connection travel straight past the handler meant to catch it. Between them, a
+  network hiccup produced a panel that spun until the app was closed. Failure is now delivered
+  rather than swallowed, everything the network can throw is converted where it is thrown, and
+  the panel carries a **Copy details** button with the whole exchange — status codes and all — so
+  a failure on someone else's phone, network and account can be reported rather than described.
+- **Three likely causes of the failure itself, while in there.** The request now sends
+  `Content-Type: application/json`, which the API has been observed to require even on a GET;
+  the search text is lower-cased, which its cache expects; and `Accept-Encoding` is no longer set
+  by hand, which had left gzip to be decoded on our side of a fence the platform normally owns.
+- **Network requests have their own thread.** They shared one with MediaStore, so a request
+  sitting on a timeout would hold up the library scan queued behind it.
+
+### Changed
+- **Each quick view on the shorts tab keeps its own order.** Sorting Favourites by date used to
+  sort All, Recent and Longest by date too — they shared one setting, which defeated the point
+  of having four views: date suits Recent and not Longest, a shuffle suits Favourites and
+  neither of the others. Longest still opens longest-first and Recent newest-first, but that is
+  now a default rather than a rule, and either can be re-sorted on its own. The sheet names the
+  view it is sorting, and offers **Use this order for every view** for anyone who wanted them
+  level all along. An order chosen under the old shared setting carries over to All and
+  Favourites rather than being quietly reset.
+
 ### Added
 - **Subtitles.** Three sources — text tracks inside the file, companion files in the same
   folder, and an optional online lookup — behind one CC control that only appears when the

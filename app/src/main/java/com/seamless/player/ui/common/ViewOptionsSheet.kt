@@ -53,6 +53,23 @@ class ViewOptionsSheet(
     private val onViewChanged: () -> Unit,
     /** The order changed: re-sort what is already loaded. */
     private val onSortChanged: () -> Unit,
+    /**
+     * Other scopes this screen's order can be copied onto, and the wording for the offer.
+     *
+     * Empty on every screen with only one list to sort, which is all of them but the shorts
+     * tab. There the four quick views each keep their own order — the point of the change that
+     * introduced this — and levelling them by hand would be four trips through this sheet.
+     */
+    private val applyToAll: List<String> = emptyList(),
+    @StringRes private val applyToAllLabel: Int = 0,
+    /**
+     * Which list this order belongs to, named in the heading.
+     *
+     * Only set where a screen keeps more than one. "Sort by" is enough when there is one list;
+     * on the shorts tab it would be a lie of omission, because the answer applies to the quick
+     * view you happen to be looking at and not to the other three.
+     */
+    @StringRes private val scopeLabel: Int = 0,
 ) {
 
     fun show(context: Context) {
@@ -72,7 +89,37 @@ class ViewOptionsSheet(
             onSortChanged()
         }
 
+        if (scopeLabel != 0) {
+            binding.sortHeader.text =
+                context.getString(R.string.sort_by_scoped, context.getString(scopeLabel))
+        }
+        bindApplyToAll(context, binding.applyAll)
+
         dialog.show()
+    }
+
+    /**
+     * The offer to level every view onto this one.
+     *
+     * Confirms in place rather than closing: the sheet stays open through every other change
+     * here, and a button that dismissed the panel would be the one control that behaved
+     * differently. It reports what it did by becoming its own confirmation, then steps aside —
+     * pressing it twice does nothing, so there is nothing to undo.
+     */
+    private fun bindApplyToAll(context: Context, button: MaterialButton) {
+        val others = applyToAll.filter { it != scope }
+        if (others.isEmpty() || applyToAllLabel == 0) {
+            button.visibility = View.GONE
+            return
+        }
+        button.visibility = View.VISIBLE
+        button.setText(applyToAllLabel)
+        button.setOnClickListener {
+            prefs.copySortTo(scope, others)
+            button.setText(R.string.sort_applied_all_views)
+            button.isEnabled = false
+            onSortChanged()
+        }
     }
 
     /**

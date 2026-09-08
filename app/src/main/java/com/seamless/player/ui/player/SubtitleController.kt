@@ -381,7 +381,7 @@ class SubtitleController(
      * also the path every later playback takes. One route in, tested every time.
      */
     private fun fetch(video: Video, candidate: SubtitleCandidate, done: (String?) -> Unit) {
-        Background.run(
+        Background.online(
             work = {
                 try {
                     search.fetch(video, candidate)
@@ -390,9 +390,14 @@ class SubtitleController(
                     error.message ?: activity.getString(R.string.subtitle_download_failed)
                 }
             },
+            onFailure = { error ->
+                // The row's spinner is turning and only `done` stops it, so this branch is not
+                // optional: without it a failed download leaves a row spinning for ever.
+                done("${activity.getString(R.string.subtitle_download_failed)} — ${error.message}")
+            },
             then = { problem ->
                 done(problem)
-                if (problem != null) return@run
+                if (problem != null) return@online
                 pendingSelect = Pending(candidate.language, SubtitleOrigin.SAVED)
                 prefs.subtitlesOnByDefault = true
                 discover(video)

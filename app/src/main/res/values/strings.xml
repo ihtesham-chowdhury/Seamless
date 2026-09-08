@@ -88,6 +88,11 @@
     <string name="sort_order">Order</string>
     <string name="sort_descending">Descending</string>
     <string name="sort_random">Random</string>
+    <!-- Names the list being sorted, on a screen that keeps more than one order. -->
+    <string name="sort_by_scoped">Sort by · %1$s</string>
+    <!-- The shorts tab keeps an order per quick view, so this offers to level them. -->
+    <string name="sort_apply_all_views">Use this order for every view</string>
+    <string name="sort_applied_all_views">Every view now uses this order</string>
     <string name="sort_shuffle_again">Shuffle again</string>
     <string name="sort_by">Sort by</string>
     <string name="sort_title">Name</string>
@@ -293,6 +298,9 @@ Picking the folder yourself grants access to it, which gets around that restrict
     <string name="subtitle_match_weak">Uncertain match</string>
     <string name="subtitle_release_info">Release details</string>
     <string name="subtitle_download_failed">The subtitle could not be downloaded</string>
+    <string name="subtitle_search_failed">The subtitle search could not be completed</string>
+    <string name="subtitle_still_searching">Still going — a slow connection can take a moment</string>
+    <string name="subtitle_copy_details">Copy details</string>
 
     <!-- Says what to try next, because "nothing found" on its own is a dead end. -->
     <string name="subtitle_no_match">No confident match for this file.\n\nRenaming it closer to the original release usually fixes this — the title and the year are what a search has to go on. A file you already have can be added with “Add a subtitle file”.</string>

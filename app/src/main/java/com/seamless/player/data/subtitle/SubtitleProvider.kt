@@ -93,12 +93,19 @@ data class SubtitleDownload(val fileName: String, val bytes: ByteArray) {
 /**
  * Thrown for anything the user should be told about: no key, a refusal, a quota, a timeout.
  *
- * The message is shown verbatim, so it is written for a person rather than for a log. Where a
+ * [message] is shown verbatim, so it is written for a person rather than for a log. Where a
  * provider explains itself in its own response, that explanation is preferred over ours — it
  * is more likely to be current.
+ *
+ * [detail] is the technical half: the status line, the endpoint, the first part of whatever
+ * came back. It is never shown unless asked for, and it exists because the alternative to
+ * carrying it is asking someone to reproduce the problem with a logcat attached.
  */
-class SubtitleProviderException(message: String, cause: Throwable? = null) :
-    Exception(message, cause)
+class SubtitleProviderException(
+    message: String,
+    val detail: String? = null,
+    cause: Throwable? = null,
+) : Exception(message, cause)
 
 /**
  * A source of subtitles from the network.
@@ -128,6 +135,15 @@ interface SubtitleProvider {
 
     /** Ordered best-first by the provider; re-scored afterwards regardless. */
     fun search(query: SubtitleQuery): List<SubtitleCandidate>
+
+    /**
+     * Somewhere to note what happened, one line per exchange.
+     *
+     * Not logging — a log is on a device nobody can read. This is collected during a search and
+     * offered behind a Copy button when the search fails, so a problem that only happens on
+     * someone else's phone, network and account can be reported in full rather than described.
+     */
+    var trace: ((String) -> Unit)?
 
     fun download(candidate: SubtitleCandidate): SubtitleDownload
 }
