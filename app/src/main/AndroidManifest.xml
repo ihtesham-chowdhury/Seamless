@@ -15,6 +15,25 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <!--
+      Added in 0.2.0, for one feature and one only: looking up a subtitle when the user asks for
+      one by name. It is worth being blunt about what this changes, because "offline-first" was
+      and remains the point of this app.
+
+      What it does not do. Nothing contacts the network when a video is opened, when the library
+      is scanned, when the app starts, or on any schedule. There is no analytics, no crash
+      reporting, no update check and no advertising identifier — there is no code here that could
+      do any of those, and the whole of the app's networking is one file, util/Http.kt, which
+      refuses plain HTTP and refuses to run on the main thread.
+
+      What it does. From the subtitle panel, "Find subtitles" sends the video's title, year,
+      episode number and a 64-bit fingerprint of the file's first and last 64 KiB to the subtitle
+      provider configured in Settings. Off by default, and inert until the user supplies their own
+      API key. Once a subtitle is downloaded it is kept, and playback never needs the network
+      again. See PRIVACY.md and docs/SUBTITLES.md.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
       The launcher icon is a plain drawable, not the adaptive pair in mipmap-anydpi-v26.
 
       Every launcher tried drew a soft rounded plate behind the adaptive version, in default
@@ -31,10 +50,13 @@
     <application
         android:name=".SeamlessApp"
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/ic_launcher_unmasked"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Seamless">
+        android:theme="@style/Theme.Seamless"
+        android:usesCleartextTraffic="false">
 
         <activity
             android:name=".ui.MainActivity"

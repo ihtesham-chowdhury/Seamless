@@ -187,7 +187,7 @@
     <string name="help_shorts_title">In the shorts feed</string>
     <string name="help_library_title">In the library</string>
 
-    <string name="help_player_body">Tap to show the controls; tap again to put them away.\n\nDrag up and down on the left for brightness, on the right for volume. Volume carries on past 100%% into amplification, marked in amber.\n\nDrag sideways to scrub. Nothing moves until you let go, so you can change your mind.\n\nDrag down from the top to close.\n\nDouble tap the left or right side to jump ten seconds.\n\nPress and hold anywhere for 2x while held. Press and hold the speed button to drop back to normal speed and stay there.</string>
+    <string name="help_player_body">Tap to show the controls; tap again to put them away.\n\nDrag up and down on the left for brightness, on the right for volume. Volume carries on past 100%% into amplification, marked in amber.\n\nDrag sideways to scrub. Nothing moves until you let go, so you can change your mind.\n\nDrag down from the top to close.\n\nDouble tap the left or right side to jump ten seconds.\n\nPress and hold anywhere for 2x while held. Press and hold the speed button to drop back to normal speed and stay there.\n\nThe CC button appears when a video has subtitles in it, or beside it. If it is not there, Subtitles in the ⋮ menu will go looking — including online, once you have switched that on in Settings. Size, position and everything else about how they look is on the same panel, under Appearance.</string>
     <string name="help_shorts_body">The Shorts tab shows every clip it found. Masonry gives each one its own shape, Grid makes them all the same, and List brings back the names and sizes. Tap one to open the feed on it; everything else follows in a random order.\n\nSwipe up and down to move between clips. There is no gap: the next one is already decoded and waiting.\n\nDrag sideways for brightness on the left half and volume on the right.\n\nDouble tap the left or right side to jump five seconds; double tap the middle to mark a favourite. Tap once to pause.\n\nPress and hold for 2x.\n\nThe padlock locks the screen so a phone in a pocket cannot skip anything.</string>
     <string name="help_library_body">Long press a folder or a video to select it. The toolbar becomes a menu of things you can do to what you picked.\n\nPin anything to keep it at the top, whatever the sort order says.\n\nA locked folder asks for your fingerprint, face or device PIN, shows no preview, and is left out of the shorts feed and out of search.\n\nSearch from the toolbar. In the library it finds videos anywhere, not only folder names.\n\nThe button beside it sets the layout and the order: grid or list, what to sort by, which way round, or no order at all. Each folder keeps its own, so the library can be by name while a camera roll is by date.</string>
 
@@ -264,4 +264,105 @@ Picking the folder yourself grants access to it, which gets around that restrict
     <string name="hud_auto_short">AUTO</string>
 
     <string name="speed_already_normal">Already at normal speed</string>
+
+    <!--
+      Subtitles.
+
+      "In this video" rather than "Embedded", "In this folder" rather than "External": the words
+      say where the file is, which is the thing that distinguishes two rows both labelled English.
+    -->
+    <string name="subtitles">Subtitles</string>
+    <string name="audio_tracks">Audio</string>
+    <string name="subtitle_off">Off</string>
+    <string name="subtitle_origin_embedded">In this video</string>
+    <string name="subtitle_origin_beside">In this folder</string>
+    <string name="subtitle_origin_saved">Downloaded</string>
+    <string name="subtitle_forced">Forced</string>
+    <string name="subtitle_sdh">SDH</string>
+    <string name="subtitle_track_number">Track %1$d</string>
+    <string name="subtitle_unknown_language">Unknown language</string>
+
+    <string name="subtitle_find">Find subtitles</string>
+    <string name="subtitle_add_file">Add a subtitle file…</string>
+    <string name="subtitle_grant_folder">Let Seamless read this folder</string>
+    <string name="subtitle_grant_folder_detail">Then subtitles saved beside your videos are found on their own</string>
+    <string name="subtitle_searching">Searching…</string>
+    <string name="subtitle_score">%1$d%%</string>
+    <string name="subtitle_match_excellent">Excellent match</string>
+    <string name="subtitle_match_good">Good match</string>
+    <string name="subtitle_match_weak">Uncertain match</string>
+    <string name="subtitle_release_info">Release details</string>
+    <string name="subtitle_download_failed">The subtitle could not be downloaded</string>
+
+    <!-- Says what to try next, because "nothing found" on its own is a dead end. -->
+    <string name="subtitle_no_match">No confident match for this file.\n\nRenaming it closer to the original release usually fixes this — the title and the year are what a search has to go on. A file you already have can be added with “Add a subtitle file”.</string>
+    <string name="subtitle_unavailable">%1$s.\n\nSettings → Subtitles has the switch and the key. Seamless makes no network request until both are in place.</string>
+
+    <string name="subtitle_found">%1$s subtitle found</string>
+    <string name="action_undo">Undo</string>
+
+    <!-- The appearance panel. -->
+    <string name="subtitle_appearance">Appearance</string>
+    <string name="subtitle_appearance_reset">Reset</string>
+    <string name="subtitle_size">Size</string>
+    <string name="subtitle_weight">Weight</string>
+    <string name="subtitle_weight_normal">Normal</string>
+    <string name="subtitle_weight_bold">Bold</string>
+    <string name="subtitle_edge">Edge</string>
+    <string name="subtitle_edge_outline">Outline</string>
+    <string name="subtitle_edge_shadow">Shadow</string>
+    <string name="subtitle_edge_none">None</string>
+    <string name="subtitle_background">Background</string>
+    <string name="subtitle_position">Position</string>
+
+    <!-- Settings. -->
+    <string name="settings_subtitles">Subtitles</string>
+    <string name="settings_subtitle_language_title">Preferred language</string>
+    <string name="settings_subtitle_online_title">Look up subtitles online</string>
+    <string name="settings_subtitle_online_summary">Off by default. Nothing leaves the device until you tap Find subtitles on a video.</string>
+    <string name="settings_subtitle_key_title">OpenSubtitles API key</string>
+    <string name="settings_subtitle_key_missing">Not set — online search is unavailable</string>
+    <string name="settings_subtitle_key_present">Set</string>
+    <string name="settings_subtitle_key_message">Registration is free at opensubtitles.com/consumers. Seamless ships no key of its own: the terms do not allow sharing one, and a key published in an open repository is a key that stops working.\n\nThe key is stored on this device only.</string>
+    <string name="settings_subtitle_account_title">OpenSubtitles account</string>
+    <string name="settings_subtitle_account_none">Not signed in</string>
+    <string name="settings_subtitle_account_message">Only sent to OpenSubtitles’ sign-in, and only to raise the download limit. Leave both blank to stay anonymous.</string>
+    <string name="settings_subtitle_username">Username</string>
+    <string name="settings_subtitle_password">Password</string>
+    <string name="settings_subtitle_auto_title">Apply certain matches at once</string>
+    <string name="settings_subtitle_auto_summary">When the file’s own fingerprint matches an upload, use it without asking</string>
+    <string name="settings_subtitle_beside_title">Save beside the video</string>
+    <string name="settings_subtitle_beside_summary">Where you have shared the folder with Seamless, so other players find them too</string>
+    <string name="settings_subtitle_clear">Clear downloaded subtitles</string>
+    <string name="settings_subtitle_clear_summary">%1$d file(s), %2$s</string>
+    <string name="settings_subtitle_clear_none">Nothing downloaded yet</string>
+    <string name="settings_subtitle_clear_done">Downloaded subtitles removed</string>
+
+    <!-- Offered as a preferred language. Short by design: the list is a shortcut, and any
+         subtitle in any language still appears on the panel whatever this is set to. -->
+    <string name="language_en">English</string>
+    <string name="language_bn">Bengali</string>
+    <string name="language_hi">Hindi</string>
+    <string name="language_ur">Urdu</string>
+    <string name="language_ar">Arabic</string>
+    <string name="language_es">Spanish</string>
+    <string name="language_fr">French</string>
+    <string name="language_de">German</string>
+    <string name="language_pt">Portuguese</string>
+    <string name="language_ru">Russian</string>
+    <string name="language_tr">Turkish</string>
+    <string name="language_id">Indonesian</string>
+    <string name="language_ja">Japanese</string>
+    <string name="language_ko">Korean</string>
+    <string name="language_zh">Chinese</string>
+    <string name="language_ta">Tamil</string>
+    <string name="language_te">Telugu</string>
+    <string name="language_ml">Malayalam</string>
+    <string name="language_fa">Persian</string>
+    <string name="language_it">Italian</string>
+
+    <!-- Extra lines on the Info dialog, from the decoder rather than from MediaStore. -->
+    <string name="info_audio">Audio</string>
+    <string name="info_subtitles">Subtitles</string>
+    <string name="info_none">None</string>
 </resources>

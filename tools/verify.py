@@ -267,6 +267,47 @@ def check_summary_providers() -> list[str]:
     return problems
 
 
+def check_network_isolation() -> list[str]:
+    """All networking through one file, and no plain HTTP.
+
+    This app's whole position is that it does not talk to anything unless asked, and the
+    manifest says so at length. A claim like that is only worth the code that keeps it true, so:
+    exactly one file may open a connection, and if the INTERNET permission is declared at all
+    then cleartext must be switched off. Both are the kind of thing that gets broken by a
+    well-meaning one-line addition somewhere else entirely.
+    """
+    problems = []
+    allowed = "Http.kt"
+    openers = (
+        r"\bHttpURLConnection\b", r"\bHttpsURLConnection\b", r"\bopenConnection\b",
+        r"\bjava\.net\.Socket\b", r"\bOkHttpClient\b", r"\bURL\(",
+    )
+    for path in kotlin_files():
+        name = os.path.basename(path)
+        if name == allowed:
+            continue
+        text = read(path)
+        for pattern in openers:
+            if re.search(pattern, text):
+                problems.append(
+                    f"{name}: opens a network connection itself; everything must go through "
+                    f"util/{allowed}, which enforces https, a size cap and no main thread")
+                break
+
+    manifest = read(os.path.join(ROOT, "app/src/main/AndroidManifest.xml"))
+    if "android.permission.INTERNET" in manifest:
+        if 'android:usesCleartextTraffic="false"' not in manifest:
+            problems.append(
+                'AndroidManifest.xml: INTERNET is declared without '
+                'android:usesCleartextTraffic="false"')
+        for rules in ("dataExtractionRules", "fullBackupContent"):
+            if rules not in manifest:
+                problems.append(
+                    f"AndroidManifest.xml: INTERNET is declared but android:{rules} is not set, "
+                    f"so the subtitle provider's credentials would be included in backups")
+    return problems
+
+
 def check_dead_strings(declared) -> list[str]:
     used: set[str] = set()
     for base in (SRC, RES):
@@ -329,6 +370,7 @@ def main() -> int:
         ("Imports", check_imports()),
         ("Light/dark colour parity", check_night_colour_parity()),
         ("Preference summaries", check_summary_providers()),
+        ("Network isolation", check_network_isolation()),
     ]
     warnings = [("Unused strings", check_dead_strings(declared))]
 

@@ -151,15 +151,24 @@ class ShortsTabFragment : Fragment() {
         if (MainActivity.hasVideoPermission(requireContext())) load()
     }
 
-    /** Plays everything in a fresh random order. */
+    /**
+     * Plays the current quick view in a fresh random order.
+     *
+     * The chip goes with it. Shuffling "everything" from a screen showing eleven favourites
+     * would be answering a question nobody asked.
+     */
     private fun openFeed() {
-        startActivity(ShortsActivity.intent(requireContext()))
+        startActivity(ShortsActivity.intent(requireContext(), feedFilter()))
     }
 
-    /** Plays everything, starting on the clip that was tapped. */
+    /** The same feed, starting on the clip that was tapped. */
     private fun openFeedAt(video: Video) {
-        startActivity(ShortsActivity.intentAt(requireContext(), video.id))
+        startActivity(ShortsActivity.intentAt(requireContext(), video.id, feedFilter()))
     }
+
+    /** Folder mode has no chips, so it can only ever mean everything in those folders. */
+    private fun feedFilter(): ShortsFilter =
+        if (wholeDevice) prefs.shortsFilter else ShortsFilter.ALL
 
     // ---- presentation ----
 
@@ -319,27 +328,20 @@ class ShortsTabFragment : Fragment() {
         val empty = clips.isEmpty()
         b.empty.visibility = if (empty) View.VISIBLE else View.GONE
         if (empty) applyEmptyText()
-        b.toolbar.subtitle = getString(R.string.shorts_video_count, clips.size)
+        b.count.text = getString(R.string.shorts_video_count, clips.size)
     }
 
     /**
      * The selected chip, applied.
      *
-     * Recent narrows as well as orders. Ordering alone would have made it identical to All,
-     * whose default order is already newest first, and a chip that changes nothing is worse
-     * than no chip at all.
+     * Membership comes from [ShortsQuery.narrow], which the feed calls too; only the order
+     * is decided here. Recent narrows as well as orders — ordering alone would have made it
+     * identical to All, whose default order is already newest first, and a chip that changes
+     * nothing is worse than no chip at all.
      */
     private fun quickView(all: List<Video>): List<Video> {
         val filter = prefs.shortsFilter
-        val kept = when (filter) {
-            ShortsFilter.FAVOURITES -> all.filter { prefs.isFavourite(it.id) }
-            ShortsFilter.RECENT -> {
-                val since = System.currentTimeMillis() / 1000 - RECENT_WINDOW_SECONDS
-                all.filter { it.dateModified >= since }
-            }
-
-            ShortsFilter.ALL, ShortsFilter.LONGEST -> all
-        }
+        val kept = ShortsQuery.narrow(all, filter, prefs)
         // A view that dictates an order gets it; the other two take the sheet's.
         val sort = when (filter) {
             ShortsFilter.RECENT -> SortSetting(SortKey.DATE, ascending = false, seed = 0L)
@@ -389,7 +391,7 @@ class ShortsTabFragment : Fragment() {
         val b = binding ?: return
         val total = ShortsQuery.resolve(allVideos, prefs).size
         b.play.isEnabled = total > 0
-        if (!wholeDevice) b.toolbar.subtitle = getString(R.string.shorts_video_count, total)
+        if (!wholeDevice) b.count.text = getString(R.string.shorts_video_count, total)
     }
 
     override fun onDestroyView() {
@@ -408,9 +410,5 @@ class ShortsTabFragment : Fragment() {
          * as anything but ragged.
          */
         const val COLUMNS = 2
-
-        /** What "Recent" means. A month is long enough to hold a weekend's filming and
-         *  short enough that the chip is still narrowing something. */
-        const val RECENT_WINDOW_SECONDS = 30L * 24 * 60 * 60
     }
 }

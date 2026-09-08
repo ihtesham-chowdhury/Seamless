@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12 and later (android:dataExtractionRules).
+
+  Two sections, because the platform asks two different questions: what may go to the cloud, and
+  what may go straight to another device the user is holding. The answer is the same either way —
+  everything but the subtitle provider's credentials. See backup_rules.xml for the older form.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="credentials.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="credentials.xml" />
+    </device-transfer>
+</data-extraction-rules>

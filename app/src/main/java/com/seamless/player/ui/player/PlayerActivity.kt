@@ -21,9 +21,11 @@ import androidx.core.content.getSystemService
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.DefaultLoadControl
@@ -63,6 +65,14 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
     private lateinit var prefs: Prefs
 
     private var player: ExoPlayer? = null
+
+    /**
+     * Subtitles, entire.
+     *
+     * Built in onCreate rather than lazily, because it registers the two document pickers it
+     * needs and registerForActivityResult refuses to run once an activity has started.
+     */
+    private lateinit var subtitles: SubtitleController
 
     /** The folder contents, before ordering. Kept so shuffle can be toggled mid-playback. */
     private var source: List<Video> = emptyList()
@@ -125,6 +135,17 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
         controls.keepScreenOn(true)
         controls.restoreBrightness(prefs.playerBrightness)
         shuffle = prefs.folderShuffle
+        subtitles = SubtitleController(
+            activity = this,
+            prefs = prefs,
+            binding = binding,
+            playerProvider = { player },
+            onAvailabilityChanged = {
+                // The CC button exists only when there is something for it to switch on.
+                binding.btnSubtitles.visibility =
+                    if (subtitles.hasTracks()) View.VISIBLE else View.GONE
+            },
+        )
         binding.root.listener = this
         goImmersive()
         wireButtons()
@@ -192,6 +213,8 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
             showHud(getString(ResizeModes.label(next)))
         }
 
+        binding.btnSubtitles.setOnClickListener { subtitles.showSubtitleSheet() }
+
         binding.btnShuffle.setOnClickListener { toggleShuffle() }
         updateShuffleIcon()
 
@@ -241,6 +264,9 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
     private fun showChrome() {
         chromeVisible = true
         binding.root.removeCallbacks(hideChromeRunnable)
+        // A caption behind the timeline is unreadable, and moving the caption is the only fix
+        // that does not involve hoping the two never coincide.
+        subtitles.applyStyle(SubtitleController.Lift.CONTROLS)
 
         val travel = CHROME_TRAVEL_DP * resources.displayMetrics.density
         chromeViews.forEach { view ->
@@ -270,6 +296,7 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
         if (!chromeVisible) return
         chromeVisible = false
         binding.root.removeCallbacks(hideChromeRunnable)
+        subtitles.applyStyle()
 
         val travel = CHROME_TRAVEL_DP * resources.displayMetrics.density
         chromeViews.forEach { view ->
@@ -451,7 +478,16 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
 
     private fun startSinglePlayback(uri: Uri) {
         val exo = player ?: buildPlayer()
-        exo.setMediaItem(MediaItem.fromUri(uri))
+        // A file handed over by another app still gets subtitles: there is no folder to look in,
+        // but its own name is enough to search with, and anything downloaded for it is kept
+        // against the URI so it is found again next time.
+        val standIn = externalVideoStandIn()
+        if (standIn != null) {
+            subtitles.onVideoStarted(standIn)
+            exo.setMediaItem(subtitles.mediaItemFor(standIn))
+        } else {
+            exo.setMediaItem(MediaItem.fromUri(uri))
+        }
         exo.prepare()
         exo.playWhenReady = true
         applyResizeMode()
@@ -469,7 +505,12 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
 
         binding.errorMessage.visibility = View.GONE
         prefs.rememberLastPlayed(video)
-        exo.setMediaItem(MediaItem.fromUri(video.uri))
+        // The bare item, deliberately: local discovery runs on a background thread and attaches
+        // what it finds afterwards. Waiting for it here would put a directory listing between the
+        // tap and the first frame for every video, including the overwhelming majority that have
+        // no subtitle anywhere near them.
+        subtitles.onVideoStarted(video)
+        exo.setMediaItem(subtitles.mediaItemFor(video))
         exo.prepare()
 
         val resumeAt = prefs.loadPosition(video)
@@ -530,6 +571,11 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
         if (playbackState == Player.STATE_ENDED) advanceOrFinish()
     }
 
+    /** Where the CC button appears from, and where a remembered subtitle choice is applied. */
+    override fun onTracksChanged(tracks: Tracks) {
+        subtitles.onTracksChanged()
+    }
+
     /**
      * Surfaces decode failures instead of leaving a black screen, then moves on. The error
      * code is shown on purpose — it is the fastest way to identify an unsupported codec.
@@ -553,8 +599,14 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
     private fun showMoreMenu(anchor: View) {
         PopupMenu(this, anchor).apply {
             menuInflater.inflate(R.menu.player_more, menu)
+            // A list of one is not a choice. Chapters are absent for the same class of reason and
+            // a more permanent one: ExoPlayer's extractors do not surface chapter metadata for
+            // local files, so there is nothing to put behind such an entry. See docs/SUBTITLES.md.
+            menu.findItem(R.id.action_audio)?.isVisible = subtitles.hasAudioChoice()
             setOnMenuItemClickListener { item ->
                 when (item.itemId) {
+                    R.id.action_subtitles -> { subtitles.showSubtitleSheet(); true }
+                    R.id.action_audio -> { subtitles.showAudioSheet(); true }
                     R.id.action_info -> { showInfo(); true }
                     R.id.action_share -> { shareCurrent(); true }
                     else -> false
@@ -570,7 +622,14 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
      */
     private fun showInfo() {
         val video = current ?: externalVideoStandIn() ?: return
-        val details = MediaInfo.details(this, video, player?.videoFormat)
+        val exo = player
+        val details = MediaInfo.details(
+            context = this,
+            video = video,
+            format = exo?.videoFormat,
+            audio = exo?.let { describeSelected(SubtitleTracks.audioOptions(it)) },
+            subtitles = exo?.let { describeSelected(SubtitleTracks.textOptions(it)) },
+        )
         AlertDialog.Builder(this)
             .setTitle(R.string.info_title)
             .setMessage(details)
@@ -587,6 +646,26 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
             }
             .setPositiveButton(android.R.string.ok, null)
             .show()
+    }
+
+    /**
+     * "English · 5.1", or how many tracks are there when none is playing.
+     *
+     * Info is a diagnostic, so it says what is selected *and* what was available — "3 available"
+     * answers "why can I not hear the English dub" in a way that a blank line does not.
+     */
+    private fun describeSelected(options: List<SubtitleTracks.Option>): String? {
+        if (options.isEmpty()) return null
+        val selected = SubtitleTracks.selected(options)
+            ?: return getString(R.string.subtitle_track_number, options.size)
+        val index = options.indexOf(selected)
+        val label = SubtitleTracks.label(this, selected, index)
+        val detail = if (selected.group.type == C.TRACK_TYPE_AUDIO) {
+            SubtitleTracks.audioDetail(selected)
+        } else {
+            SubtitleTracks.detail(this, selected)
+        }
+        return if (detail.isBlank()) label else "$label · $detail"
     }
 
     private fun shareCurrent() {
@@ -901,6 +980,7 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
 
     override fun onDestroy() {
         savePosition()
+        subtitles.release()
         binding.root.removeCallbacks(remainingTicker)
         binding.root.removeCallbacks(hideChromeRunnable)
         binding.playerView.player = null

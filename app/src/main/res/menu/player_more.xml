@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  The overflow.
+
+  Subtitles is here as well as on the CC button, and that is the point of it: the button only
+  appears when captions already exist, so without this entry there would be no way to go looking
+  for one. Audio is hidden unless the file has more than one track — a menu item that opens a list
+  of one is a dead end.
+-->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_subtitles" android:title="@string/subtitles" />
+    <item android:id="@+id/action_audio" android:title="@string/audio_tracks" />
     <item android:id="@+id/action_info" android:title="@string/action_info" />
     <item android:id="@+id/action_share" android:title="@string/action_share" />
 </menu>

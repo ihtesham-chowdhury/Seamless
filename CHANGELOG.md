@@ -9,7 +9,50 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **Subtitles.** Three sources — text tracks inside the file, companion files in the same
+  folder, and an optional online lookup — behind one CC control that only appears when the
+  video actually has captions. What makes the online half worth having is that it matches on
+  the file's own 128 KiB fingerprint as well as its name: a fingerprint match is the same
+  encode, frame for frame, so the subtitle is correctly timed rather than merely about the
+  right film. That case is downloaded, switched on, and reported with a line of text and an
+  Undo; a merely plausible match shows a short list with what each one is and how well it
+  matches; an unlikely one says no confident match and suggests what to try, instead of
+  guessing. Off by default, and inert until you supply your own free API key — so a default
+  install still makes no network request of any kind. Details, and the reasoning, in
+  [docs/SUBTITLES.md](docs/SUBTITLES.md).
+- **Subtitle appearance, on the panel rather than in Settings.** Size, weight, edge,
+  background opacity and vertical position, applied as they move, with the caption lifted
+  into the middle of the picture while the panel is open so the effect is visible. The
+  defaults are the point: white text with a thin outline, not the opaque black bar that
+  makes subtitled films look like training videos. The caption also moves up when the
+  transport controls appear, because "never behind a control" is a requirement rather than a
+  hope.
+- **Audio track selection**, in the overflow menu, hidden when a file has only one. It came
+  free: "which audio track" and "which subtitle track" are one question asked about two
+  renderers, so they share the panel and the selection code.
+- **`INTERNET`, for the subtitle lookup and nothing else.** This is a real change to the
+  app's position and is documented as one, at length, in the manifest and in
+  [PRIVACY.md](PRIVACY.md). The whole of the app's networking is now one file that refuses
+  plain HTTP and refuses to run on the main thread; `tools/verify.py` fails the build if a
+  second file opens a connection, or if the manifest ever declares `INTERNET` without
+  cleartext disabled or without backup rules. The provider credentials are kept in their own
+  preferences file so they can be excluded from cloud backup, which they are.
+
 ### Fixed
+- **"Shorts" is back at the top left of the shorts tab.** It was a `MaterialToolbar` title,
+  and a toolbar measures its title and subtitle as one vertical group and centres that group
+  in its own bounds. With both present at Material 3's sizes the group is taller than
+  `?attr/actionBarSize`, so the overflow went above the top edge — clipping the title away
+  entirely and leaving the count sitting alone where the title should have been. It is two
+  ordinary text views now, which cannot do that at any font scale.
+- **A quick view is now the feed you get.** Tapping a clip in Favourites played that clip and
+  then everything else on the device; the same in Recent and Longest. The chip narrowed the
+  wall and nothing else, because the wall applied the filter and the feed re-resolved the
+  list from scratch without it. Membership now has exactly one definition, in `ShortsQuery`,
+  which both go through — so what you are looking at and what you get cannot drift apart
+  again. Folder mode is unchanged: it has no chips, so it can only ever mean everything in
+  the chosen folders.
 - **Settings no longer crashes the app when you open it.** The resume-threshold preference
   had both a summary provider declared in XML and a summary written in code, and
   `Preference.setSummary` throws outright on a preference that has a provider — so the whole

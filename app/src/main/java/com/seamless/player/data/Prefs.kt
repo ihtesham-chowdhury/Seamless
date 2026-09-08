@@ -74,6 +74,28 @@ enum class ShortsFilter {
     }
 }
 
+/**
+ * How subtitle text is separated from the picture behind it.
+ *
+ * Not a full caption-style editor, and deliberately so. An outline or a shadow is what makes
+ * white text readable over a bright frame; the opaque black box every other player defaults to
+ * is what makes a film look like a training video. Three answers cover it.
+ */
+enum class SubtitleEdge {
+    /** Nothing. Only sensible with a background behind the text. */
+    NONE,
+
+    /** A thin dark outline around every glyph. The default: readable over anything. */
+    OUTLINE,
+
+    /** A soft drop shadow. Gentler, and enough over most material. */
+    SHADOW;
+
+    companion object {
+        fun from(value: String?) = entries.firstOrNull { it.name == value } ?: OUTLINE
+    }
+}
+
 /** Library layout. */
 enum class LibraryView { LIST, GRID;
     companion object {
@@ -156,6 +178,17 @@ class Prefs(context: Context) {
     private val app = context.applicationContext
     private val settings = app.getSharedPreferences("settings", Context.MODE_PRIVATE)
     private val resume = app.getSharedPreferences("resume", Context.MODE_PRIVATE)
+
+    /**
+     * The subtitle provider's API key, password and session token — and nothing else.
+     *
+     * Its own file so that it can be kept out of cloud backup without taking every other setting
+     * with it. `allowBackup` is on, which is right for a theme choice and a sort order and wrong
+     * for someone's credentials: a restore onto another device would carry them along, and a key
+     * is the user's to place, not this app's to copy around. The manifest's backup rules name this
+     * file specifically. See res/xml/backup_rules.xml.
+     */
+    private val credentials = app.getSharedPreferences("credentials", Context.MODE_PRIVATE)
 
     // ---- shorts feed ----
 
@@ -485,6 +518,137 @@ class Prefs(context: Context) {
         get() = settings.getFloat(KEY_BRIGHTNESS, -1f)
         set(value) = settings.edit { putFloat(KEY_BRIGHTNESS, value) }
 
+    // ---- subtitles ----
+
+    /**
+     * The language to prefer when a video offers several, and the one to search for.
+     *
+     * English by default rather than the device language, because the default declared in
+     * settings.xml has to be a fixed string and two places computing a default is how they
+     * drift apart. The device's own language is not ignored, though: [subtitleSearchLanguages]
+     * asks for it as well, so a Bengali phone gets Bengali results without anyone changing a
+     * setting, and the preference decides which of the two wins.
+     */
+    var subtitleLanguage: String
+        get() = settings.getString(KEY_SUBTITLE_LANGUAGE, "en") ?: "en"
+        set(value) = settings.edit { putString(KEY_SUBTITLE_LANGUAGE, value) }
+
+    /**
+     * Languages to ask a provider for, preferred first.
+     *
+     * More than one on purpose. A search costs the same whether it asks for one language or
+     * three, and coming back with the wrong-language subtitle for the right encode is far more
+     * useful than coming back empty.
+     */
+    val subtitleSearchLanguages: List<String>
+        get() = listOf(subtitleLanguage, java.util.Locale.getDefault().language, "en")
+            .filter { it.isNotBlank() }
+            .distinct()
+
+    /**
+     * Whether the app may contact a subtitle provider at all.
+     *
+     * Off. This is the only switch in Seamless that turns networking on, and it stays off
+     * until someone decides otherwise — with no key configured the app cannot reach the network
+     * even if it is flipped. See PRIVACY.md.
+     */
+    var subtitleOnlineEnabled: Boolean
+        get() = settings.getBoolean(KEY_SUBTITLE_ONLINE, false)
+        set(value) = settings.edit { putBoolean(KEY_SUBTITLE_ONLINE, value) }
+
+    /** The user's own OpenSubtitles API key. Never shipped, never shared; see the provider. */
+    var subtitleApiKey: String
+        get() = credentials.getString(KEY_SUBTITLE_API_KEY, "").orEmpty().trim()
+        set(value) = credentials.edit { putString(KEY_SUBTITLE_API_KEY, value.trim()) }
+
+    /** Optional sign-in, which only raises the daily download limit. */
+    var subtitleAccountName: String
+        get() = credentials.getString(KEY_SUBTITLE_ACCOUNT, "").orEmpty().trim()
+        set(value) = credentials.edit { putString(KEY_SUBTITLE_ACCOUNT, value.trim()) }
+
+    var subtitleAccountPassword: String
+        get() = credentials.getString(KEY_SUBTITLE_PASSWORD, "").orEmpty()
+        set(value) = credentials.edit { putString(KEY_SUBTITLE_PASSWORD, value) }
+
+    /** The provider's session token, cached so we sign in at most once a day. */
+    var subtitleToken: String?
+        get() = credentials.getString(KEY_SUBTITLE_TOKEN, null)
+        set(value) = credentials.edit {
+            if (value == null) remove(KEY_SUBTITLE_TOKEN) else putString(KEY_SUBTITLE_TOKEN, value)
+        }
+
+    /** Everything the provider needs to identify us, forgotten in one go. */
+    fun clearSubtitleCredentials() = credentials.edit { clear() }
+
+    /**
+     * Whether the user has subtitles on, as a habit rather than as a per-video choice.
+     *
+     * This is what makes the player stop asking. Turn English on for episode one and it is set;
+     * episodes two to ten come up with subtitles already showing, in whichever track carries the
+     * preferred language. Turning them off sets it back. A per-video memory still overrides this,
+     * so a film deliberately watched without subtitles stays that way.
+     */
+    var subtitlesOnByDefault: Boolean
+        get() = settings.getBoolean(KEY_SUBTITLES_ON, false)
+        set(value) = settings.edit { putBoolean(KEY_SUBTITLES_ON, value) }
+
+    /**
+     * Apply a subtitle whose file hash matched, without asking first.
+     *
+     * On, because that case is not a guess: the upload was timed against this exact encode.
+     * Anything less certain still asks, whatever this is set to.
+     */
+    var subtitleAutoApply: Boolean
+        get() = settings.getBoolean(KEY_SUBTITLE_AUTO, true)
+        set(value) = settings.edit { putBoolean(KEY_SUBTITLE_AUTO, value) }
+
+    /**
+     * Also write a downloaded subtitle into the video's own folder, where other players find it.
+     *
+     * Only possible where the user has handed that folder over, which Android requires before an
+     * app may write among someone else's files. The app's own copy is written either way, so this
+     * changes who else can see the subtitle rather than whether it works here.
+     */
+    var subtitleSaveBeside: Boolean
+        get() = settings.getBoolean(KEY_SUBTITLE_BESIDE, true)
+        set(value) = settings.edit { putBoolean(KEY_SUBTITLE_BESIDE, value) }
+
+    // ---- subtitle appearance ----
+
+    /**
+     * A multiplier on Media3's own text size, not an absolute size.
+     *
+     * Subtitle text has to scale with the video's height or it is wrong on every screen but
+     * the one it was tuned on, so the underlying value is a fraction of the view. This is how
+     * much bigger or smaller than the sensible default the user wants it.
+     */
+    var subtitleTextScale: Float
+        get() = settings.getFloat(KEY_SUBTITLE_SCALE, 1f)
+        set(value) = settings.edit { putFloat(KEY_SUBTITLE_SCALE, value.coerceIn(0.7f, 1.8f)) }
+
+    var subtitleBold: Boolean
+        get() = settings.getBoolean(KEY_SUBTITLE_BOLD, false)
+        set(value) = settings.edit { putBoolean(KEY_SUBTITLE_BOLD, value) }
+
+    /** 0 means no box at all, which is the default and the whole point. */
+    var subtitleBackgroundOpacity: Int
+        get() = settings.getInt(KEY_SUBTITLE_BACKGROUND, 0)
+        set(value) = settings.edit { putInt(KEY_SUBTITLE_BACKGROUND, value.coerceIn(0, 100)) }
+
+    var subtitleEdge: SubtitleEdge
+        get() = SubtitleEdge.from(settings.getString(KEY_SUBTITLE_EDGE, null))
+        set(value) = settings.edit { putString(KEY_SUBTITLE_EDGE, value.name) }
+
+    /**
+     * How far off the bottom of the picture the text sits, as a fraction of the height.
+     *
+     * The default clears the transport controls, which is the position that matters: subtitles
+     * that jump when the controls appear are worse than subtitles that always sit a little high.
+     */
+    var subtitleBottomPadding: Float
+        get() = settings.getFloat(KEY_SUBTITLE_PADDING, 0.08f)
+        set(value) = settings.edit { putFloat(KEY_SUBTITLE_PADDING, value.coerceIn(0.02f, 0.30f)) }
+
     // ---- resume positions ----
 
     private fun eligibleForResume(durationMs: Long) =
@@ -552,6 +716,20 @@ class Prefs(context: Context) {
         private const val KEY_LAST_PLAYED_ID = "last_played_id"
         private const val KEY_LAST_PLAYED_FOLDER = "last_played_folder"
         private const val KEY_LAST_PLAYED_NAME = "last_played_name"
+        private const val KEY_SUBTITLE_LANGUAGE = "subtitle_language"
+        private const val KEY_SUBTITLE_ONLINE = "subtitle_online"
+        private const val KEY_SUBTITLE_API_KEY = "subtitle_api_key"
+        private const val KEY_SUBTITLE_ACCOUNT = "subtitle_account"
+        private const val KEY_SUBTITLE_PASSWORD = "subtitle_password"
+        private const val KEY_SUBTITLE_TOKEN = "subtitle_token"
+        private const val KEY_SUBTITLES_ON = "subtitles_on_by_default"
+        private const val KEY_SUBTITLE_AUTO = "subtitle_auto_apply"
+        private const val KEY_SUBTITLE_BESIDE = "subtitle_save_beside"
+        private const val KEY_SUBTITLE_SCALE = "subtitle_text_scale"
+        private const val KEY_SUBTITLE_BOLD = "subtitle_bold"
+        private const val KEY_SUBTITLE_BACKGROUND = "subtitle_background_opacity"
+        private const val KEY_SUBTITLE_EDGE = "subtitle_edge"
+        private const val KEY_SUBTITLE_PADDING = "subtitle_bottom_padding"
         private const val DEFAULT_RESUME_MINUTES = 10
     }
 }

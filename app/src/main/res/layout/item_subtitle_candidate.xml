@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One subtitle on offer.
+
+  Language first, because it is the thing being chosen between. Then the release and how well it
+  matches, in words: "WEB-DL · Excellent match" tells you what to do with the number beside it,
+  and the number alone would not.
+
+  The raw release string — `The.Matrix.1999.1080p.BluRay.x264-AMIABLE` — is behind the ⓘ. It is
+  the most useful line here for anyone who recognises their own file in it and the ugliest thing
+  on the panel for everyone else, so it is one tap away rather than on show.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/ripple_sheet_row"
+    android:orientation="vertical"
+    android:paddingStart="8dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="8dp"
+    android:paddingBottom="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/language"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="#FFFFFFFF"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/quality"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="#8AFFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="#D9FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/info"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="4dp"
+            android:alpha="0.7"
+            android:background="@drawable/ripple_borderless_circle"
+            android:contentDescription="@string/subtitle_release_info"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_info" />
+
+        <ProgressBar
+            android:id="@+id/busy"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="6dp"
+            android:indeterminateTint="#FFFFFFFF"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/release"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="monospace"
+        android:textColor="#75FFFFFF"
+        android:textIsSelectable="true"
+        android:textSize="11sp"
+        android:visibility="gone" />
+</LinearLayout>

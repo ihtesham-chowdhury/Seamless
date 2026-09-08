@@ -2,6 +2,7 @@ package com.seamless.player.ui.settings
 
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,10 +21,14 @@ import com.seamless.player.data.AccentColor
 import com.seamless.player.data.Prefs
 import com.seamless.player.data.ShortsSource
 import com.seamless.player.data.ThemeMode
+import com.seamless.player.data.subtitle.SubtitleStore
+import com.seamless.player.databinding.DialogSubtitleAccountBinding
+import com.seamless.player.databinding.DialogSubtitleKeyBinding
 import com.seamless.player.ui.common.AccentColors
 import com.seamless.player.ui.common.AppLock
 import com.seamless.player.ui.common.ThemeManager
 import com.seamless.player.ui.help.HelpActivity
+import com.seamless.player.util.appVersionName
 import com.seamless.player.util.applyFloatingNavInset
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -96,6 +101,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         wireShortsSource()
+        wireSubtitles()
 
         findPreference<Preference>("clear_resume")?.setOnPreferenceClickListener {
             prefs.clearAllPositions()
@@ -126,7 +132,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
         updateLockedSummary()
 
-        findPreference<Preference>("version")?.summary = versionName()
+        findPreference<Preference>("version")?.summary = requireContext().appVersionName()
     }
 
     /**
@@ -149,12 +155,94 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    /** Whatever this build says it is; there is nowhere else on screen that says. */
-    private fun versionName(): String = runCatching {
-        requireContext().packageManager
-            .getPackageInfo(requireContext().packageName, 0)
-            .versionName
-    }.getOrNull().orEmpty()
+    // ---- subtitles ----
+
+    /**
+     * The three rows that hold something rather than toggle something.
+     *
+     * All three write through [Prefs] rather than letting the preference machinery persist them:
+     * the key and the password live in a separate file that is excluded from backup, and "clear"
+     * is an action rather than a value.
+     */
+    private fun wireSubtitles() {
+        findPreference<Preference>("subtitle_api_key")?.setOnPreferenceClickListener {
+            showApiKeyDialog()
+            true
+        }
+        findPreference<Preference>("subtitle_account")?.setOnPreferenceClickListener {
+            showAccountDialog()
+            true
+        }
+        findPreference<Preference>("subtitle_clear")?.setOnPreferenceClickListener {
+            SubtitleStore(requireContext()).clear()
+            toast(getString(R.string.settings_subtitle_clear_done))
+            updateSubtitleSummaries()
+            true
+        }
+        updateSubtitleSummaries()
+    }
+
+    private fun updateSubtitleSummaries() {
+        findPreference<Preference>("subtitle_api_key")?.setSummary(
+            if (prefs.subtitleApiKey.isBlank()) R.string.settings_subtitle_key_missing
+            else R.string.settings_subtitle_key_present
+        )
+
+        findPreference<Preference>("subtitle_account")?.summary =
+            prefs.subtitleAccountName.ifBlank {
+                getString(R.string.settings_subtitle_account_none)
+            }
+
+        val store = SubtitleStore(requireContext())
+        val held = store.count()
+        findPreference<Preference>("subtitle_clear")?.summary = if (held == 0) {
+            getString(R.string.settings_subtitle_clear_none)
+        } else {
+            getString(
+                R.string.settings_subtitle_clear_summary,
+                held,
+                Formatter.formatFileSize(requireContext(), store.totalBytes()),
+            )
+        }
+    }
+
+    private fun showApiKeyDialog() {
+        val binding = DialogSubtitleKeyBinding.inflate(layoutInflater)
+        binding.key.setText(prefs.subtitleApiKey)
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.settings_subtitle_key_title)
+            .setView(binding.root)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val fresh = binding.key.text?.toString().orEmpty().trim()
+                if (fresh != prefs.subtitleApiKey) {
+                    // A different key is a different consumer, so the session token that came
+                    // from the old one is worthless and would only produce a puzzling refusal.
+                    prefs.subtitleToken = null
+                }
+                prefs.subtitleApiKey = fresh
+                updateSubtitleSummaries()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun showAccountDialog() {
+        val binding = DialogSubtitleAccountBinding.inflate(layoutInflater)
+        binding.username.setText(prefs.subtitleAccountName)
+        binding.password.setText(prefs.subtitleAccountPassword)
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.settings_subtitle_account_title)
+            .setView(binding.root)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                prefs.subtitleAccountName = binding.username.text?.toString().orEmpty()
+                prefs.subtitleAccountPassword = binding.password.text?.toString().orEmpty()
+                // Signing in as somebody else, or out altogether, invalidates the old token.
+                prefs.subtitleToken = null
+                updateSubtitleSummaries()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
 
     private fun updateLockedSummary() {
         findPreference<Preference>("locked_folders")?.summary =

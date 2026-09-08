@@ -183,6 +183,37 @@ finger and springs back if released early. Toggle in Settings → Gestures.
   in along the bottom after three failed attempts, then fades. In slider mode the
   slide-to-unlock bar is the one permanent element, because a control has to be visible to
   be usable, and it sits low and out of the way.
+- **A subtitle track's id says where it came from.** Every subtitle file this app attaches to
+  a media item is given an id like `seamless-sub:SAVED:0`, which Media3 hands back as
+  `Format.id`; anything without that prefix came out of the container. Once subtitles are
+  handed to Media3, the player's own track list is the only thing that knows what exists, and
+  a table kept alongside it would have to be held in step through every prepare, rebuild and
+  recycle. The id survives all of that for free. See `data/subtitle/LocalSubtitles.kt` and
+  [SUBTITLES.md](SUBTITLES.md).
+- **Subtitles are attached after playback has started, not before.** Local discovery is file
+  I/O, and putting a directory listing between the tap and the first frame would tax every
+  video for the benefit of the few that have a subtitle beside them. So the player prepares a
+  bare media item, discovery runs on a background thread, and *only if it finds something* is
+  the item rebuilt with the subtitles attached and re-prepared at the position already
+  reached. The re-prepare costs a frame or two on a local file and never happens at all in
+  the common case.
+- **The shorts feed gets a byte-for-byte unchanged media item when there is nothing to
+  attach.** A `MediaItem` carrying subtitle configurations becomes a merging source rather
+  than a single one, and `DefaultPreloadManager` is the most delicate thing in this codebase.
+  The feed therefore reads the subtitle store once for the entire feed — one directory
+  listing, almost always empty — and calls `MediaItem.fromUri` exactly as before for every
+  clip that has none. It deliberately does not look in each clip's own folder: that would be
+  a listing per page during scrolling.
+- **All networking is one file, and that is enforced.** `util/Http.kt` is the only place a
+  connection is opened; it refuses anything but https, refuses to run on the main thread, and
+  caps every response. `tools/verify.py` fails on a second file that opens a connection, and
+  on an `INTERNET` declaration without cleartext disabled or without backup rules. The
+  guarantee in PRIVACY.md is only worth the check that keeps it true.
+- **The subtitle confidence scale has two bands, enforced rather than hoped for.** A file-hash
+  match is floored at 92 and everything else capped at 87, so the top band is reachable only
+  by a match on the encode itself. That is what lets the app apply one automatically without
+  asking, and it is why the number shown next to a candidate cannot claim more than the
+  evidence behind it. See `data/subtitle/SubtitleScoring.kt`.
 - **Masonry tiles are measured from metadata, not from thumbnails.** MediaStore gives every
   clip a rotation-corrected width and height, so `ShortsTileAdapter` can set a tile's height
   at bind time and the picture arrives into a space that is already the right shape. Sizing

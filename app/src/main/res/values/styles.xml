@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Widget styles for the player's floating panels.
+
+  These exist because the player runs on Material's own dark theme with no accent overlay
+  applied — the accent colour is a browsing-UI idea, and a purple slider over someone's film
+  would be a peculiar thing to insist on. So the panels are drawn in white on glass, like every
+  other control in the player, and that means the handful of Material widgets used there need
+  telling. Everything is a literal colour for the same reason the player's other chrome is.
+-->
+<resources>
+
+    <!-- One segment of a segmented control: Normal / Bold, None / Outline / Shadow. -->
+    <style name="Widget.Seamless.SheetToggle" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textColor">@color/sheet_toggle_text</item>
+        <item name="backgroundTint">@color/sheet_toggle_bg</item>
+        <item name="strokeColor">#4DFFFFFF</item>
+        <item name="rippleColor">#33FFFFFF</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">42dp</item>
+    </style>
+
+    <!-- Size and position. White, so it reads as part of the player rather than of Material. -->
+    <style name="Widget.Seamless.SheetSlider" parent="Widget.Material3.Slider">
+        <item name="thumbColor">#FFFFFFFF</item>
+        <item name="trackColorActive">#FFFFFFFF</item>
+        <item name="trackColorInactive">#40FFFFFF</item>
+        <item name="haloColor">#33FFFFFF</item>
+        <item name="labelBehavior">gone</item>
+    </style>
+
+    <!-- A heading inside a floating panel: small, spaced, and quiet. -->
+    <style name="TextAppearance.Seamless.SheetLabel" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textColor">#99FFFFFF</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+</resources>

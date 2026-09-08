@@ -138,6 +138,67 @@
             android:title="@string/settings_clear_resume" />
     </PreferenceCategory>
 
+    <!--
+      Subtitles.
+
+      How they *look* is not here, deliberately. Size, weight and position are decided by looking
+      at them over the film, so they live on the player's own appearance panel, one tap from the CC
+      button, where every change can be seen as it is made. What is here is the part you set once.
+    -->
+    <PreferenceCategory
+        android:layout="@layout/pref_category"
+        android:title="@string/settings_subtitles">
+
+        <ListPreference
+            android:defaultValue="en"
+            android:entries="@array/subtitle_language_entries"
+            android:entryValues="@array/subtitle_language_values"
+            android:key="subtitle_language"
+            android:layout="@layout/pref_row_top"
+            android:title="@string/settings_subtitle_language_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <!-- The only switch in the app that turns networking on. Off, and documented in
+             PRIVACY.md; with no key set below it, flipping it still reaches nothing. -->
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="subtitle_online"
+            android:layout="@layout/pref_row_middle"
+            android:summary="@string/settings_subtitle_online_summary"
+            android:title="@string/settings_subtitle_online_title" />
+
+        <!-- No summary and no provider on either of these two: the fragment writes what is
+             actually stored, and setSummary throws on a preference that has a provider. -->
+        <Preference
+            android:key="subtitle_api_key"
+            android:layout="@layout/pref_row_middle"
+            android:title="@string/settings_subtitle_key_title" />
+
+        <Preference
+            android:key="subtitle_account"
+            android:layout="@layout/pref_row_middle"
+            android:title="@string/settings_subtitle_account_title" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="subtitle_auto_apply"
+            android:layout="@layout/pref_row_middle"
+            android:summary="@string/settings_subtitle_auto_summary"
+            android:title="@string/settings_subtitle_auto_title" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="subtitle_save_beside"
+            android:layout="@layout/pref_row_middle"
+            android:summary="@string/settings_subtitle_beside_summary"
+            android:title="@string/settings_subtitle_beside_title" />
+
+        <Preference
+            android:key="subtitle_clear"
+            android:layout="@layout/pref_row_bottom"
+            android:title="@string/settings_subtitle_clear" />
+    </PreferenceCategory>
+
     <PreferenceCategory
         android:layout="@layout/pref_category"
         android:title="@string/settings_gestures">

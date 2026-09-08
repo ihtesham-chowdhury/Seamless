@@ -28,8 +28,21 @@ object MediaInfo {
         return if (parts.isEmpty()) "unknown format" else parts.joinToString(" · ")
     }
 
-    /** The full breakdown shown by the Info action. */
-    fun details(context: Context, video: Video, format: Format?): String {
+    /**
+     * The full breakdown shown by the Info action.
+     *
+     * [audio] and [subtitles] are passed in already worded rather than read from the player here.
+     * Track selection lives with the player, and pulling it into this file would mean a
+     * diagnostic helper reaching into the playback layer to answer a question the caller had
+     * already answered.
+     */
+    fun details(
+        context: Context,
+        video: Video,
+        format: Format?,
+        audio: String? = null,
+        subtitles: String? = null,
+    ): String {
         val lines = mutableListOf<String>()
         lines += line(context, R.string.info_name, video.name)
         lines += line(
@@ -60,6 +73,14 @@ object MediaInfo {
         lines += line(
             context, R.string.info_bitrate,
             if (bitrate > 0) "${bitrate / 1000} kbps" else "—",
+        )
+        lines += line(
+            context, R.string.info_audio,
+            audio?.takeIf { it.isNotBlank() } ?: context.getString(R.string.info_none),
+        )
+        lines += line(
+            context, R.string.info_subtitles,
+            subtitles?.takeIf { it.isNotBlank() } ?: context.getString(R.string.info_none),
         )
         return lines.joinToString("\n")
     }

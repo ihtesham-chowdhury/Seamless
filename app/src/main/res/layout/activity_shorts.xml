@@ -61,6 +61,23 @@
             android:padding="12dp"
             android:src="@drawable/ic_aspect_ratio" />
 
+        <!--
+          Captions in the feed are embedded tracks and anything already downloaded, so this is
+          absent for almost every clip and present for the few that have them. No online lookup
+          here: a search built on release names has nothing to work with on IMG_20240817.mp4, and
+          offering it would be offering a button that always fails.
+        -->
+        <ImageButton
+            android:id="@+id/btn_subtitles"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/circle_control_bg"
+            android:contentDescription="@string/subtitles"
+            android:padding="12dp"
+            android:src="@drawable/ic_closed_caption"
+            android:visibility="gone" />
+
         <ImageButton
             android:id="@+id/btn_lock"
             android:layout_width="48dp"

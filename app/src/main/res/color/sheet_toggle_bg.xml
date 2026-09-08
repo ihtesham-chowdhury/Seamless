@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A segmented control on the player's dark glass panels.
+
+  Selected is a solid white fill rather than a tinted outline: over a moving picture, a
+  difference in stroke colour is not a difference anyone can see at a glance, and the whole
+  point of a segmented control is that its state is legible without reading it.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="#FFFFFFFF" android:state_checked="true" />
+    <item android:color="#00FFFFFF" />
+</selector>

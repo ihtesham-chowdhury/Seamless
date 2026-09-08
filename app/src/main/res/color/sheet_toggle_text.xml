@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Inverted against sheet_toggle_bg: dark on the white fill, white on the clear one. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="#FF16161A" android:state_checked="true" />
+    <item android:color="#FFFFFFFF" />
+</selector>

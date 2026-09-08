@@ -9,14 +9,17 @@ import android.widget.ImageView
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.Tracks
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.ui.SubtitleView
 import androidx.recyclerview.widget.RecyclerView
 import com.seamless.player.R
 import com.seamless.player.data.Video
 import com.seamless.player.databinding.PageShortBinding
 import com.seamless.player.ui.common.LevelHudView
 import com.seamless.player.ui.common.MediaInfo
+import com.seamless.player.ui.common.SubtitleStyles
 import com.seamless.player.util.Log
 import com.seamless.player.util.ScreenControls
 import com.seamless.player.util.Thumbnails
@@ -59,6 +62,12 @@ class ShortsAdapter(
 
         /** Marks or unmarks the clip at [index]; reports what it now is. */
         fun onFavouriteToggled(index: Int): Boolean
+
+        /** The clip at [index] now knows what tracks it has, so the CC button can decide. */
+        fun onTextTracksKnown(index: Int)
+
+        /** Subtitle appearance, read per page as it attaches. */
+        fun subtitleStyle(view: SubtitleView)
     }
 
     /** The page the user is actually looking at. Only this one plays. */
@@ -143,6 +152,16 @@ class ShortsAdapter(
         attached.forEach { it.applyResizeMode() }
     }
 
+    /**
+     * The player driving the page the user is looking at, if it has one.
+     *
+     * The feed's subtitle panel needs a player to read tracks off and to select on, and the pool
+     * means there is no single long-lived one to hold a reference to. Asking the attached pages
+     * which of them is in focus is the only answer that cannot go stale.
+     */
+    fun focusedPlayer(): ExoPlayer? =
+        attached.firstOrNull { it.index == focusedPosition }?.currentPlayer
+
     /** Called by the activity when it is going away, so no player is left holding a surface. */
     fun releaseAll() {
         attached.toList().forEach { it.releasePlayer() }
@@ -179,6 +198,9 @@ class ShortsAdapter(
     ) : RecyclerView.ViewHolder(binding.root), GestureOverlayLayout.Listener, Player.Listener {
 
         private var player: ExoPlayer? = null
+
+        /** For the feed's subtitle panel; null while this page is waiting for a player. */
+        val currentPlayer: ExoPlayer? get() = player
 
         /** Read by the adapter when deciding which waiting page to serve first. */
         var index: Int = RecyclerView.NO_POSITION
@@ -232,6 +254,15 @@ class ShortsAdapter(
                     ),
                 )
             }
+        }
+
+        /**
+         * Captions in the feed are whatever the container carries, plus anything already
+         * downloaded for the clip. Reported upward so the CC button can appear for the handful of
+         * clips that have any and stay away for the rest.
+         */
+        override fun onTracksChanged(tracks: Tracks) {
+            if (index != RecyclerView.NO_POSITION) host.onTextTracksKnown(index)
         }
 
         /** Redraws the thin position bar four times a second while playing. */
@@ -328,6 +359,9 @@ class ShortsAdapter(
             exo.playWhenReady = false
             exo.prepare()
             binding.playerView.player = exo
+            // Per page, because each PlayerView has its own subtitle view and a style set on one
+            // of them says nothing about the next.
+            binding.playerView.subtitleView?.let { host.subtitleStyle(it) }
 
             // Recomputed rather than trusted: a page can be handed a player after the focus
             // has already moved onto it, and the old code left such a page paused for ever.

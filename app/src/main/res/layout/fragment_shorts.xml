@@ -14,18 +14,55 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <!--
+      The title and the count, as ordinary text rather than a toolbar's title and subtitle.
+
+      A MaterialToolbar was the obvious way to match the library's header, and it is what
+      this was. It does not survive a subtitle at this height: Toolbar measures its title and
+      subtitle as one vertical group and centres that group in its own bounds, and the group
+      is taller than ?attr/actionBarSize once both are present at Material 3's sizes. The
+      overflow goes half above the top edge, which clipped "Shorts" away entirely and left
+      the count sitting alone where the title should have been. Nothing about that gets safer
+      at a larger font scale, and there is no title-and-subtitle behaviour here worth
+      inheriting, so the two lines are laid out directly.
+    -->
+    <LinearLayout
+        android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:title="@string/tab_shorts">
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="?attr/actionBarSize"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="10dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Always "Shorts", in both source modes. Which clips the tab is drawing from
+                 is a detail of the tab; it is not a different screen. -->
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_shorts"
+                android:textAppearance="?attr/textAppearanceTitleLarge" />
+
+            <TextView
+                android:id="@+id/count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.7"
+                android:textAppearance="?attr/textAppearanceBodySmall" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/toolbar_actions"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="10dp"
             android:background="@drawable/glass_pill_bg"
             android:gravity="center_vertical"
             android:orientation="horizontal"
@@ -57,7 +94,7 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_shuffle" />
         </LinearLayout>
-    </com.google.android.material.appbar.MaterialToolbar>
+    </LinearLayout>
 
     <!--
       The quick views. Scrolls sideways rather than wrapping, so the row is always one line

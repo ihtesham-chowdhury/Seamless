@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 11 and earlier (android:fullBackupContent).
+
+  Everything is backed up except the subtitle provider's credentials. A theme, a sort order and a
+  set of favourites are exactly what a restore should bring back; an API key and a password are
+  not — those belong to the person and the device they were entered on, and copying them onto a
+  new phone is not this app's decision to make. The equivalent rules for Android 12 and later are
+  in data_extraction_rules.xml.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="credentials.xml" />
+</full-backup-content>

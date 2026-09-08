@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The floating panel the player's sheets are drawn on.
+
+  Not the standard bottom-sheet surface, which is opaque, square across the top and edge to
+  edge. This one is inset on all sides, rounded all round, and translucent enough that the
+  video keeps playing visibly around it — the same treatment as the circular floating controls,
+  at the size of a panel.
+
+  A vertical gradient rather than a flat fill, for the same reason as the toolbar's capsule:
+  Android has no public backdrop blur for an in-app view, so what carries "glass" is a surface
+  that is lighter where the light would fall. See glass_pill_bg.xml.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <corners android:radius="26dp" />
+    <gradient
+        android:angle="270"
+        android:endColor="#F51A1A1E"
+        android:startColor="#EB2A2A31" />
+    <stroke
+        android:width="1dp"
+        android:color="#26FFFFFF" />
+</shape>

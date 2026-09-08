@@ -85,4 +85,57 @@
         <item>60</item>
         <item>300</item>
     </string-array>
+
+    <!--
+      Languages offered as a preference, ordered by who is likely to be reading this.
+
+      Not every language there is: the setting picks which of several tracks to prefer, and a
+      list of two hundred would be a worse way to answer that than a list of twenty. Anything not
+      here still plays, still appears on the subtitle panel, and is still searched for — the
+      device’s own language is always included in a search alongside this one.
+    -->
+    <string-array name="subtitle_language_entries">
+        <item>@string/language_en</item>
+        <item>@string/language_bn</item>
+        <item>@string/language_hi</item>
+        <item>@string/language_ur</item>
+        <item>@string/language_ar</item>
+        <item>@string/language_es</item>
+        <item>@string/language_fr</item>
+        <item>@string/language_de</item>
+        <item>@string/language_pt</item>
+        <item>@string/language_ru</item>
+        <item>@string/language_tr</item>
+        <item>@string/language_id</item>
+        <item>@string/language_ja</item>
+        <item>@string/language_ko</item>
+        <item>@string/language_zh</item>
+        <item>@string/language_ta</item>
+        <item>@string/language_te</item>
+        <item>@string/language_ml</item>
+        <item>@string/language_fa</item>
+        <item>@string/language_it</item>
+    </string-array>
+    <string-array name="subtitle_language_values">
+        <item>en</item>
+        <item>bn</item>
+        <item>hi</item>
+        <item>ur</item>
+        <item>ar</item>
+        <item>es</item>
+        <item>fr</item>
+        <item>de</item>
+        <item>pt</item>
+        <item>ru</item>
+        <item>tr</item>
+        <item>id</item>
+        <item>ja</item>
+        <item>ko</item>
+        <item>zh</item>
+        <item>ta</item>
+        <item>te</item>
+        <item>ml</item>
+        <item>fa</item>
+        <item>it</item>
+    </string-array>
 </resources>
