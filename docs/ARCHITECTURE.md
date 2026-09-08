@@ -183,6 +183,13 @@ finger and springs back if released early. Toggle in Settings → Gestures.
   in along the bottom after three failed attempts, then fades. In slider mode the
   slide-to-unlock bar is the one permanent element, because a control has to be visible to
   be usable, and it sits low and out of the way.
+- **The subtitle matcher's pure half is executable, and gets executed.** `ReleaseName` and
+  `SubtitleScoring` touch nothing Android, so `tools/subtitle_probe.py` compiles a `main()`
+  against the type-checker's own output and runs them over twenty real release names. That is
+  not gold-plating: the two worst bugs shipped in this package were a recursive builder that
+  threw from a static initialiser and a year regex that read a title as a release year, and
+  neither is visible to a compiler, a wiring check or a reading. Anything added to
+  `data/subtitle/` that does not need a `Context` should be reachable from the probe.
 - **Background work delivers its failures.** `Background` used to catch a throwable, log it and
   return — which is fine for a query whose caller has nothing on screen waiting, and was quietly
   catastrophic for one that has. A subtitle search that threw left its panel saying "Searching…"

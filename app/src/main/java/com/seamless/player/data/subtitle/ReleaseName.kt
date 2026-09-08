@@ -126,7 +126,14 @@ object ReleaseName {
             }
         }
 
-        val yearMatch = YEAR.find(stem)
+        // The *last* year in the name, not the first.
+        //
+        // Titles contain years — "1917", "Blade Runner 2049", "2012" — and taking the first
+        // match makes the film's own name its release year and leaves the rest of the name in
+        // the title. The release year is always the later token in those cases, because the
+        // title comes first. A title with a year after the release year would defeat this, and
+        // is rare enough to be the right thing to get wrong.
+        val yearMatch = YEAR.findAll(stem).lastOrNull()
         val year = yearMatch?.groupValues?.get(1)?.toIntOrNull()
         if (yearMatch != null && (cutAt < 0 || yearMatch.range.first < cutAt)) {
             cutAt = yearMatch.range.first
@@ -139,6 +146,9 @@ object ReleaseName {
         val titleSource = if (brackets.isNotEmpty() && cutAt < 0) {
             DASH_EPISODE.replace(withoutBrackets, "")
         } else {
+            // cutAt == 0 means the name opens with its own year or episode number and has no
+            // title before it. Cutting there would leave nothing, so the whole name is kept —
+            // a poor title is still a better search than an empty one.
             if (cutAt > 0) stem.substring(0, cutAt) else stem
         }
 
@@ -176,7 +186,12 @@ object ReleaseName {
      * year has usually already cut the name at the right place anyway.
      */
     private fun cleanTitle(raw: String): String {
-        val spaced = raw.replace('.', ' ').replace('_', ' ').replace('-', ' ')
+        // Brackets go too. "Movie (2019).mkv" cuts at the year, which is inside the bracket, and
+        // leaves a dangling "(" on the end of the title — which then gets searched for.
+        val spaced = raw
+            .replace('.', ' ').replace('_', ' ').replace('-', ' ')
+            .replace('(', ' ').replace(')', ' ')
+            .replace('[', ' ').replace(']', ' ')
         val words = spaced.split(' ').filter { it.isNotBlank() }.toMutableList()
         while (words.isNotEmpty() && words.last().lowercase(Locale.ROOT) in NOISE) {
             words.removeAt(words.lastIndex)

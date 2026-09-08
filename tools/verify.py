@@ -353,6 +353,37 @@ def check_control_characters() -> list[str]:
     return problems
 
 
+def check_shadowed_builders() -> list[str]:
+    """A local function that shadows the receiver it was meant to call.
+
+    Written the day it cost two rounds of testing. Inside a buildMap block, a helper declared
+    as `fun put(code, vararg names)` shadows MutableMap.put, so the `put(it, code)` in its body
+    called itself: infinite recursion in a static initialiser, throwing a StackOverflowError.
+    An Error is not an Exception, so it walked past every handler on the way out and every later
+    touch of that object failed with NoClassDefFoundError instead. Nothing about the symptom
+    pointed at the cause, and neither the compiler nor a type-check has anything to say about it.
+
+    The rule is narrow on purpose: a *local* function — indented past a class body — named after
+    a method of one of the receivers a builder block supplies. Renaming it is always the fix, so
+    a false positive costs one word.
+    """
+    trap = ("put", "add", "set", "remove", "get", "clear", "append", "plusAssign")
+    problems = []
+    for path in kotlin_files():
+        for number, line in enumerate(read(path).split(chr(10)), 1):
+            stripped = line.lstrip()
+            if not stripped.startswith("fun "):
+                continue
+            if len(line) - len(stripped) < 8:
+                continue  # a member of a class, which shadows nothing
+            name = stripped[4:].split("(")[0].strip()
+            if name in trap:
+                problems.append(
+                    f"{os.path.basename(path)}:{number}: local fun '{name}' shadows the "
+                    f"builder method of the same name; give it a different name")
+    return problems
+
+
 def check_dead_strings(declared) -> list[str]:
     used: set[str] = set()
     for base in (SRC, RES):
@@ -417,6 +448,7 @@ def main() -> int:
         ("Preference summaries", check_summary_providers()),
         ("Network isolation", check_network_isolation()),
         ("Control characters", check_control_characters()),
+        ("Shadowed builders", check_shadowed_builders()),
     ]
     warnings = [("Unused strings", check_dead_strings(declared))]
 

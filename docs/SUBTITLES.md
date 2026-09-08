@@ -342,3 +342,7 @@ rebuild and recycle, and the id survives all of it for free.
 | Never fetch the same thing twice | downloads are named by a hash of their bytes; a subtitle in the store stops the search running again |
 | No expensive work while scrolling | the feed does no per-page storage work at all |
 | https only, one file | `util/Http.kt` refuses anything else; `tools/verify.py` refuses a second file that opens a connection |
+
+The parser and the scorer are run rather than reasoned about: `python tools/subtitle_probe.py`
+puts twenty real release names through them and prints what each one became. Add a name to it
+when one parses badly — that is the fastest route from a bad match to a fix.

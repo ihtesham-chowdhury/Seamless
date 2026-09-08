@@ -10,6 +10,22 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Fixed
+- **Subtitles did not work at all, and the reason was four lines of table-building.** The
+  language table was built inside a `buildMap` block by a helper declared as
+  `fun put(code, vararg names)` — which shadows `MutableMap.put`, so the `put(it, code)` in its
+  body called itself. Infinite recursion in a static initialiser, throwing a
+  `StackOverflowError`; and an `Error` is not an `Exception`, so it walked past every handler on
+  the way out and every later touch of that object failed with `NoClassDefFoundError` instead.
+  Nothing about the symptoms pointed anywhere near it: online search reported a generic failure
+  and local subtitle files silently never appeared, because the first thing either does is ask
+  what language something is in. Found by running the code rather than reading it —
+  `tools/subtitle_probe.py` is new and does exactly that, and `tools/verify.py` now refuses a
+  local function named after a method of the builder it sits inside.
+- **"Blade Runner 2049 (2017)" was a film from 2049.** The parser took the first four-digit year
+  in a name, which is the title's own whenever a title contains one — so `1917.2019.720p` was
+  searched for as "1917 2019 720p WEBRip x264 AAC" from 1917. It takes the last one now, which
+  is right in every case where a title carries a year, and trailing brackets are stripped so
+  `Movie (2019).mkv` no longer searches for `Movie (`.
 - **A subtitle search that failed said "Searching…" instead of saying what went wrong.** Not a
   slow search — a lost one. `Background` logged any exception its work threw and returned, so a
   caller waiting on a result waited for ever; and the download step let an `IOException` from a

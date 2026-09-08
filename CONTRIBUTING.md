@@ -60,9 +60,17 @@ There is no test suite yet — adding one would be a welcome contribution. Until
    run Gradle. It invokes the Kotlin compiler directly against `android.jar` and the
    dependency jars in the Gradle cache, generating stand-ins for `R`, `BuildConfig` and
    the view-binding classes from the same resources AGP reads. It will not build an APK
-   and does not replace step 3, but it catches wrong types and calls to library methods
+   and does not replace step 4, but it catches wrong types and calls to library methods
    that do not exist. Needs a JDK and an installed SDK platform; nothing else.
-2. `python tools/svg_to_vector.py <source.svg> <target.xml> [size_dp]` for any other SVG
+2. `python tools/subtitle_probe.py` if you touched anything in `data/subtitle/`. It compiles a
+   small `main()` against the classes step 1 produced and *runs* the file-name parser and the
+   scorer over twenty real release names. This is the only check here that executes code, and
+   it exists because the two worst bugs in that package could not have been caught by anything
+   that does not: a recursive builder that threw a `StackOverflowError` from a static
+   initialiser, and a year regex that read "Blade Runner 2049" as a 2049 film. Neither is a
+   type error and neither is a wiring error. Run `tools/typecheck.py` first — the probe uses
+   its output.
+3. `python tools/svg_to_vector.py <source.svg> <target.xml> [size_dp]` for any other SVG
    that has to become a drawable — do not retype path data by hand.
    `python tools/icon_from_svg.py` if you changed `art/icon.svg`, then
    `python tools/icon_preview.py` and `python tools/ui_preview.py` if you touched the
@@ -70,10 +78,10 @@ There is no test suite yet — adding one would be a welcome contribution. Until
    `build/preview/`. The icon one reads the real drawables; the UI one is a *port* of the
    `onDraw` maths into SVG, so it can drift from the Kotlin — it is for judging shape and
    proportion at the extremes, not for proving correctness.
-3. `./gradlew assembleDebug` must pass.
-4. Install on a real device. Emulator video decode is not representative, and much of this
+4. `./gradlew assembleDebug` must pass.
+5. Install on a real device. Emulator video decode is not representative, and much of this
    app is about decode timing.
-5. If you touched the feed, verify the thing it exists for: record the screen at 60 fps and
+6. If you touched the feed, verify the thing it exists for: record the screen at 60 fps and
    count black frames between clips. The target is one. "Feels fast" is not a measurement.
 
 ## Commits and pull requests
