@@ -163,8 +163,14 @@ is ever built.
 **5. Build the release APK.**
 
 ```bash
-./gradlew clean assembleRelease
+./gradlew assembleRelease
 ```
+
+Not `clean assembleRelease`. On Windows, `clean` deletes `app/build`, and Windows refuses to
+delete a directory any process has open — which Android Studio does, continuously, for a
+project it has loaded. It fails with `Unable to delete directory` and names a folder that
+looks unrelated to what you asked for. It also achieves nothing: the release variant's own
+outputs are the only thing that could be stale, and Gradle rebuilds those anyway.
 
 Output: `app/build/outputs/apk/release/app-release.apk`. With no `keystore.properties` it
 comes out unsigned and named `app-release-unsigned.apk` — if that is what you have, stop and
@@ -230,6 +236,8 @@ twice.
 | A dotted style name with no `parent` | `resource style/… not found`, `failed linking references` | AAPT2 infers a parent by dropping the last name segment. Use `parent=""` to opt out |
 | Missing `buildConfig = true` | `Unresolved reference: BuildConfig` | Off by default since AGP 8 |
 | Referencing `exo_*` drawables from Media3 | Lint `PrivateResource`, or a missing resource | The Media3 AAR marks nothing public. Use `@+id/` for its ids and ship your own drawables |
+| `gradlew clean` on Windows | `Unable to delete directory 'app\build'` | Windows will not delete a directory another process has open, and Android Studio holds one for every loaded project. Drop `clean`, or close Studio |
+| A `.ps1` with an em dash, no BOM | `Unexpected token '}'`, `string is missing the terminator` | Windows PowerShell 5.1 decodes a BOM-less file as the ANSI codepage. An em dash's last byte becomes U+201D, which PowerShell accepts as a closing quote. Keep helper scripts ASCII |
 
 Before bumping **any** AndroidX dependency, check what compileSdk its AAR demands:
 
