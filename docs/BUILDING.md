@@ -89,12 +89,24 @@ build. Publishing means `assembleRelease`, and `assembleRelease` means a keystor
 Release builds are unsigned unless you provide a keystore. Nothing about signing is
 committed, and `.gitignore` refuses `*.jks`, `*.keystore` and `keystore.properties`.
 
-Create a keystore once:
+Create a keystore once — and *once* is the whole point, because this key becomes the app's
+identity for the rest of its life. `keytool` comes with the JDK; on Windows it is not usually
+on the PATH, but Android Studio ships one at
+`C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe`.
 
 ```bash
 keytool -genkey -v -keystore seamless-release.jks \
-  -keyalg RSA -keysize 2048 -validity 10000 -alias seamless
+  -keyalg RSA -keysize 4096 -validity 10000 -alias seamless
 ```
+
+4096 rather than the more commonly copied 2048: signing happens once per release, so the extra
+work costs nothing measurable, and the key has to outlive every guess anyone is making now
+about how long 2048 stays respectable. 10000 days is a little over 27 years, comfortably past
+the 2033 floor Google Play imposes on upload keys.
+
+Keep the file **outside the repository**. `.gitignore` refuses `*.jks` already, but a key that
+was never in the working tree cannot be committed by an unlucky `git add -A` from a future
+version of the ignore file.
 
 Then create `keystore.properties` **in the project root**:
 
@@ -113,6 +125,14 @@ source.
 > identify an app by its signing key. Lose it and you cannot ship an update to existing
 > users — you would have to publish under a new application id, and everyone would have to
 > reinstall.
+
+One thing to know before the first APK goes out, because it is easier to plan for than to
+undo. If Seamless later joins Google Play, Play App Signing re-signs uploads with a key Google
+holds, and the resulting install carries a different signature from the APKs published here.
+The two cannot update each other: someone who installed from GitHub and later installs from
+Play has to uninstall first, and vice versa. That is not a reason to avoid either — F-Droid
+builds and signs its own way too — only a reason to expect it and to say so on the release
+page rather than to be asked about it.
 
 ---
 
@@ -160,7 +180,9 @@ apksigner verify --print-certs app/build/outputs/apk/release/app-release.apk
 
 The first line must show the versionCode and versionName from step 2. The certificate's
 SHA-256 must be **the same as the last release's** — a different key means no existing
-install can be updated, only uninstalled and replaced.
+install can be updated, only uninstalled and replaced. On the first signed release there is
+nothing to compare it with, so write the fingerprint down instead: it is what every later
+release is checked against.
 
 **7. Install it over the previous version on a real device** and open it once. This is the
 step that catches a ProGuard rule that was needed and is not there: `isMinifyEnabled` is on
