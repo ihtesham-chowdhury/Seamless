@@ -1,0 +1,9 @@
+Subtitles, done properly.
+
+One CC control, always in the same place, saying whether a subtitle is playing without a badge — and no second entry hiding in the menu.
+
+The panel scrolls its track list only, so Find subtitles, Choose subtitle file and Appearance no longer slide off the bottom of the screen.
+
+One subtitle per language per video, and a quiet delete on anything Seamless downloaded for you.
+
+Looking a subtitle up online is still off by default and still needs your own free API key.

@@ -9,6 +9,16 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+Nothing yet.
+
+---
+
+## [0.2.3] — 2026-09-10
+
+Subtitles, and then the three rounds of fixing them that the first attempt needed. The
+engine landed in 0.2.0 and did not work at all until 0.2.2; this is the first version where
+the whole feature — finding a subtitle, choosing one, being rid of one — is worth using.
+
 ### Changed
 - **One CC control, always in the same place, with its state on its face.** Subtitles used to be
   reachable from the button *and* from the overflow menu, because the button only appeared once a
@@ -343,5 +353,6 @@ First release. Everything below is new.
 - A watchdog catches the silent case where a clip decodes but never renders a frame
 - Decoder fallback enabled, so a decoder that refuses a clip is not the end of it
 
-[Unreleased]: https://github.com/ihtesham-chowdhury/Seamless/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/ihtesham-chowdhury/Seamless/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/ihtesham-chowdhury/Seamless/releases/tag/v0.2.3
 [0.1.0]: https://github.com/ihtesham-chowdhury/Seamless/releases/tag/v0.1.0

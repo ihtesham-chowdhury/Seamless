@@ -71,19 +71,16 @@ nothing about what it is or which build it came from:
 cp app/build/outputs/apk/debug/app-debug.apk seamless-0.1.0-debug.apk
 ```
 
-To hang it off a GitHub release rather than sending the file directly:
-
-1. `git tag -a v0.1.0 -m "0.1.0" && git push origin v0.1.0`
-2. On GitHub: **Releases → Draft a new release**, choose the tag, and drag the renamed APK
-   into the attachments box.
-
 CI already builds a debug APK on every push and uploads it as a workflow artifact, so
 anyone with repository access can download one without building anything themselves.
 
-A **release** APK (`./gradlew assembleRelease`) is smaller and minified, but with no
-`keystore.properties` present it comes out unsigned, and Android will not install an
-unsigned APK. For one friend testing on one phone, debug is the right answer; signing
-matters when you publish.
+**A debug APK is for testing and never for publishing.** It is signed with the Android debug
+key, which is the same on every machine on earth and ships with the SDK — so anyone can build
+an "update" to it that a phone will accept. It also has minification off, `BuildConfig.DEBUG`
+true (which is what silences logging in release builds), and is roughly three times the size.
+Worse than any of that: a phone will not replace a debug-signed install with a properly signed
+one, so the first person you hand it to has to uninstall before they can ever have a real
+build. Publishing means `assembleRelease`, and `assembleRelease` means a keystore.
 
 ---
 
@@ -116,6 +113,86 @@ source.
 > identify an app by its signing key. Lose it and you cannot ship an update to existing
 > users — you would have to publish under a new application id, and everyone would have to
 > reinstall.
+
+---
+
+## Cutting a release
+
+In order. Steps 1 to 4 are this repository; 5 to 8 are the APK; 9 and 10 are GitHub.
+
+**1. Everything is committed and the checks pass.**
+
+```bash
+python tools/verify.py && python tools/typecheck.py && python tools/subtitle_probe.py
+```
+
+**2. `versionCode` and `versionName` in `app/build.gradle.kts` are the version you mean.**
+`versionCode` must go up by at least one every single time, and never down: it is the only
+number Android compares when deciding whether one APK may replace another. `versionName` is
+the one humans read and is compared by nothing.
+
+**3. `CHANGELOG.md` has a section for it** — `## [x.y.z] — YYYY-MM-DD` rather than
+`[Unreleased]` — with a fresh empty `[Unreleased]` above it and the two link references at
+the bottom of the file updated.
+
+**4. `fastlane/metadata/android/en-US/changelogs/<versionCode>.txt` exists.** One file per
+versionCode, named by the number and not by the name, **500 characters maximum** — F-Droid
+truncates silently past that. Only tagged versions need one, because only a tagged version
+is ever built.
+
+**5. Build the release APK.**
+
+```bash
+./gradlew clean assembleRelease
+```
+
+Output: `app/build/outputs/apk/release/app-release.apk`. With no `keystore.properties` it
+comes out unsigned and named `app-release-unsigned.apk` — if that is what you have, stop and
+go back to [Signing a release](#signing-a-release).
+
+**6. Check the APK is what you think it is** before it leaves the machine. Both tools are in
+`$ANDROID_HOME/build-tools/<version>/`:
+
+```bash
+aapt2 dump badging app/build/outputs/apk/release/app-release.apk | head -3
+apksigner verify --print-certs app/build/outputs/apk/release/app-release.apk
+```
+
+The first line must show the versionCode and versionName from step 2. The certificate's
+SHA-256 must be **the same as the last release's** — a different key means no existing
+install can be updated, only uninstalled and replaced.
+
+**7. Install it over the previous version on a real device** and open it once. This is the
+step that catches a ProGuard rule that was needed and is not there: `isMinifyEnabled` is on
+for release and off for debug, so a release build can fail in ways nothing before this point
+would have shown.
+
+**8. Rename it.** `app-release.apk` says nothing to whoever downloads it:
+
+```bash
+cp app/build/outputs/apk/release/app-release.apk seamless-0.2.3.apk
+```
+
+**9. Tag it, and push the tag.** The tag is what the changelog links point at and what
+F-Droid watches:
+
+```bash
+git push origin main
+git tag -a v0.2.3 -m "Seamless 0.2.3"
+git push origin v0.2.3
+```
+
+**10. Publish the release.** On GitHub: **Releases → Draft a new release**, choose the tag
+that is already there, paste the changelog section as the notes, and attach the renamed APK.
+Or in one command, if you have the `gh` CLI:
+
+```bash
+gh release create v0.2.3 seamless-0.2.3.apk --title "Seamless 0.2.3" --notes-file notes.md
+```
+
+> The keystore is the release. Everything else here can be done again; a lost signing key
+> cannot, and it ends the app's ability to update itself for everyone who already has it.
+> Back up the `.jks` and its passwords somewhere that survives this computer.
 
 ---
 
