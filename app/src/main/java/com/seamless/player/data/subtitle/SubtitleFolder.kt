@@ -120,6 +120,32 @@ object SubtitleFolder {
         }
     }
 
+    /**
+     * Deletes a companion subtitle sitting beside a video. Returns whether it went.
+     *
+     * Guarded twice, because this is the one place in the app that removes a file the user put
+     * there rather than one the app wrote. The name has to belong to the video it was listed
+     * under, and the delete has to go through whichever route can actually reach it: a granted
+     * tree gets a DocumentFile, the legacy path gets a plain File, and neither is tried on a
+     * URI of the other kind.
+     *
+     * Does file I/O. Never call this on the main thread.
+     */
+    fun deleteCompanion(context: Context, videoName: String, uri: Uri, fileName: String): Boolean {
+        if (!SubtitleNames.belongsTo(videoName, fileName)) {
+            Log.w("SubtitleFolder", "refusing to delete $fileName: not a companion of $videoName")
+            return false
+        }
+        return runCatching {
+            when (uri.scheme) {
+                "file" -> uri.path?.let { java.io.File(it).delete() } ?: false
+                else -> DocumentFile.fromSingleUri(context, uri)?.delete() ?: false
+            }
+        }.onFailure {
+            Log.w("SubtitleFolder", "cannot delete $fileName: ${it.message}")
+        }.getOrDefault(false)
+    }
+
     /** Keeps the grant across restarts. Without this it lasts until the process dies. */
     fun remember(context: Context, treeUri: Uri) {
         runCatching {

@@ -1,62 +1,76 @@
 package com.seamless.player.ui.player
 
+import android.app.Dialog
 import android.content.Context
-import android.graphics.Color
+import android.graphics.Point
+import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.DecelerateInterpolator
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.seamless.player.R
 
 /**
- * A panel that floats over the video instead of replacing it.
+ * A panel that floats over the video instead of being pulled out of the bottom of it.
  *
- * `BottomSheetDialog` gets used for the drag, the scrim and the dismissal, all of which are
- * worth having, and then three of its defaults are undone:
+ * This was a `BottomSheetDialog` and is not any more, and the difference is the whole point.
+ * A bottom sheet is bottom-anchored by construction: it can be given a margin, but it still
+ * belongs to the edge of the screen, still stretches the full width, and still reads as a
+ * drawer attached to the frame. What it is meant to be is a card resting on top of the
+ * picture, clear of every edge, with the film continuing around it. Those are different
+ * objects and no amount of margin turns one into the other.
  *
- * - **The opaque surface.** The sheet's own container is painted transparent so the layout's
- *   inset, rounded, translucent panel is what you see — video visible all the way round it,
- *   rather than a card wedged against the bottom of the screen.
- * - **The collapsed state.** A sheet that opens half-way and waits to be dragged is right for a
- *   long scrolling list and wrong for a short one; these open fully and stay there.
+ * Three decisions are worth stating:
+ *
+ * - **Where it sits.** Against the end edge and the bottom edge, inset from both. The inset is
+ *   the entire difference between a card resting on the picture and a drawer attached to the
+ *   frame, and it is what was missing. On a phone held upright the width cap is wider than the
+ *   screen, so the horizontal inset centres it; on a wide screen it hugs the side the CC button
+ *   is on and leaves the picture — and the transport controls — visible beside it. One rule,
+ *   right in both. Bottom-anchored rather than centred so the caption can still be lifted clear
+ *   of it while the appearance panel is open, which is the only way to see what a caption style
+ *   actually looks like.
+ * - **How big it may get.** Capped in width, and its scrolling part capped as a share of the
+ *   screen. A panel allowed to grow is a settings page with a video behind it.
  * - **The system bars.** This is the one that is not cosmetic. Showing any dialog over an
  *   immersive activity hands focus to a new window, and a focused window that has not asked to
  *   be immersive brings the status and navigation bars back — over a film, mid-sentence. The
- *   fix is the documented one: create the window unfocusable so the bars stay put, show it, hide
- *   the bars on the dialog's own window as well, then restore focus so the panel can be touched.
- *
- * One thing is added rather than undone: the panel grows very slightly out of the top-right
- * corner as it arrives, which is where the control that opened it lives. It is a scale and a
- * fade on the content view only — the sheet's own slide is left alone, and the two compose
- * because they touch different properties. The effect is small on purpose. What it has to say
- * is "this control expanded", not "a dialog has appeared".
+ *   fix is the documented one: create the window unfocusable so the bars stay put, show it,
+ *   hide the bars on the dialog's own window as well, then restore focus so it can be touched.
  */
 internal object FloatingSheet {
 
-    fun create(context: Context, content: View): BottomSheetDialog {
-        val dialog = BottomSheetDialog(context)
+    fun create(context: Context, content: View): Dialog {
+        val dialog = FloatingDialog(context, content)
         dialog.setContentView(content)
+        dialog.setCanceledOnTouchOutside(true)
+
+        val insetPx = context.resources.getDimensionPixelSize(R.dimen.sheet_side_inset)
+        val bottomPx = context.resources.getDimensionPixelSize(R.dimen.sheet_bottom_inset)
+        val maxWidth = context.resources.getDimensionPixelSize(R.dimen.sheet_max_width)
+        val screenWidth = screenSize(context).x
 
         dialog.window?.let { window ->
             // Keep the scrim light: the point of a floating panel is that the film carries on
             // behind it, and a standard dim would put it behind frosted grey.
             window.setDimAmount(0.18f)
+            window.setLayout(
+                minOf(screenWidth - insetPx * 2, maxWidth),
+                WindowManager.LayoutParams.WRAP_CONTENT,
+            )
+            window.setGravity(Gravity.END or Gravity.BOTTOM)
+            // x and y are offsets from the gravity edges on a floating window, which is how the
+            // card gets air underneath it rather than sitting on the bottom of the screen.
+            window.attributes = window.attributes.apply {
+                x = insetPx
+                y = bottomPx
+            }
             window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
         }
 
-        // The sheet's own container, which Material paints with colorSurface. Set now rather
-        // than posted: setContentView has already attached it, and a posted call would show one
-        // frame of opaque card before the panel appeared.
-        (content.parent as? View)?.setBackgroundColor(Color.TRANSPARENT)
-        dialog.behavior.skipCollapsed = true
-
         dialog.setOnShowListener {
-            // Expanded here rather than before showing, because the behavior settles its own
-            // state as the sheet is laid out and would overwrite an earlier assignment.
-            dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-            growFromControl(content)
+            dialog.animateIn()
             val window = dialog.window ?: return@setOnShowListener
             WindowInsetsControllerCompat(window, window.decorView).apply {
                 hide(WindowInsetsCompat.Type.systemBars())
@@ -68,32 +82,83 @@ internal object FloatingSheet {
         return dialog
     }
 
-    /**
-     * The panel's arrival, pivoted on the corner the control sits in.
-     *
-     * Deliberately not a window animation. `BottomSheetDialog` moves the sheet itself through
-     * its behavior rather than through the window, so a window animation would be a second
-     * thing sliding at the same time; scaling and fading the content view leaves translation to
-     * the behavior and the two never meet. Both properties are hardware-accelerated, which
-     * matters here more than usual — this runs over decoding video.
-     */
-    private fun growFromControl(content: View) {
-        content.pivotX = content.width.toFloat()
-        content.pivotY = 0f
-        content.alpha = 0f
-        content.scaleX = OPENING_SCALE
-        content.scaleY = OPENING_SCALE
-        content.animate()
-            .alpha(1f)
-            .scaleX(1f)
-            .scaleY(1f)
-            .setDuration(OPEN_MS)
-            .setInterpolator(DecelerateInterpolator(1.6f))
-            .start()
+    @Suppress("DEPRECATION")
+    private fun screenSize(context: Context): Point {
+        val manager = context.getSystemService(WindowManager::class.java)
+        return Point().also { manager?.defaultDisplay?.getSize(it) }
     }
 
-    /** Close enough to 1 to read as growth rather than as a zoom. */
-    private const val OPENING_SCALE = 0.96f
+    /**
+     * A dialog that animates itself out of the way rather than vanishing.
+     *
+     * `dismiss` is overridden rather than the animation being run at each call site because
+     * there are five ways out of this panel — the close button, a tap outside, the back
+     * gesture, choosing a track, and the player being torn down — and four of them are the
+     * system calling `dismiss` directly. Anything less than an override leaves some of them
+     * cutting to black while the others glide.
+     *
+     * The motion is the one Apple uses for a popover and iOS uses for a share sheet: scale and
+     * opacity together, weighted so the panel appears to come *from* the control rather than
+     * to fade in over it. The pivot is the top end corner, which is where the control row is.
+     * Both properties are hardware-accelerated, which matters more here than usual — this runs
+     * over decoding video.
+     */
+    private class FloatingDialog(
+        context: Context,
+        private val content: View,
+    ) : Dialog(context, R.style.Theme_Seamless_FloatingSheet) {
 
-    private const val OPEN_MS = 190L
+        private var leaving = false
+
+        fun animateIn() {
+            content.pivotX = content.width.toFloat()
+            content.pivotY = 0f
+            content.alpha = 0f
+            content.scaleX = OPENING_SCALE
+            content.scaleY = OPENING_SCALE
+            content.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(OPEN_MS)
+                // Heavily weighted towards the end of the curve. A panel that decelerates
+                // sharply reads as settling into place; a linear one reads as being dragged.
+                .setInterpolator(DecelerateInterpolator(2.2f))
+                .start()
+        }
+
+        override fun dismiss() {
+            if (leaving || !isShowing) {
+                finish()
+                return
+            }
+            leaving = true
+            content.animate()
+                .alpha(0f)
+                .scaleX(CLOSING_SCALE)
+                .scaleY(CLOSING_SCALE)
+                .setDuration(CLOSE_MS)
+                .setInterpolator(DecelerateInterpolator())
+                .withEndAction { finish() }
+                .start()
+        }
+
+        /** `super.dismiss()` cannot be called from inside a lambda, so it is called from here. */
+        private fun finish() {
+            // The window can be gone already if the activity was destroyed while this was
+            // animating, and dismissing a dialog whose host has left throws.
+            runCatching { super.dismiss() }
+        }
+
+        private companion object {
+            /** Close enough to 1 to read as arriving rather than as zooming. */
+            const val OPENING_SCALE = 0.93f
+
+            /** Shrinks further on the way out than it grew on the way in, which reads as away. */
+            const val CLOSING_SCALE = 0.95f
+
+            const val OPEN_MS = 260L
+            const val CLOSE_MS = 180L
+        }
+    }
 }

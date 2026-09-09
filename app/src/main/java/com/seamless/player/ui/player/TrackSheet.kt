@@ -1,11 +1,11 @@
 package com.seamless.player.ui.player
 
+import android.app.Dialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.seamless.player.R
 import com.seamless.player.databinding.ItemSheetActionBinding
 import com.seamless.player.databinding.ItemTrackRowBinding
@@ -84,7 +84,7 @@ class TrackSheet(
     )
 
     private var binding: SheetTracksBinding? = null
-    private var dialog: BottomSheetDialog? = null
+    private var dialog: Dialog? = null
 
     val isShowing: Boolean get() = dialog?.isShowing == true
 
@@ -92,7 +92,7 @@ class TrackSheet(
         dialog?.takeIf { it.isShowing }?.dismiss()
     }
 
-    fun show(context: Context, onDismiss: () -> Unit = {}): BottomSheetDialog {
+    fun show(context: Context, onDismiss: () -> Unit = {}): Dialog {
         val binding = SheetTracksBinding.inflate(LayoutInflater.from(context))
         val dialog = FloatingSheet.create(context, binding.root)
         this.binding = binding
@@ -118,7 +118,7 @@ class TrackSheet(
         draw(binding, dialog)
     }
 
-    private fun draw(binding: SheetTracksBinding, dialog: BottomSheetDialog) {
+    private fun draw(binding: SheetTracksBinding, dialog: Dialog) {
         val content = content()
         val context = binding.root.context
         val inflater = LayoutInflater.from(context)
@@ -134,12 +134,12 @@ class TrackSheet(
             item.label.text = row.label
             item.detail.text = row.detail
             item.detail.visibility = if (row.detail.isEmpty()) View.GONE else View.VISIBLE
-            // The tick keeps its space either way, so the selection can move without the text
-            // beside it shifting sideways.
-            item.tick.visibility = if (row.selected) View.VISIBLE else View.INVISIBLE
-            item.root.setBackgroundResource(
-                if (row.selected) R.drawable.sheet_row_selected_bg
-                else R.drawable.ripple_sheet_row
+            // A filled radio, not a tick and not a highlighted row. The two radio drawables
+            // share a ring, so the selection moves without anything shifting sideways, and an
+            // unselected row still shows that it could be chosen -- which an empty space does
+            // not. Painting the selected row's background as well would be saying it twice.
+            item.tick.setImageResource(
+                if (row.selected) R.drawable.ic_radio_on else R.drawable.ic_radio_off
             )
             item.root.setOnClickListener {
                 dialog.dismiss()
@@ -170,7 +170,7 @@ class TrackSheet(
         into: ViewGroup,
         actions: List<Action>,
         inflater: LayoutInflater,
-        dialog: BottomSheetDialog,
+        dialog: Dialog,
     ) {
         into.removeAllViews()
         into.visibility = if (actions.isEmpty()) View.GONE else View.VISIBLE

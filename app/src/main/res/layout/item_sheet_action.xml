@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  An action at the foot of a floating panel: find subtitles, add a file, appearance.
+  An action at the foot of a floating panel: find subtitles, choose a file, appearance.
 
   Same height and same rhythm as a track row, indented to the same place, so the panel reads as
-  one list with a line across it rather than as a list and a toolbar. The subtitle line is
-  optional and carries the explaining — "needs an internet connection", "one-off folder
-  permission" — which is where an explanation belongs: next to the thing it is about.
+  one column with hairlines across it rather than as a list and a toolbar. The optional second
+  line carries the explaining — "needs an internet connection", "one-off folder permission" —
+  which is where an explanation belongs: next to the thing it is about.
 
-  No trailing chevron. Every one of these opens something, so an arrow on each of them says
-  nothing that the row does not already say, and three of them in a column is exactly the sort
-  of decoration this panel is trying not to have.
+  A chevron, because every one of these opens something else and the row should say so before
+  it is tapped. The icon and the chevron are both a step below the label in weight: the words
+  say what the row does, the glyphs only help find it again.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -17,15 +17,13 @@
     android:layout_height="wrap_content"
     android:background="@drawable/ripple_sheet_row"
     android:gravity="center_vertical"
-    android:minHeight="52dp"
+    android:minHeight="@dimen/sheet_row_height"
     android:orientation="horizontal"
     android:paddingStart="8dp"
-    android:paddingTop="6dp"
-    android:paddingEnd="14dp"
-    android:paddingBottom="6dp">
+    android:paddingTop="4dp"
+    android:paddingEnd="10dp"
+    android:paddingBottom="4dp">
 
-    <!-- Below the label in weight, not level with it: the words say what the row does and
-         the glyph only helps find it again. -->
     <ImageView
         android:id="@+id/icon"
         android:layout_width="20dp"
@@ -45,14 +43,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="#FFFFFFFF"
-            android:textSize="15sp" />
+            android:textSize="@dimen/sheet_label_size" />
 
         <TextView
             android:id="@+id/detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="#8AFFFFFF"
-            android:textSize="12sp"
+            android:textSize="@dimen/sheet_detail_size"
             android:visibility="gone" />
     </LinearLayout>
+
+    <ImageView
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_chevron_right"
+        app:tint="#59FFFFFF" />
 </LinearLayout>

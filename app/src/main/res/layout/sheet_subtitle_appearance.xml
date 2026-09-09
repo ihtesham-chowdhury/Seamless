@@ -1,181 +1,235 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  How subtitles look, in one screenful.
+  How subtitles look, in the same floating card as everything else.
 
   Five controls, and stopping at five is the point. Every other player's caption settings screen
   is a font picker, four colour pickers and an opacity slider for each of them, which is a lot of
   work to arrive back at what the defaults should have been. What is here is what people actually
   reach for: bigger, bolder, further up, and a box if they really want one.
 
-  Everything applies as it moves, and the subtitle itself is lifted to the middle of the picture
-  while this panel is open so the effect is visible rather than hidden behind it.
+  **The controls scroll and the header and Reset do not.** This is the fix for a real complaint:
+  in landscape a phone gives a panel about 360dp, this column wants more than that, and the
+  panel had no scroll — so Background and Position simply did not exist on a landscape video.
+  A control that is only reachable in one orientation is worse than a missing one, because the
+  person who found it once now knows it is there.
+
+  Sliders rather than rows that open sub-screens, deliberately, and this is the one place the
+  reference layout is not followed to the letter. A caption style is not something anyone can
+  picture from a label: you find out whether it is right by looking at it over the actual film.
+  Everything applies as it moves and the subtitle is lifted into the middle of the picture while
+  this panel is open, which a value-and-chevron row cannot do without hiding the result behind a
+  second panel.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/transparent"
-    android:padding="10dp">
+    android:background="@android:color/transparent">
 
-    <LinearLayout
+    <com.seamless.player.ui.common.CappedColumn
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/sheet_glass_bg"
         android:orientation="vertical"
-        android:paddingStart="18dp"
-        android:paddingTop="10dp"
-        android:paddingEnd="18dp"
-        android:paddingBottom="20dp">
+        android:paddingStart="@dimen/sheet_pad_horizontal"
+        android:paddingTop="@dimen/sheet_pad_top"
+        android:paddingEnd="@dimen/sheet_pad_horizontal"
+        android:paddingBottom="@dimen/sheet_pad_bottom">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/subtitle_appearance"
+                android:textColor="#FFFFFFFF"
+                android:textSize="@dimen/sheet_title_size"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/close"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:background="@drawable/ripple_borderless_circle"
+                android:contentDescription="@string/action_close"
+                android:padding="8dp"
+                android:src="@drawable/ic_close"
+                app:tint="#8AFFFFFF" />
+        </LinearLayout>
 
         <View
-            android:layout_width="32dp"
-            android:layout_height="4dp"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/sheet_grabber" />
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="2dp"
+            android:background="#1FFFFFFF" />
 
-        <TextView
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:text="@string/subtitle_appearance"
-            android:textColor="#FFFFFFFF"
-            android:textSize="17sp"
-            android:textStyle="bold" />
+            android:layout_weight="1"
+            android:scrollbars="none">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/subtitle_size"
-            android:textAppearance="@style/TextAppearance.Seamless.SheetLabel" />
-
-        <!--
-          Whole numbers, not the 0.7–1.8 multiplier they stand for.
-
-          A Material Slider throws at layout if (valueTo - valueFrom) is not an exact multiple
-          of stepSize, and 1.8 - 0.7 is 1.1000001 in float arithmetic, which is not an exact
-          multiple of 0.1. Percent in, percent out, divided by a hundred in code.
-        -->
-        <com.google.android.material.slider.Slider
-            android:id="@+id/size"
-            style="@style/Widget.Seamless.SheetSlider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:stepSize="10"
-            android:valueFrom="70"
-            android:valueTo="180" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/subtitle_weight"
-            android:textAppearance="@style/TextAppearance.Seamless.SheetLabel" />
-
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/weight"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:selectionRequired="true"
-            app:singleSelection="true">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/weight_normal"
-                style="@style/Widget.Seamless.SheetToggle"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/subtitle_weight_normal" />
+                android:orientation="vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/weight_bold"
-                style="@style/Widget.Seamless.SheetToggle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/subtitle_weight_bold" />
-        </com.google.android.material.button.MaterialButtonToggleGroup>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/sheet_group_gap"
+                    android:text="@string/subtitle_size"
+                    android:textAppearance="@style/TextAppearance.Seamless.SheetLabel" />
 
-        <TextView
+                <!--
+                  Whole numbers, not the 0.7-1.8 multiplier they stand for.
+
+                  A Material Slider throws at layout if (valueTo - valueFrom) is not an exact
+                  multiple of stepSize, and 1.8 - 0.7 is 1.1000001 in float arithmetic, which is
+                  not an exact multiple of 0.1. Percent in, percent out, divided by a hundred in
+                  code.
+                -->
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/size"
+                    style="@style/Widget.Seamless.SheetSlider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stepSize="10"
+                    android:valueFrom="70"
+                    android:valueTo="180" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/sheet_group_gap_tight"
+                    android:text="@string/subtitle_weight"
+                    android:textAppearance="@style/TextAppearance.Seamless.SheetLabel" />
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/weight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/weight_normal"
+                        style="@style/Widget.Seamless.SheetToggle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/subtitle_weight_normal" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/weight_bold"
+                        style="@style/Widget.Seamless.SheetToggle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/subtitle_weight_bold" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/sheet_group_gap"
+                    android:text="@string/subtitle_edge"
+                    android:textAppearance="@style/TextAppearance.Seamless.SheetLabel" />
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/edge"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/edge_outline"
+                        style="@style/Widget.Seamless.SheetToggle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/subtitle_edge_outline" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/edge_shadow"
+                        style="@style/Widget.Seamless.SheetToggle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/subtitle_edge_shadow" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/edge_none"
+                        style="@style/Widget.Seamless.SheetToggle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/subtitle_edge_none" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/sheet_group_gap"
+                    android:text="@string/subtitle_background"
+                    android:textAppearance="@style/TextAppearance.Seamless.SheetLabel" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/background"
+                    style="@style/Widget.Seamless.SheetSlider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stepSize="5"
+                    android:valueFrom="0"
+                    android:valueTo="100" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/sheet_group_gap_tight"
+                    android:text="@string/subtitle_position"
+                    android:textAppearance="@style/TextAppearance.Seamless.SheetLabel" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/position"
+                    style="@style/Widget.Seamless.SheetSlider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stepSize="1"
+                    android:valueFrom="2"
+                    android:valueTo="30" />
+            </LinearLayout>
+        </ScrollView>
+
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:text="@string/subtitle_edge"
-            android:textAppearance="@style/TextAppearance.Seamless.SheetLabel" />
+            android:layout_height="1dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="#1FFFFFFF" />
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/edge"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:selectionRequired="true"
-            app:singleSelection="true">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/edge_outline"
-                style="@style/Widget.Seamless.SheetToggle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/subtitle_edge_outline" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/edge_shadow"
-                style="@style/Widget.Seamless.SheetToggle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/subtitle_edge_shadow" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/edge_none"
-                style="@style/Widget.Seamless.SheetToggle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/subtitle_edge_none" />
-        </com.google.android.material.button.MaterialButtonToggleGroup>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:text="@string/subtitle_background"
-            android:textAppearance="@style/TextAppearance.Seamless.SheetLabel" />
-
-        <com.google.android.material.slider.Slider
-            android:id="@+id/background"
-            style="@style/Widget.Seamless.SheetSlider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:stepSize="5"
-            android:valueFrom="0"
-            android:valueTo="100" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/subtitle_position"
-            android:textAppearance="@style/TextAppearance.Seamless.SheetLabel" />
-
-        <com.google.android.material.slider.Slider
-            android:id="@+id/position"
-            style="@style/Widget.Seamless.SheetSlider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:stepSize="1"
-            android:valueFrom="2"
-            android:valueTo="30" />
-
+        <!-- Pinned below the scroll. Reset is the way out of a style you have made unreadable,
+             so it must not be the thing you have to scroll to find. -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/reset"
             style="@style/Widget.Seamless.SheetToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/subtitle_appearance_reset" />
-    </LinearLayout>
+    </com.seamless.player.ui.common.CappedColumn>
 </FrameLayout>

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Behind the track that is currently playing. Faint: the tick says which one it is, and
-     this only stops the row looking identical to the ones above and below it. -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <corners android:radius="14dp" />
-    <solid android:color="#1FFFFFFF" />
-</shape>

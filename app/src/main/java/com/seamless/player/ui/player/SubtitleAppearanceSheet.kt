@@ -35,6 +35,7 @@ class SubtitleAppearanceSheet(
         val binding = SheetSubtitleAppearanceBinding.inflate(LayoutInflater.from(context))
         val dialog = FloatingSheet.create(context, binding.root)
         dialog.setOnDismissListener { onDismiss() }
+        binding.close.setOnClickListener { dialog.dismiss() }
 
         // The two fractional settings ride on percentage sliders; see the layout for why.
         bindSlider(binding.size, prefs.subtitleTextScale * 100f) {

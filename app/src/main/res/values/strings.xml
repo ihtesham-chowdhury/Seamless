@@ -287,6 +287,13 @@ Picking the folder yourself grants access to it, which gets around that restrict
     <string name="subtitle_track_number">Track %1$d</string>
     <string name="subtitle_unknown_language">Unknown language</string>
     <string name="subtitle_remove">Remove this subtitle</string>
+    <string name="subtitle_remove_failed">That subtitle could not be removed</string>
+
+    <!-- Only for a file the user put beside their video. A subtitle Seamless downloaded
+         goes on one tap, because it can be fetched again in a second. -->
+    <string name="subtitle_remove_file_title">Delete this file?</string>
+    <string name="subtitle_remove_file_message">%1$s will be deleted from the folder it is in. Other players will stop finding it too.</string>
+    <string name="subtitle_remove_file_confirm">Delete</string>
 
     <!-- The panel with nothing in it. Says what is true, then what to do about it. -->
     <string name="subtitle_none_yet">No subtitles for this video yet.</string>

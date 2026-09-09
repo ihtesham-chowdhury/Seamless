@@ -1,0 +1,30 @@
+<resources>
+    <!--
+      The same panels, on a screen a fifth as tall.
+
+      A phone on its side gives a panel about 360dp of height to work with, and the appearance
+      panel alone wants more than that at portrait sizes: five labels, three sliders, two
+      segmented controls and a button. So everything loses a little — the type by a point, the
+      rows by six dp, the gaps by nearly half — and what is left over goes to the scroll cap in
+      integers.xml, which is allowed to take far more of a short screen than of a tall one.
+
+      Nothing here changes what a panel contains. Hiding a control in landscape would mean a
+      setting that exists in one orientation, which is how "I only found this on a portrait
+      video" happens. See values/dimens.xml for the full reasoning.
+    -->
+    <dimen name="sheet_side_inset">14dp</dimen>
+    <dimen name="sheet_bottom_inset">12dp</dimen>
+    <dimen name="sheet_max_width">400dp</dimen>
+
+    <dimen name="sheet_pad_horizontal">8dp</dimen>
+    <dimen name="sheet_pad_top">6dp</dimen>
+    <dimen name="sheet_pad_bottom">10dp</dimen>
+
+    <dimen name="sheet_title_size">15sp</dimen>
+    <dimen name="sheet_label_size">14sp</dimen>
+    <dimen name="sheet_detail_size">11sp</dimen>
+    <dimen name="sheet_row_height">46dp</dimen>
+
+    <dimen name="sheet_group_gap">10dp</dimen>
+    <dimen name="sheet_group_gap_tight">6dp</dimen>
+</resources>

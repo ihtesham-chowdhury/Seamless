@@ -57,6 +57,11 @@ data class Sidecar(
     val language: String?,
     val label: String,
     val origin: SubtitleOrigin,
+    /**
+     * What the file is called, for the one thing that needs to know: deleting a companion
+     * beside the video, which is checked against the video's own name before it goes.
+     */
+    val fileName: String? = null,
 ) {
     fun toConfiguration(): MediaItem.SubtitleConfiguration =
         MediaItem.SubtitleConfiguration.Builder(uri)
@@ -106,6 +111,7 @@ object LocalSubtitles {
                     language = tags.language,
                     label = labelFor(tags, file.name),
                     origin = SubtitleOrigin.BESIDE,
+                    fileName = file.name,
                 )
             }
         }
@@ -131,6 +137,7 @@ object LocalSubtitles {
                 language = file.language,
                 label = SubtitleLanguages.displayName(file.language).ifEmpty { file.file.name },
                 origin = SubtitleOrigin.SAVED,
+                fileName = file.file.name,
             )
         }
 

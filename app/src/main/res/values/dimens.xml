@@ -8,4 +8,35 @@
     <dimen name="nav_pill_height">62dp</dimen>
     <dimen name="nav_pill_margin">12dp</dimen>
     <dimen name="nav_pill_reserve">86dp</dimen>
+
+    <!--
+      The player's floating panels, and the reason they are dimensions rather than numbers
+      typed into the layouts.
+
+      A phone in landscape is a different room. It is around 360dp tall where portrait is 800,
+      so a panel sized to look generous upright fills the screen on its side and stops being a
+      panel at all: the whole idea is that the film keeps playing visibly around it. Every one
+      of these has a smaller counterpart in values-land, and the layouts read the name rather
+      than the number so there is one panel layout instead of two that drift apart.
+
+      The bottom inset is the one that is not about size. Without it a bottom sheet sits flush
+      against the bottom edge of the screen, which reads as a drawer attached to the frame; the
+      gap is what makes it read as floating above the picture.
+    -->
+    <dimen name="sheet_side_inset">12dp</dimen>
+    <dimen name="sheet_bottom_inset">18dp</dimen>
+    <dimen name="sheet_max_width">460dp</dimen>
+
+    <dimen name="sheet_pad_horizontal">10dp</dimen>
+    <dimen name="sheet_pad_top">10dp</dimen>
+    <dimen name="sheet_pad_bottom">12dp</dimen>
+
+    <dimen name="sheet_title_size">17sp</dimen>
+    <dimen name="sheet_label_size">15sp</dimen>
+    <dimen name="sheet_detail_size">12sp</dimen>
+    <dimen name="sheet_row_height">52dp</dimen>
+
+    <!-- The appearance panel's gap between one control and the next label. -->
+    <dimen name="sheet_group_gap">18dp</dimen>
+    <dimen name="sheet_group_gap_tight">10dp</dimen>
 </resources>

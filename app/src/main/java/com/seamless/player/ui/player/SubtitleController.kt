@@ -1,9 +1,11 @@
 package com.seamless.player.ui.player
 
 import android.net.Uri
+import android.widget.Toast
 import android.provider.OpenableColumns
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -166,18 +168,10 @@ class SubtitleController(
         applyRememberedChoice(player, options)
     }
 
-    /**
-     * What the CC control should look like right now.
-     *
-     * Three states rather than two, because "subtitles are on" and "this control is open" are
-     * different facts and the user needs both: on closing the panel, the difference between
-     * them is the only thing that says whether anything was changed.
-     */
-    fun ccState(): CcButton.State {
-        if (panel?.isShowing == true) return CcButton.State.OPEN
-        val player = playerProvider() ?: return CcButton.State.IDLE
-        val selected = SubtitleTracks.selected(SubtitleTracks.textOptions(player))
-        return if (selected != null) CcButton.State.ACTIVE else CcButton.State.IDLE
+    /** Whether a subtitle is on screen, which is the only thing the CC control shows. */
+    fun hasActiveTrack(): Boolean {
+        val player = playerProvider() ?: return false
+        return SubtitleTracks.selected(SubtitleTracks.textOptions(player)) != null
     }
 
     fun hasAudioChoice(): Boolean {
@@ -381,20 +375,50 @@ class SubtitleController(
     }
 
     /**
-     * How to remove [option], or null when it is not this app's to remove.
+     * How to remove [option], or null when there is nothing to remove.
      *
-     * Only a file in the store — something downloaded here or picked here. A track inside the
-     * container has no file of its own; a `.srt` sitting in the user's folder is a file they
-     * put there, and a caption menu is not the place to delete other people's files.
+     * Anything that is a file: one this app downloaded or was handed through the picker, and
+     * one sitting beside the video in a folder the app has been given. Not a track inside the
+     * container, which has no file of its own and cannot be taken out of the video.
+     *
+     * The two are not treated the same. A downloaded subtitle is the app's own and goes on one
+     * tap — it can be fetched again in a second. A `.srt` beside the video is the user's file,
+     * visible to every other player they own, and possibly the only copy; that one asks first.
+     * Refusing to delete it at all was the previous answer and it was the wrong one: the button
+     * then never appeared for anybody whose subtitles live in their own folders, which is most
+     * people with a subtitle problem.
      */
     private fun removalOf(option: SubtitleTracks.Option): (() -> Unit)? {
-        if (SubtitleOrigin.of(option.format.id) != SubtitleOrigin.SAVED) return null
+        val origin = SubtitleOrigin.of(option.format.id)
+        if (origin == SubtitleOrigin.EMBEDDED) return null
         val sidecar = sidecars.firstOrNull { it.id == option.format.id } ?: return null
-        return { removeSaved(sidecar, option) }
+        return when (origin) {
+            SubtitleOrigin.SAVED -> ({ remove(sidecar, option) })
+            SubtitleOrigin.BESIDE -> ({ confirmThenRemove(sidecar, option) })
+            SubtitleOrigin.EMBEDDED -> null
+        }
     }
 
     /**
-     * Deletes one downloaded subtitle and puts the player back on its feet.
+     * Asks before deleting a file the user put there.
+     *
+     * Named, because "delete this subtitle" is a different question from "delete
+     * Movie.en.srt" when there are three of them in the folder and two are for other episodes.
+     */
+    private fun confirmThenRemove(sidecar: Sidecar, option: SubtitleTracks.Option) {
+        val name = sidecar.fileName ?: sidecar.label
+        AlertDialog.Builder(activity)
+            .setTitle(R.string.subtitle_remove_file_title)
+            .setMessage(activity.getString(R.string.subtitle_remove_file_message, name))
+            .setPositiveButton(R.string.subtitle_remove_file_confirm) { _, _ ->
+                remove(sidecar, option)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    /**
+     * Deletes one subtitle file and puts the player back on its feet.
      *
      * The remembered choice is cleared when the track being deleted is the one playing, so the
      * next discovery does not spend its time looking for a file that is gone; what it settles
@@ -402,7 +426,7 @@ class SubtitleController(
      * off if nothing does. Deleting a subtitle you were not watching changes nothing you can
      * see except the row going away, which is the point.
      */
-    private fun removeSaved(sidecar: Sidecar, option: SubtitleTracks.Option) {
+    private fun remove(sidecar: Sidecar, option: SubtitleTracks.Option) {
         val playing = video ?: return
         val wasPlaying = option.isSelected
         // Whatever Undo was holding, it is either this file or older than it; either way the
@@ -415,10 +439,23 @@ class SubtitleController(
         if (wasPlaying) remember(null)
 
         Background.run(
-            work = { store.deleteIfOwned(sidecar.uri) },
+            work = {
+                when (sidecar.origin) {
+                    SubtitleOrigin.SAVED -> store.deleteIfOwned(sidecar.uri)
+                    SubtitleOrigin.BESIDE -> SubtitleFolder.deleteCompanion(
+                        activity,
+                        playing.name,
+                        sidecar.uri,
+                        sidecar.fileName.orEmpty(),
+                    )
+                    SubtitleOrigin.EMBEDDED -> false
+                }
+            },
             then = { deleted ->
                 if (!deleted) {
                     Log.w(TAG, "could not delete ${sidecar.uri}")
+                    Toast.makeText(activity, R.string.subtitle_remove_failed, Toast.LENGTH_SHORT)
+                        .show()
                     return@run
                 }
                 if (wasPlaying) playerProvider()?.let { SubtitleTracks.disableText(it) }

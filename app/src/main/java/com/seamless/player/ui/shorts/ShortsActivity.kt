@@ -32,7 +32,6 @@ import com.seamless.player.databinding.ActivityShortsBinding
 import com.seamless.player.ui.common.ResizeModes
 import com.seamless.player.ui.common.SubtitleStyles
 import com.seamless.player.ui.common.Tips
-import com.seamless.player.ui.player.CcButton
 import com.seamless.player.ui.player.SubtitleTracks
 import com.seamless.player.ui.player.TrackSheet
 import com.seamless.player.util.Background
@@ -71,9 +70,6 @@ class ShortsActivity : AppCompatActivity(), ShortsAdapter.Host {
 
     /** The track panel while it is up, so the CC button can show that it is open. */
     private var subtitlePanel: TrackSheet? = null
-
-    /** As in the ordinary player: the accent, mixed light enough to read over any frame. */
-    private val subtitleAccent: Int by lazy { CcButton.accentFor(this, prefs.accentColor) }
 
     private val preloadControl = ShortsPreloadControl()
     private var preloadManager: DefaultPreloadManager? = null
@@ -306,17 +302,10 @@ class ShortsActivity : AppCompatActivity(), ShortsAdapter.Host {
         val options = player?.let { SubtitleTracks.textOptions(it) }.orEmpty()
         binding.btnSubtitles.visibility = if (options.isEmpty()) View.GONE else View.VISIBLE
         if (options.isEmpty()) return
-        // The same three-state treatment as the player's, so "subtitles are on" looks the same
-        // wherever it is said.
-        CcButton.apply(
-            binding.btnSubtitles,
-            when {
-                subtitlePanel?.isShowing == true -> CcButton.State.OPEN
-                SubtitleTracks.selected(options) != null -> CcButton.State.ACTIVE
-                else -> CcButton.State.IDLE
-            },
-            subtitleAccent,
-        )
+        // Lit when a subtitle is playing, faded when one is not -- the same treatment the
+        // player gives it, and the same the favourite button gives its own state here.
+        binding.btnSubtitles.alpha =
+            if (SubtitleTracks.selected(options) != null) 1f else 0.4f
     }
 
     /**

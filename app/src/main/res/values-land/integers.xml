@@ -1,0 +1,4 @@
+<resources>
+    <!-- See values/integers.xml. Room left above for the floating control row, and no more. -->
+    <integer name="sheet_max_height_percent">80</integer>
+</resources>

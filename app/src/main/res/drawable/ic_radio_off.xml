@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- An available track. Same ring as ic_radio_on with nothing in it, so the two line up
+     exactly and only the centre changes when the selection moves. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp" android:height="20dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM12,20.5c-4.69,0 -8.5,-3.81 -8.5,-8.5S7.31,3.5 12,3.5s8.5,3.81 8.5,8.5 -3.81,8.5 -8.5,8.5z" />
+</vector>

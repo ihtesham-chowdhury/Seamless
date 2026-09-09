@@ -5,6 +5,28 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
+    <!--
+      The window a floating panel lives in.
+
+      Not a bottom sheet. The subtitle panel is a card that floats over the picture, clear of
+      every edge, and a BottomSheetDialog is bottom-anchored by construction: it can be given a
+      margin but it still belongs to the bottom of the screen, and it still reads as a drawer
+      pulled out of the frame rather than as something resting on top of it.
+
+      windowIsFloating with a transparent background is what leaves the panel's own rounded,
+      translucent surface as the only thing drawn. The window animation is null on purpose —
+      the content view is animated instead, so the scale can be pivoted on the corner the
+      control that opened it sits in. Material3's dialog parent is kept because the appearance
+      panel puts real Material sliders and toggle buttons inside this window.
+    -->
+    <style name="Theme.Seamless.FloatingSheet" parent="Theme.Material3.Dark.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
     <!-- Player surfaces: always black, never a light background flashing behind video. -->
     <style name="Theme.Seamless.Fullscreen" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:windowBackground">@color/black</item>

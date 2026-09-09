@@ -1,0 +1,16 @@
+<resources>
+    <!--
+      How much of the screen a floating panel may take, as a percentage of its height.
+
+      This is the whole card, not the list inside it. Capping the list says nothing about how
+      tall the panel ends up, because the header, the hairlines and three action rows are added
+      on top of it, and a list allowed most of a landscape screen produced a card that ran off
+      the top of it and covered the controls it was opened from.
+
+      Upright there is height to spare and the panel should not take it. On a phone lying down
+      the whole screen is about as tall as a portrait panel, so the share has to be larger even
+      though the result is smaller: a strict cap there means controls that exist in one
+      orientation and not the other, which is exactly the complaint this answers.
+    -->
+    <integer name="sheet_max_height_percent">76</integer>
+</resources>
