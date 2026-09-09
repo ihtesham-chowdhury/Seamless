@@ -79,8 +79,12 @@ The name is the goal.
   ask. See below
 
 **Subtitles**
-- A CC control in the floating row, present only when the video actually has captions — and
-  a Subtitles entry in the overflow menu for going to look for one
+- One CC control in the floating row, always in the same place, saying which of three things
+  is true without a badge or a word on it: plain when nothing is on, a thin ring in your accent
+  colour when a subtitle is playing, ringed and filled while the panel is open
+- The panel answers what you opened it to ask — which subtitle am I watching — and puts
+  finding one below a line and appearance below a second one. Only the list scrolls, so the
+  things to *do* never slide off the bottom
 - Three sources, in order of certainty: text tracks inside the file, companion files in the
   same folder (`Movie.en.srt`, `Movie.bn.srt`, `Movie.en-US.forced.srt`), and an optional
   online lookup
@@ -93,6 +97,9 @@ The name is the goal.
 - Clean white text with a thin outline, not an opaque black bar — and it moves up out of the
   way when the controls appear. Size, weight, edge, background and position are five
   controls on the panel itself, applied as they move
+- One subtitle per language per video, so downloading English twice does not leave you with
+  two rows called English — and anything Seamless put on your device has a quiet delete at the
+  end of its row
 - Remembers the track per video, and the habit across videos: turn subtitles on for episode
   one and the rest of the series comes up with them already showing
 - Audio track selection comes free with it, in the overflow menu, when a file has more than

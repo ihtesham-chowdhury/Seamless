@@ -28,6 +28,14 @@ import java.security.MessageDigest
  * which is what makes "do not download the same subtitle twice" free. The same bytes produce
  * the same name, so a second download of something already held overwrites itself rather than
  * accumulating.
+ *
+ * That covers the identical file and not the near-identical one, which is the case that
+ * actually happens: search again, pick a different upload of the same English subtitle, and the
+ * bytes differ by a line of timing. The panel then shows English, English, English, English,
+ * with nothing to tell them apart. So [save] goes further and replaces what it supersedes — one
+ * subtitle per video per language, because a second English subtitle is not a second choice, it
+ * is a correction of the first. Anything genuinely different is a different language and keeps
+ * its own row.
  */
 class SubtitleStore(context: Context) {
 
@@ -89,6 +97,55 @@ class SubtitleStore(context: Context) {
         return byKey
     }
 
+    /**
+     * Drops everything but the newest subtitle per language for one video.
+     *
+     * [save] keeps this true going forward; this is for the phones where it already went wrong.
+     * Four files called English accumulated before there was a rule, and a rule that only
+     * applies to future downloads would leave them there for ever with no way to be rid of
+     * them. Newest wins, because the reason there is a fourth is that the third was not right.
+     *
+     * Returns whether anything was removed. Does file I/O; never call it on the main thread.
+     */
+    fun prune(videoKey: String): Boolean {
+        val prefix = "$videoKey."
+        val mine = directory.listFiles()
+            ?.filter { it.isFile && it.name.startsWith(prefix) && SubtitleFormats.isSubtitle(it.name) }
+            ?: return false
+        if (mine.size < 2) return false
+
+        var removed = false
+        mine.groupBy { languageOf(videoKey, it.name) ?: "und" }.forEach { (_, group) ->
+            if (group.size < 2) return@forEach
+            val newest = group.maxByOrNull { it.lastModified() } ?: return@forEach
+            group.forEach { file ->
+                if (file == newest) return@forEach
+                if (runCatching { file.delete() }.getOrDefault(false)) removed = true
+            }
+        }
+        return removed
+    }
+
+    /**
+     * Deletes one file, if it is one of ours.
+     *
+     * The caller reaches this holding a URI it read off a player track, which is two hops from
+     * anything that checked what the file is. So the check is here: a path outside this store's
+     * own directory is refused rather than trusted, and there is no route from a mismatched
+     * track id to deleting something that matters.
+     */
+    fun deleteIfOwned(uri: Uri): Boolean {
+        val path = uri.path ?: return false
+        val file = File(path)
+        val parent = runCatching { file.canonicalFile.parentFile }.getOrNull() ?: return false
+        val mine = runCatching { directory.canonicalFile }.getOrNull() ?: return false
+        if (parent != mine) {
+            Log.w("SubtitleStore", "refusing to delete $path: not in the store")
+            return false
+        }
+        return runCatching { file.delete() }.getOrDefault(false)
+    }
+
     /** Every video that has something saved, so settings can say how much is held. */
     fun totalBytes(): Long = directory.listFiles()?.sumOf { it.length() } ?: 0L
 
@@ -97,8 +154,12 @@ class SubtitleStore(context: Context) {
     /**
      * Writes [bytes] and returns the file, or null if it could not be written.
      *
-     * Overwrites silently when the same bytes for the same video and language are already
-     * held, which is the whole point of the content hash in the name.
+     * Replaces anything already held for this video in this language. See the note at the top
+     * of the class: the alternative is a panel listing four subtitles all called English, and
+     * the fourth is there because the first three were wrong.
+     *
+     * The replacement happens after the write, not before, so a failed download leaves the
+     * subtitle that was working exactly where it was.
      */
     fun save(videoKey: String, language: String?, extension: String, bytes: ByteArray): Saved? {
         val tag = SubtitleLanguages.normalise(language) ?: "und"
@@ -106,6 +167,7 @@ class SubtitleStore(context: Context) {
         val file = File(directory, name)
         return try {
             file.writeBytes(bytes)
+            supersede(videoKey, tag, keep = name)
             Saved(file, videoKey, tag.takeIf { it != "und" })
         } catch (error: Exception) {
             Log.e("SubtitleStore", "cannot write $name", error)
@@ -113,9 +175,26 @@ class SubtitleStore(context: Context) {
         }
     }
 
-    /** Undo, for the transient notice shown after an automatic match. */
+    /** Undo, for the transient notice shown after an automatic match, and the delete button. */
     fun delete(saved: Saved) {
         runCatching { saved.file.delete() }
+    }
+
+    /**
+     * Every earlier file for this video and language, gone.
+     *
+     * Prefix-matched on `<key>.<tag>.` rather than by listing and parsing, so a name this
+     * version does not understand — written by an older one, or by a future one — is either
+     * matched exactly or left alone. Never deletes [keep], which is the file just written.
+     */
+    private fun supersede(videoKey: String, tag: String, keep: String) {
+        val prefix = "$videoKey.$tag."
+        directory.listFiles()?.forEach { file ->
+            if (!file.isFile || file.name == keep) return@forEach
+            if (!file.name.startsWith(prefix)) return@forEach
+            if (!SubtitleFormats.isSubtitle(file.name)) return@forEach
+            runCatching { file.delete() }
+        }
     }
 
     fun clear() {

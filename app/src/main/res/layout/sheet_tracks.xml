@@ -8,12 +8,20 @@
   panel. What the user is doing here is choosing a track for something they are watching, so the
   thing they are watching should not disappear behind a grey card while they do it.
 
+  **Only the tracks scroll.** This is the fix for a real bug and the reason for the weight on the
+  list: everything used to be one column of `wrap_content`, so a file with four or five subtitle
+  tracks pushed Find subtitles, Choose subtitle file and Appearance off the bottom of the screen.
+  They were not missing, they were below the fold of a panel that had no fold — which is how
+  "the appearance settings disappear once I add a subtitle" happens. The list now gives up its
+  own height first and the things to *do* stay put.
+
   Both lists are filled at runtime. How many subtitle tracks a file has is a property of the
   file, and the actions differ between the two players — the feed has no online search — so
   declaring a fixed set of rows here would mean a second layout that differed only in which
   rows it hid.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/transparent"
@@ -27,7 +35,7 @@
         android:paddingStart="10dp"
         android:paddingTop="10dp"
         android:paddingEnd="10dp"
-        android:paddingBottom="14dp">
+        android:paddingBottom="12dp">
 
         <View
             android:layout_width="32dp"
@@ -35,20 +43,85 @@
             android:layout_gravity="center_horizontal"
             android:background="@drawable/sheet_grabber" />
 
-        <TextView
-            android:id="@+id/sheet_title"
+        <!-- Title and a way out. The close button is here rather than only on the scrim
+             because the scrim is a sliver of video: aiming at it means aiming at the film. -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="14dp"
-            android:layout_marginBottom="6dp"
-            android:textColor="#FFFFFFFF"
-            android:textSize="17sp"
-            android:textStyle="bold" />
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="4dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <ScrollView
+            <TextView
+                android:id="@+id/sheet_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="#FFFFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/sheet_close"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:background="@drawable/ripple_borderless_circle"
+                android:contentDescription="@string/action_close"
+                android:padding="8dp"
+                android:src="@drawable/ic_close"
+                app:tint="#8AFFFFFF" />
+        </LinearLayout>
+
+        <!--
+          Nothing to choose from. The mark rather than a bare sentence: an empty panel is the
+          one moment there is room for the app to have a face, and the sentence underneath
+          still says what to do next.
+        -->
+        <LinearLayout
+            android:id="@+id/empty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="14dp"
+            android:paddingBottom="18dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:alpha="0.9"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_subtitles_mark" />
+
+            <TextView
+                android:id="@+id/empty_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:lineSpacingExtra="2dp"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp"
+                android:textColor="#A6FFFFFF"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!--
+          wrap_content *and* a weight, which is the combination that shrinks. A height of 0dp
+          with a weight collapses to nothing inside a wrap_content parent, because the parent
+          has no spare height to hand out; wrap_content measures naturally first and then gives
+          height back when the column overflows. See the note at the top of this file.
+        -->
+        <com.seamless.player.ui.common.CappedScrollView
+            android:id="@+id/rows_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:scrollbars="none">
 
             <LinearLayout
@@ -56,7 +129,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
-        </ScrollView>
+        </com.seamless.player.ui.common.CappedScrollView>
 
         <!-- Hidden when there is nothing below it, so the panel does not end on a line. -->
         <View
@@ -66,11 +139,32 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="6dp"
             android:background="#1FFFFFFF" />
 
         <LinearLayout
             android:id="@+id/actions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <!--
+          A second line, and the whole reason Appearance sits below it: the panel answers "what
+          am I watching" above the line and "how does it look" below, and the second question is
+          not the one anyone opened this to ask.
+        -->
+        <View
+            android:id="@+id/footer_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="6dp"
+            android:background="#14FFFFFF" />
+
+        <LinearLayout
+            android:id="@+id/footer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" />

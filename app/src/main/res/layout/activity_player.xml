@@ -79,9 +79,13 @@
             android:src="@drawable/ic_aspect_ratio" />
 
         <!--
-          Only on screen when the video actually has captions. A permanently greyed-out CC is a
-          control that lies about what it can do; when there is nothing to show, the same thing
-          lives in the overflow menu as "Subtitles", where "find me one" belongs anyway.
+          Always here, and the only way in.
+
+          It used to appear only once a video turned out to have captions, which meant "find me
+          a subtitle" had to live in the overflow menu as well — the same thing in two places
+          under the same name. A control that moves around teaches nobody where it is. The
+          background is set from code, because it has three states and the accent that
+          distinguishes them is a runtime value: see CcButton.
         -->
         <ImageButton
             android:id="@+id/btn_subtitles"
@@ -91,8 +95,7 @@
             android:background="@drawable/circle_control_bg"
             android:contentDescription="@string/subtitles"
             android:padding="12dp"
-            android:src="@drawable/ic_closed_caption"
-            android:visibility="gone" />
+            android:src="@drawable/ic_closed_caption" />
 
         <ImageButton
             android:id="@+id/btn_lock"

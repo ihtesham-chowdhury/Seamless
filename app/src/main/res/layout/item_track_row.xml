@@ -1,23 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  One selectable track in the panel: a tick, a name, and where it came from.
+  One selectable track in the panel: a tick, a name, where it came from, and — on a subtitle
+  this app downloaded — a way to be rid of it.
 
   The tick occupies its space whether or not it is drawn, so nothing shifts sideways when the
   selection moves. Origin goes on the second line rather than in a badge because it is the
   thing that distinguishes two rows both labelled "English", and a badge would make it look
   like a warning.
+
+  The delete button is deliberately underweight: faint, thin-stroked, and at the far edge where
+  a thumb reaching for the row does not land. It appears only on files this app put on the
+  device — never on a track inside the video, which cannot be deleted, and never on a file
+  sitting in the user's own folder, which is theirs.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/ripple_sheet_row"
     android:gravity="center_vertical"
-    android:minHeight="54dp"
+    android:minHeight="52dp"
     android:orientation="horizontal"
     android:paddingStart="8dp"
-    android:paddingTop="6dp"
-    android:paddingEnd="14dp"
-    android:paddingBottom="6dp">
+    android:paddingTop="5dp"
+    android:paddingEnd="6dp"
+    android:paddingBottom="5dp">
 
     <ImageView
         android:id="@+id/tick"
@@ -51,4 +58,17 @@
             android:textColor="#8AFFFFFF"
             android:textSize="12sp" />
     </LinearLayout>
+
+    <!-- 40dp of touch target around a 20dp glyph: quiet to look at, ordinary to hit. -->
+    <ImageButton
+        android:id="@+id/remove"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="6dp"
+        android:background="@drawable/ripple_borderless_circle"
+        android:contentDescription="@string/subtitle_remove"
+        android:padding="10dp"
+        android:src="@drawable/ic_delete_subtitle"
+        android:visibility="gone"
+        app:tint="#66FFFFFF" />
 </LinearLayout>

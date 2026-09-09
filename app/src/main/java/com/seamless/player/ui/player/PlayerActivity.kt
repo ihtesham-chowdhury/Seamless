@@ -74,6 +74,17 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
      */
     private lateinit var subtitles: SubtitleController
 
+    /**
+     * The accent, resolved once, for the CC control's active and open states.
+     *
+     * Read from preferences rather than from a theme attribute on purpose: the player runs on
+     * Material's own dark theme with no accent overlay applied, because tinting a whole player
+     * in someone's chosen colour would be a strange thing to insist on over a film. One control
+     * borrowing the colour is a different matter — it is the only thing on this screen that has
+     * a state worth colouring.
+     */
+    private val subtitleAccent: Int by lazy { CcButton.accentFor(this, prefs.accentColor) }
+
     /** The folder contents, before ordering. Kept so shuffle can be toggled mid-playback. */
     private var source: List<Video> = emptyList()
     private var queue: List<Video> = emptyList()
@@ -140,11 +151,7 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
             prefs = prefs,
             binding = binding,
             playerProvider = { player },
-            onAvailabilityChanged = {
-                // The CC button exists only when there is something for it to switch on.
-                binding.btnSubtitles.visibility =
-                    if (subtitles.hasTracks()) View.VISIBLE else View.GONE
-            },
+            onStateChanged = { updateSubtitleButton() },
         )
         binding.root.listener = this
         goImmersive()
@@ -214,6 +221,7 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
         }
 
         binding.btnSubtitles.setOnClickListener { subtitles.showSubtitleSheet() }
+        updateSubtitleButton()
 
         binding.btnShuffle.setOnClickListener { toggleShuffle() }
         updateShuffleIcon()
@@ -594,6 +602,19 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
         }
     }
 
+    /**
+     * Repaints the CC control for what is true now.
+     *
+     * The control is always on screen — that is the change from the version where it appeared
+     * only once a video turned out to have captions. A button that comes and going depending on
+     * the file teaches nobody where it is, and it meant "find me a subtitle" had to live in the
+     * overflow menu as well, so the same thing existed in two places with two different names.
+     * One control, always in the same spot, with its state on its face.
+     */
+    private fun updateSubtitleButton() {
+        CcButton.apply(binding.btnSubtitles, subtitles.ccState(), subtitleAccent)
+    }
+
     // ---- overflow menu ----
 
     private fun showMoreMenu(anchor: View) {
@@ -605,7 +626,6 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
             menu.findItem(R.id.action_audio)?.isVisible = subtitles.hasAudioChoice()
             setOnMenuItemClickListener { item ->
                 when (item.itemId) {
-                    R.id.action_subtitles -> { subtitles.showSubtitleSheet(); true }
                     R.id.action_audio -> { subtitles.showAudioSheet(); true }
                     R.id.action_info -> { showInfo(); true }
                     R.id.action_share -> { shareCurrent(); true }

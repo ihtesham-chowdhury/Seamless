@@ -6,8 +6,13 @@
   one list with a line across it rather than as a list and a toolbar. The subtitle line is
   optional and carries the explaining — "needs an internet connection", "one-off folder
   permission" — which is where an explanation belongs: next to the thing it is about.
+
+  No trailing chevron. Every one of these opens something, so an arrow on each of them says
+  nothing that the row does not already say, and three of them in a column is exactly the sort
+  of decoration this panel is trying not to have.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/ripple_sheet_row"
@@ -19,12 +24,15 @@
     android:paddingEnd="14dp"
     android:paddingBottom="6dp">
 
+    <!-- Below the label in weight, not level with it: the words say what the row does and
+         the glyph only helps find it again. -->
     <ImageView
         android:id="@+id/icon"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginEnd="14dp"
-        android:contentDescription="@null" />
+        android:contentDescription="@null"
+        app:tint="#B3FFFFFF" />
 
     <LinearLayout
         android:layout_width="0dp"

@@ -49,8 +49,12 @@ class SubtitleController(
     private val prefs: Prefs,
     private val binding: ActivityPlayerBinding,
     private val playerProvider: () -> ExoPlayer?,
-    /** The set of tracks changed: the CC button may need to appear or go away. */
-    private val onAvailabilityChanged: () -> Unit,
+    /**
+     * Something changed that the CC control shows: a track was selected, the set of tracks
+     * changed, or the panel opened or closed. The control is always on screen, so this is
+     * never about whether to draw it — only about which of its three states it is in.
+     */
+    private val onStateChanged: () -> Unit,
 ) {
 
     private val store = SubtitleStore(activity)
@@ -73,6 +77,9 @@ class SubtitleController(
     private var pendingSelect: Pending? = null
 
     private var candidates: SubtitleCandidatesSheet? = null
+
+    /** The track panel, while it is up. Held so a deletion can redraw it in place. */
+    private var panel: TrackSheet? = null
 
     /** The last automatic download, kept only so Undo has something to undo. */
     private var undoable: SubtitleStore.Saved? = null
@@ -119,11 +126,22 @@ class SubtitleController(
         discover(video)
     }
 
-    /** The player has worked out what is in the file. */
+    /**
+     * The player has worked out what is in the file.
+     *
+     * Also where an open panel is redrawn. Discovery, a download and a deletion all change the
+     * track list from a background thread and all three come back through here, so this is the
+     * one place that knows the list has settled; redrawing at any of the call sites would draw
+     * it as it was a moment before.
+     */
     fun onTracksChanged() {
-        val player = playerProvider() ?: return
-        onAvailabilityChanged()
+        reconcileTracks()
+        onStateChanged()
+        panel?.refresh()
+    }
 
+    private fun reconcileTracks() {
+        val player = playerProvider() ?: return
         val options = SubtitleTracks.textOptions(player)
         if (options.isEmpty()) return
 
@@ -148,9 +166,18 @@ class SubtitleController(
         applyRememberedChoice(player, options)
     }
 
-    fun hasTracks(): Boolean {
-        val player = playerProvider() ?: return false
-        return SubtitleTracks.textOptions(player).isNotEmpty()
+    /**
+     * What the CC control should look like right now.
+     *
+     * Three states rather than two, because "subtitles are on" and "this control is open" are
+     * different facts and the user needs both: on closing the panel, the difference between
+     * them is the only thing that says whether anything was changed.
+     */
+    fun ccState(): CcButton.State {
+        if (panel?.isShowing == true) return CcButton.State.OPEN
+        val player = playerProvider() ?: return CcButton.State.IDLE
+        val selected = SubtitleTracks.selected(SubtitleTracks.textOptions(player))
+        return if (selected != null) CcButton.State.ACTIVE else CcButton.State.IDLE
     }
 
     fun hasAudioChoice(): Boolean {
@@ -183,6 +210,8 @@ class SubtitleController(
     fun release() {
         candidates?.dismiss()
         candidates = null
+        panel?.dismiss()
+        panel = null
     }
 
     // ---- local discovery ----
@@ -223,41 +252,78 @@ class SubtitleController(
 
     // ---- the panel ----
 
+    /**
+     * The panel, which is rebuilt from the player every time it is drawn.
+     *
+     * Passing a function rather than a list is what lets a deletion redraw it without closing
+     * it: the rows are always whatever the player says they are now, and there is no second
+     * copy of the track list to keep in step.
+     */
     fun showSubtitleSheet() {
-        val player = playerProvider() ?: return
-        val options = SubtitleTracks.textOptions(player)
-        val selected = SubtitleTracks.selected(options)
+        if (playerProvider() == null) return
+        val sheet = TrackSheet(activity.getString(R.string.subtitles)) { panelContent() }
+        panel = sheet
+        sheet.show(activity, onDismiss = {
+            panel = null
+            onStateChanged()
+        })
+        onStateChanged()
+    }
 
-        val rows = mutableListOf(
-            TrackSheet.Row(
-                label = activity.getString(R.string.subtitle_off),
-                detail = "",
-                selected = selected == null,
-                onClick = {
-                    SubtitleTracks.disableText(player)
-                    remember(SubtitleStore.OFF)
-                    prefs.subtitlesOnByDefault = false
-                },
-            )
-        )
-        options.forEachIndexed { index, option ->
-            rows += TrackSheet.Row(
-                label = SubtitleTracks.label(activity, option, index),
-                detail = SubtitleTracks.detail(activity, option),
-                selected = option.isSelected,
-                onClick = {
-                    SubtitleTracks.select(player, option)
-                    remember(option.id)
-                    prefs.subtitlesOnByDefault = true
-                },
-            )
+    private fun panelContent(): TrackSheet.Content {
+        val player = playerProvider() ?: return TrackSheet.Content(emptyList())
+        val options = SubtitleTracks.textOptions(player)
+
+        val rows = if (options.isEmpty()) {
+            // No "Off" row for a video with nothing to switch off. A list of one choice that
+            // is already made is not a list; the empty state says more in the same space.
+            emptyList()
+        } else {
+            buildList {
+                add(
+                    TrackSheet.Row(
+                        label = activity.getString(R.string.subtitle_off),
+                        detail = "",
+                        selected = SubtitleTracks.selected(options) == null,
+                        onClick = {
+                            SubtitleTracks.disableText(player)
+                            remember(SubtitleStore.OFF)
+                            prefs.subtitlesOnByDefault = false
+                            onStateChanged()
+                        },
+                    )
+                )
+                options.forEachIndexed { index, option ->
+                    add(
+                        TrackSheet.Row(
+                            label = SubtitleTracks.label(activity, option, index),
+                            detail = SubtitleTracks.detail(activity, option),
+                            selected = option.isSelected,
+                            onClick = {
+                                SubtitleTracks.select(player, option)
+                                remember(option.id)
+                                prefs.subtitlesOnByDefault = true
+                                onStateChanged()
+                            },
+                            onRemove = removalOf(option),
+                        )
+                    )
+                }
+            }
         }
 
-        TrackSheet(
-            title = activity.getString(R.string.subtitles),
+        return TrackSheet.Content(
             rows = rows,
             actions = sheetActions(),
-        ).show(activity)
+            footer = listOf(
+                TrackSheet.Action(
+                    icon = R.drawable.ic_text_size,
+                    label = activity.getString(R.string.subtitle_appearance),
+                    onClick = { showAppearance() },
+                )
+            ),
+            emptyText = activity.getString(R.string.subtitle_none_yet),
+        )
     }
 
     fun showAudioSheet() {
@@ -282,41 +348,86 @@ class SubtitleController(
      * is an offer to solve a problem the user does not have.
      */
     private fun sheetActions(): List<TrackSheet.Action> {
-        val playing = video
+        val playing = video ?: return emptyList()
         val actions = mutableListOf<TrackSheet.Action>()
 
-        if (playing != null) {
-            actions += TrackSheet.Action(
-                icon = R.drawable.ic_search,
-                label = activity.getString(R.string.subtitle_find),
-                detail = search.unavailableReason(),
-                onClick = { findOnline(playing) },
-            )
-            actions += TrackSheet.Action(
-                icon = R.drawable.ic_add,
-                label = activity.getString(R.string.subtitle_add_file),
-                onClick = { pickFile.launch(PICK_MIME_TYPES) },
-            )
-            if (playing.relativePath.isNotBlank() &&
-                SubtitleFolder.folderFor(activity, playing) == null
-            ) {
-                actions += TrackSheet.Action(
-                    icon = R.drawable.ic_folder,
-                    label = activity.getString(R.string.subtitle_grant_folder),
-                    detail = activity.getString(R.string.subtitle_grant_folder_detail),
-                    onClick = {
-                        pickFolder.launch(SubtitleFolder.initialFolderUri(playing))
-                    },
-                )
-            }
-        }
-
         actions += TrackSheet.Action(
-            icon = R.drawable.ic_text_size,
-            label = activity.getString(R.string.subtitle_appearance),
-            onClick = { showAppearance() },
+            icon = R.drawable.ic_search,
+            label = activity.getString(R.string.subtitle_find),
+            detail = search.unavailableReason(),
+            onClick = { findOnline(playing) },
         )
+        // Second, and named for what it does rather than for the plus sign. Subtitles beside
+        // the video are found without being asked for, so this is the fallback for the file
+        // that is somewhere else — not an equal partner to Find subtitles.
+        actions += TrackSheet.Action(
+            icon = R.drawable.ic_folder,
+            label = activity.getString(R.string.subtitle_choose_file),
+            onClick = { pickFile.launch(PICK_MIME_TYPES) },
+        )
+        if (playing.relativePath.isNotBlank() &&
+            SubtitleFolder.folderFor(activity, playing) == null
+        ) {
+            actions += TrackSheet.Action(
+                icon = R.drawable.ic_lock_folder,
+                label = activity.getString(R.string.subtitle_grant_folder),
+                detail = activity.getString(R.string.subtitle_grant_folder_detail),
+                onClick = {
+                    pickFolder.launch(SubtitleFolder.initialFolderUri(playing))
+                },
+            )
+        }
         return actions
+    }
+
+    /**
+     * How to remove [option], or null when it is not this app's to remove.
+     *
+     * Only a file in the store — something downloaded here or picked here. A track inside the
+     * container has no file of its own; a `.srt` sitting in the user's folder is a file they
+     * put there, and a caption menu is not the place to delete other people's files.
+     */
+    private fun removalOf(option: SubtitleTracks.Option): (() -> Unit)? {
+        if (SubtitleOrigin.of(option.format.id) != SubtitleOrigin.SAVED) return null
+        val sidecar = sidecars.firstOrNull { it.id == option.format.id } ?: return null
+        return { removeSaved(sidecar, option) }
+    }
+
+    /**
+     * Deletes one downloaded subtitle and puts the player back on its feet.
+     *
+     * The remembered choice is cleared when the track being deleted is the one playing, so the
+     * next discovery does not spend its time looking for a file that is gone; what it settles
+     * on instead is the ordinary rule — the preferred language if something else carries it,
+     * off if nothing does. Deleting a subtitle you were not watching changes nothing you can
+     * see except the row going away, which is the point.
+     */
+    private fun removeSaved(sidecar: Sidecar, option: SubtitleTracks.Option) {
+        val playing = video ?: return
+        val wasPlaying = option.isSelected
+        // Whatever Undo was holding, it is either this file or older than it; either way the
+        // offer has expired, and an Undo that deletes a file which is already gone is a button
+        // that does nothing.
+        undoable = null
+        hideNotice()
+        // Forget the choice before the file goes, so the next pass through
+        // applyRememberedChoice looks for a track rather than for a file that is not there.
+        if (wasPlaying) remember(null)
+
+        Background.run(
+            work = { store.deleteIfOwned(sidecar.uri) },
+            then = { deleted ->
+                if (!deleted) {
+                    Log.w(TAG, "could not delete ${sidecar.uri}")
+                    return@run
+                }
+                if (wasPlaying) playerProvider()?.let { SubtitleTracks.disableText(it) }
+                // Discovery rebuilds the media item; the panel redraws from onTracksChanged
+                // once the player has actually caught up.
+                discover(playing)
+                onStateChanged()
+            },
+        )
     }
 
     private fun showAppearance() {

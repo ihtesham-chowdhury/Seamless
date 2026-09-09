@@ -9,7 +9,40 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+- **One CC control, always in the same place, with its state on its face.** Subtitles used to be
+  reachable from the button *and* from the overflow menu, because the button only appeared once a
+  video turned out to have captions — so there had to be some other way to go looking for one.
+  Two doors to one room teach you that neither is the door. The button is now always present and
+  the menu entry is gone, and the control says which of three things is true without a badge or a
+  word on it: plain when nothing is on, a thin accent ring when a subtitle is playing, ringed and
+  filled while the panel is open. The accent is the one you chose in Settings, mixed light enough
+  to read over any frame.
+- **The subtitle panel, rebuilt around the question it is actually asked.** Which subtitle am I
+  watching, at the top, where it belongs; **Find subtitles** and **Choose subtitle file** below a
+  line; **Appearance** below a second line, because it is real and it is not why anyone opened
+  the panel. The panel grows out of the corner the control sits in rather than arriving as a
+  dialog, and it carries a close button of its own — the only thing to tap outside it is the film.
+- **"Add a subtitle file…" is now "Choose subtitle file…"**, with a folder rather than a plus.
+  Subtitles beside the video are found without being asked for, so this is the fallback for a
+  file that is somewhere else, not a second way to do the ordinary thing.
+
 ### Fixed
+- **The appearance controls went missing on any video with a few subtitle tracks.** They were
+  never missing. The whole panel was one column of `wrap_content`, so four or five tracks pushed
+  Find subtitles, Choose subtitle file and Appearance off the bottom of a screen that had no way
+  to scroll to them — worst in landscape, which is where films are watched. Only the track list
+  scrolls now, and it gives up its own height before anything else does.
+- **Downloading English four times listed English four times, with no way to be rid of any of
+  them.** The store deduplicated identical bytes and nothing else, and two uploads of the same
+  subtitle differ by a line of timing. One subtitle per video per language now: a second English
+  replaces the first, because the reason there is a second is that the first was wrong. Files
+  that piled up before this rule are cleared on the next play, newest kept. Anything left that
+  this app put on the device has a quiet delete button at the end of its row — and only those,
+  never a track inside the video, and never a `.srt` sitting in a folder of yours.
+- **Deleting the subtitle you were watching now stands the player back up** rather than leaving
+  it pointed at a file that is gone: it falls back to another track in your preferred language,
+  or to off if there is none.
 - **Subtitles did not work at all, and the reason was four lines of table-building.** The
   language table was built inside a `buildMap` block by a helper declared as
   `fun put(code, vararg names)` — which shadows `MutableMap.put`, so the `put(it, code)` in its

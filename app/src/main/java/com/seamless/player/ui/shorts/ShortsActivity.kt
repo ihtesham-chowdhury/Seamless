@@ -32,6 +32,7 @@ import com.seamless.player.databinding.ActivityShortsBinding
 import com.seamless.player.ui.common.ResizeModes
 import com.seamless.player.ui.common.SubtitleStyles
 import com.seamless.player.ui.common.Tips
+import com.seamless.player.ui.player.CcButton
 import com.seamless.player.ui.player.SubtitleTracks
 import com.seamless.player.ui.player.TrackSheet
 import com.seamless.player.util.Background
@@ -67,6 +68,12 @@ class ShortsActivity : AppCompatActivity(), ShortsAdapter.Host {
      */
     private val subtitleStore by lazy { SubtitleStore(this) }
     private var savedSubtitles: Map<String, List<SubtitleStore.Saved>> = emptyMap()
+
+    /** The track panel while it is up, so the CC button can show that it is open. */
+    private var subtitlePanel: TrackSheet? = null
+
+    /** As in the ordinary player: the accent, mixed light enough to read over any frame. */
+    private val subtitleAccent: Int by lazy { CcButton.accentFor(this, prefs.accentColor) }
 
     private val preloadControl = ShortsPreloadControl()
     private var preloadManager: DefaultPreloadManager? = null
@@ -286,20 +293,39 @@ class ShortsActivity : AppCompatActivity(), ShortsAdapter.Host {
     /**
      * The CC button, present only for a clip that actually has captions.
      *
+     * Unlike the player's, this one does come and go, and for a reason rather than by
+     * inheritance: the feed has no online search behind it, so a CC button on a clip with no
+     * captions would open a panel that could only say no. In the player the same button leads
+     * somewhere, which is why it is always there.
+     *
      * Recomputed rather than remembered, because the page a position refers to changes as the
      * pool hands players around, and a cached answer would be for the clip before last.
      */
     private fun updateSubtitleButton() {
         val player = feedAdapter?.focusedPlayer()
-        val has = player != null && SubtitleTracks.textOptions(player).isNotEmpty()
-        binding.btnSubtitles.visibility = if (has) View.VISIBLE else View.GONE
+        val options = player?.let { SubtitleTracks.textOptions(it) }.orEmpty()
+        binding.btnSubtitles.visibility = if (options.isEmpty()) View.GONE else View.VISIBLE
+        if (options.isEmpty()) return
+        // The same three-state treatment as the player's, so "subtitles are on" looks the same
+        // wherever it is said.
+        CcButton.apply(
+            binding.btnSubtitles,
+            when {
+                subtitlePanel?.isShowing == true -> CcButton.State.OPEN
+                SubtitleTracks.selected(options) != null -> CcButton.State.ACTIVE
+                else -> CcButton.State.IDLE
+            },
+            subtitleAccent,
+        )
     }
 
     /**
-     * The same panel the ordinary player uses, with one fewer thing on it.
+     * The same panel the ordinary player uses, with the management taken out.
      *
-     * No "find subtitles" and no folder permission: neither belongs in a feed of camera clips.
-     * Appearance does, because a caption that is too small is too small everywhere.
+     * Choosing a track, and nothing else. No online search, no folder permission, no removing
+     * files and no appearance controls: a feed of camera clips is not where anyone administers
+     * a subtitle collection, and every one of those has a home in the player, where the file
+     * being watched is a film someone chose to sit down with.
      */
     private fun showSubtitleSheet() {
         val player = feedAdapter?.focusedPlayer() ?: return
@@ -311,7 +337,10 @@ class ShortsActivity : AppCompatActivity(), ShortsAdapter.Host {
                 label = getString(R.string.subtitle_off),
                 detail = "",
                 selected = SubtitleTracks.selected(options) == null,
-                onClick = { SubtitleTracks.disableText(player) },
+                onClick = {
+                    SubtitleTracks.disableText(player)
+                    updateSubtitleButton()
+                },
             )
         )
         options.forEachIndexed { index, option ->
@@ -319,15 +348,23 @@ class ShortsActivity : AppCompatActivity(), ShortsAdapter.Host {
                 label = SubtitleTracks.label(this, option, index),
                 detail = SubtitleTracks.detail(this, option),
                 selected = option.isSelected,
-                onClick = { SubtitleTracks.select(player, option) },
+                onClick = {
+                    SubtitleTracks.select(player, option)
+                    updateSubtitleButton()
+                },
             )
         }
         // The overlay would withdraw on its own timer while the panel was open, so hold it —
         // and start it again on the way out, or it would stay up until the next tap.
         binding.root.removeCallbacks(hideOverlay)
-        TrackSheet(getString(R.string.subtitles), rows).show(this).setOnDismissListener {
+        val sheet = TrackSheet(getString(R.string.subtitles), rows)
+        subtitlePanel = sheet
+        sheet.show(this, onDismiss = {
+            subtitlePanel = null
+            updateSubtitleButton()
             binding.root.postDelayed(hideOverlay, OVERLAY_LINGER_MS)
-        }
+        })
+        updateSubtitleButton()
     }
 
     /** Filled when this clip is a favourite, outlined when it is not. */

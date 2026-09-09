@@ -70,7 +70,10 @@ There is no test suite yet — adding one would be a welcome contribution. Until
    initialiser, and a year regex that read "Blade Runner 2049" as a 2049 film. Neither is a
    type error and neither is a wiring error. Run `tools/typecheck.py` first — the probe uses
    its output.
-3. `python tools/svg_to_vector.py <source.svg> <target.xml> [size_dp]` for any other SVG
+3. `python tools/svg_to_vector.py <source.svg> <target.xml> [size_dp]` for any other SVG.
+   It carries an identity `translate(0,0)`, an offset viewBox (as a translating `<group>`) and
+   `rgb()` fills, and refuses anything it cannot carry faithfully — gradients, strokes, real
+   transforms — rather than dropping half a drawing silently
    that has to become a drawable — do not retype path data by hand.
    `python tools/icon_from_svg.py` if you changed `art/icon.svg`, then
    `python tools/icon_preview.py` and `python tools/ui_preview.py` if you touched the

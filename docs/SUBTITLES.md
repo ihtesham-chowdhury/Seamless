@@ -90,7 +90,7 @@ There are exactly two honest routes, and the app offers both:
 | Route | When it works | What it costs |
 |---|---|---|
 | **Let Seamless read this folder** (`ACTION_OPEN_DOCUMENT_TREE`, taken persistably) | Always | One prompt, once per folder, permanently. Every companion subtitle in that folder is then found on its own, for every video in it. |
-| **Add a subtitle file…** (`ACTION_OPEN_DOCUMENT`) | Always | One prompt per file. The file is copied into the app's store, so it sticks. |
+| **Choose subtitle file…** (`ACTION_OPEN_DOCUMENT`) | Always | One prompt per file. The file is copied into the app's store, so it sticks. |
 | A plain file read | Android 12 and earlier only | Nothing — it is tried first and allowed to fail. |
 
 The folder row only appears in the panel when it would achieve something: the video has a
@@ -203,6 +203,87 @@ log a failure and return, so the panel it was feeding was simply never told.
 
 ---
 
+## The panel
+
+One control opens it and there is no second way in. That is worth saying because there used to
+be: the CC button appeared only when a video already had captions, so "go and find me one" had
+to live in the overflow menu as well, under the same name. Two entries to one panel do not make
+it twice as findable — they make neither of them the answer to "where is that".
+
+So the control is always there, and it carries its own state instead of a badge:
+
+| | What it means |
+|---|---|
+| plain disc | nothing switched on |
+| thin accent ring | a subtitle is playing |
+| accent ring and fill | the panel is open |
+
+The last two are separate on purpose. Closing the panel is the moment you find out whether
+anything changed, and if "on" and "open" looked the same there would be nothing to find out.
+The accent is the one chosen in Settings, mixed a third of the way to white so it separates
+from a dark disc on a bright frame and from a bright disc on a dark one. The player itself
+stays uncoloured; a whole video player tinted in someone's chosen purple would be a strange
+thing to insist on, but one control with a state is exactly what an accent is for.
+
+The panel answers one question and puts everything else beneath it:
+
+```
+Subtitles                    ×
+
+  Off
+✓ English      Downloaded   🗑
+  English      In this video
+  বাংলা          In this folder
+─────────────────────────────
+🔍 Find subtitles
+📁 Choose subtitle file…
+─────────────────────────────
+Aa Appearance
+```
+
+Above the first line: what am I watching. Between the lines: what to do when the answer is
+"none of these". Below the second: appearance, which is real, wanted, and nobody's reason for
+opening this panel.
+
+**Only the list scrolls.** Everything used to be one column that grew, which meant a file with
+five text tracks pushed all three actions off the bottom of the screen — and in landscape,
+where films are actually watched, off the bottom of a fairly short screen. It looked exactly
+like the appearance controls disappearing once you added a subtitle. The list now gives up its
+own height first, and is capped at a little under half the screen so the panel stays a panel
+with the film visible around it.
+
+---
+
+## One subtitle per language
+
+Downloading English twice used to leave two rows called English, four times four rows, and
+nothing to tell them apart or take them away. The store deduplicated identical bytes, which
+catches the same file twice and misses the case that actually happens: a second upload of the
+same subtitle, differing by a line of timing.
+
+The rule now is one saved subtitle per video per language. A second English replaces the first,
+because the reason there is a second is that the first was wrong. Anything genuinely different
+is a different language and keeps its own row. Files that accumulated before the rule are
+cleared on the next play, newest kept — a rule that only applied going forward would leave the
+existing mess there for ever.
+
+Two rows can still both say English, and should: one inside the video and one downloaded are
+different files with different timings, and the second line says which is which.
+
+**Deleting.** A subtitle this app put on the device carries a quiet delete at the end of its
+row. Nothing else does, and the distinction is not squeamishness:
+
+- a track inside the video has no file of its own to remove;
+- a `.srt` in your own folder is a file you put there, and a caption menu is not where anyone
+  should be able to delete files they did not know were listed.
+
+Deleting the track that is playing falls back the same way opening a video does — the preferred
+language if something else carries it, off if nothing does. The panel stays open, because
+tidying comes in twos and threes and closing after each one would mean opening the panel three
+times.
+
+---
+
 ## What it remembers
 
 - **Per video**: the exact track, or "off". So a film watched without subtitles stays that way.
@@ -305,6 +386,7 @@ data/subtitle/
 ui/player/
   SubtitleController.kt   all of it, for the ordinary player
   SubtitleTracks.kt       reading and selecting tracks — subtitles and audio alike
+  CcButton.kt             the control's three states, drawn from the accent
   TrackSheet.kt           the floating panel
   SubtitleAppearanceSheet.kt
   SubtitleCandidatesSheet.kt
@@ -312,6 +394,7 @@ ui/player/
 
 ui/common/
   SubtitleStyles.kt       preferences → CaptionStyleCompat
+  CappedScrollView.kt     a list that will not take the whole screen
 
 util/
   Http.kt                 the whole of this app's networking

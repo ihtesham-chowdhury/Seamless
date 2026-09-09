@@ -86,7 +86,11 @@ object LocalSubtitles {
      * Does file I/O. Never call this on the main thread.
      */
     fun discover(context: Context, store: SubtitleStore, video: Video): List<Sidecar> {
-        val sidecars = fromStore(store.saved(store.keyFor(video))).toMutableList()
+        val key = store.keyFor(video)
+        // Before anything is read, not after: a video with four leftover copies of the same
+        // English subtitle should never get as far as building four tracks out of them.
+        store.prune(key)
+        val sidecars = fromStore(store.saved(key)).toMutableList()
 
         // A video from outside the library has no folder to look in — relativePath is empty
         // and companions() would be listing the root of storage.

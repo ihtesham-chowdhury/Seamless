@@ -286,12 +286,16 @@ Picking the folder yourself grants access to it, which gets around that restrict
     <string name="subtitle_sdh">SDH</string>
     <string name="subtitle_track_number">Track %1$d</string>
     <string name="subtitle_unknown_language">Unknown language</string>
+    <string name="subtitle_remove">Remove this subtitle</string>
+
+    <!-- The panel with nothing in it. Says what is true, then what to do about it. -->
+    <string name="subtitle_none_yet">No subtitles for this video yet.</string>
 
     <string name="subtitle_find">Find subtitles</string>
-    <string name="subtitle_add_file">Add a subtitle file…</string>
+    <string name="subtitle_choose_file">Choose subtitle file…</string>
     <string name="subtitle_grant_folder">Let Seamless read this folder</string>
     <string name="subtitle_grant_folder_detail">Then subtitles saved beside your videos are found on their own</string>
-    <string name="subtitle_searching">Searching…</string>
+    <string name="subtitle_searching">Looking for a match…</string>
     <string name="subtitle_score">%1$d%%</string>
     <string name="subtitle_match_excellent">Excellent match</string>
     <string name="subtitle_match_good">Good match</string>
@@ -303,7 +307,7 @@ Picking the folder yourself grants access to it, which gets around that restrict
     <string name="subtitle_copy_details">Copy details</string>
 
     <!-- Says what to try next, because "nothing found" on its own is a dead end. -->
-    <string name="subtitle_no_match">No confident match for this file.\n\nRenaming it closer to the original release usually fixes this — the title and the year are what a search has to go on. A file you already have can be added with “Add a subtitle file”.</string>
+    <string name="subtitle_no_match">No confident match for this file.\n\nRenaming it closer to the original release usually fixes this — the title and the year are what a search has to go on. A file you already have can be added with “Choose subtitle file”.</string>
     <string name="subtitle_unavailable">%1$s.\n\nSettings → Subtitles has the switch and the key. Seamless makes no network request until both are in place.</string>
 
     <string name="subtitle_found">%1$s subtitle found</string>

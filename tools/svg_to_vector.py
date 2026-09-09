@@ -7,9 +7,11 @@ with a solid fill and no transform. Path data is copied through untouched — An
 parser understands the same grammar, exponents included — so the only thing this script
 actually does is translate the wrapper and the fill attributes.
 
-It refuses anything it cannot faithfully carry across (gradients, strokes, transforms,
+It refuses anything it cannot faithfully carry across (gradients, strokes, real transforms,
 clip paths) rather than dropping it silently, because a converter that quietly discards half
-a drawing is worse than no converter.
+a drawing is worse than no converter. Two things it does carry rather than refuse: an identity
+`translate(0,0)`, which editors stamp on everything, and a viewBox with a non-zero origin,
+which becomes a translating <group>.
 
 Usage:  python tools/svg_to_vector.py <source.svg> <res/drawable/name.xml> [size_dp]
 """
@@ -23,16 +25,31 @@ import xml.etree.ElementTree as ET
 
 SVG = "http://www.w3.org/2000/svg"
 
+# Drawing tools stamp this on every path whether or not anything moved. It means nothing,
+# and refusing it would refuse most real exports; anything with actual numbers in it still
+# stops the conversion.
+RGB_FUNCTION = re.compile(r"rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)")
+
+IDENTITY_TRANSFORM = re.compile(r"translate\(\s*0\s*[, ]\s*0\s*\)")
+
 
 def tag(element) -> str:
     return element.tag.split("}")[-1]
 
 
 def android_colour(fill: str) -> str:
-    """#rgb or #rrggbb to Android's #AARRGGBB."""
+    """#rgb, #rrggbb or rgb(r, g, b) to Android's #AARRGGBB."""
     value = fill.strip()
+    # rgb() is what several editors write, and it carries exactly the same information as the
+    # hex form — so it is converted rather than refused.
+    channels = RGB_FUNCTION.fullmatch(value)
+    if channels:
+        parts = [int(channels.group(n)) for n in (1, 2, 3)]
+        if any(part > 255 for part in parts):
+            raise SystemExit(f"channel out of range in {fill!r}")
+        return "#FF" + "".join("%02X" % part for part in parts)
     if not value.startswith("#"):
-        raise SystemExit(f"only hex fills are supported, found {fill!r}")
+        raise SystemExit(f"only hex and rgb() fills are supported, found {fill!r}")
     digits = value[1:]
     if len(digits) == 3:
         digits = "".join(c * 2 for c in digits)
@@ -48,8 +65,6 @@ def convert(source: str, size_dp: float) -> str:
     if len(box) != 4:
         raise SystemExit("the SVG needs a viewBox")
     min_x, min_y, width, height = (float(v) for v in box)
-    if min_x or min_y:
-        raise SystemExit("viewBox must start at 0,0; this script does not offset paths")
 
     paths = []
     for element in root.iter():
@@ -61,7 +76,8 @@ def convert(source: str, size_dp: float) -> str:
                 "VectorDrawable cannot carry those across unchanged; flatten them first.")
         if tag(element) != "path":
             continue
-        if element.get("transform"):
+        transform = (element.get("transform") or "").strip()
+        if transform and not IDENTITY_TRANSFORM.fullmatch(transform):
             raise SystemExit(f"path {element.get('id')} has a transform; flatten it first")
         if (element.get("stroke") or "none") != "none":
             raise SystemExit(f"path {element.get('id')} is stroked; only fills are supported")
@@ -73,11 +89,23 @@ def convert(source: str, size_dp: float) -> str:
     if not paths:
         raise SystemExit("no filled <path> elements found")
 
+    indent = "    " if not (min_x or min_y) else "        "
     body = "\n\n".join(
-        f'    <path\n        android:fillColor="{colour}"\n'
-        f'        android:pathData="{data}" />'
+        f'{indent}<path\n{indent}    android:fillColor="{colour}"\n'
+        f'{indent}    android:pathData="{data}" />'
         for colour, data in paths
     )
+
+    # A viewBox that does not start at 0,0 is an offset, and a VectorDrawable has no
+    # viewBox origin to put it in — so it becomes a group that translates the drawing
+    # back. Editors emit these routinely (an artboard cropped to its content), and
+    # refusing them meant editing path data by hand, which is the one thing this script
+    # exists to avoid.
+    if min_x or min_y:
+        body = (
+            f'    <group\n        android:translateX="{-min_x:g}"\n'
+            f'        android:translateY="{-min_y:g}">\n\n{body}\n    </group>'
+        )
     aspect = height / width
     return (
         '<?xml version="1.0" encoding="utf-8"?>\n'
