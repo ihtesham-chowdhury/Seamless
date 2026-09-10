@@ -189,6 +189,17 @@ class SubtitleController(
      */
     enum class Lift { NONE, CONTROLS, PANEL }
 
+    /**
+     * How far up the appearance panel actually reaches, as a fraction of the screen.
+     *
+     * Set when that panel reports its own laid-out height and reset when it closes. It began
+     * as a constant and the constant was wrong: the panel is as tall as its contents, its
+     * contents are a size smaller in landscape, and the card is anchored to the bottom now
+     * rather than being a full-width sheet — so a fixed 42% put the caption squarely behind
+     * the panel adjusting it, which is the one thing this lift exists to prevent.
+     */
+    private var panelReach = PANEL_PADDING
+
     fun applyStyle(lift: Lift = Lift.NONE) {
         val view = binding.playerView.subtitleView ?: return
         val padding = when (lift) {
@@ -196,7 +207,7 @@ class SubtitleController(
             // Never *lower* the text: someone who has already pushed it up past the controls
             // asked for that, and undoing it here would be overruling them.
             Lift.CONTROLS -> maxOf(prefs.subtitleBottomPadding, CONTROLS_PADDING)
-            Lift.PANEL -> maxOf(prefs.subtitleBottomPadding, PANEL_PADDING)
+            Lift.PANEL -> maxOf(prefs.subtitleBottomPadding, panelReach)
         }
         SubtitleStyles.apply(view, prefs, padding)
     }
@@ -471,8 +482,21 @@ class SubtitleController(
         // Raised while the panel is open, so the caption is visible above it and every change can
         // be seen as it is made rather than guessed at from a label. Lowered again on dismissal.
         applyStyle(Lift.PANEL)
-        SubtitleAppearanceSheet(prefs) { applyStyle(Lift.PANEL) }
-            .show(activity, onDismiss = { applyStyle() })
+        SubtitleAppearanceSheet(prefs) { applyStyle(Lift.PANEL) }.show(
+            activity,
+            onDismiss = {
+                panelReach = PANEL_PADDING
+                applyStyle()
+            },
+            onMeasured = { reach ->
+                // A little above the panel's top edge rather than exactly on it, and never so
+                // high that the caption ends up under the control row. On a short screen the
+                // ceiling is doing real work: the panel can reach most of the way up, and the
+                // honest answer there is "as high as it can go" rather than "hidden".
+                panelReach = (reach + PANEL_CLEARANCE).coerceAtMost(PANEL_CEILING)
+                applyStyle(Lift.PANEL)
+            },
+        )
     }
 
     // ---- online ----
@@ -701,8 +725,15 @@ class SubtitleController(
         /** Clear of the transport bar, which is about a fifth of the height of the screen. */
         const val CONTROLS_PADDING = 0.20f
 
-        /** Clear of a floating panel, which covers rather more. */
+        /** Where the caption goes before the appearance panel has said how tall it is. */
         const val PANEL_PADDING = 0.42f
+
+        /** Enough air between the caption and the panel's top edge to read as separate. */
+        const val PANEL_CLEARANCE = 0.04f
+
+        /** Above this the caption is behind the control row, which is no better than behind
+         *  the panel. */
+        const val PANEL_CEILING = 0.86f
 
         /** Long enough to read two lines and reach Undo, short enough not to be chrome. */
         const val NOTICE_LINGER_MS = 6_000L

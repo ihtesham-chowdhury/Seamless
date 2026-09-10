@@ -31,11 +31,31 @@ class SubtitleAppearanceSheet(
      * the text while this panel is open so the effect is visible above it, and something has to
      * lower it again; a timer would either fight the closing animation or lag behind it.
      */
-    fun show(context: Context, onDismiss: () -> Unit = {}) {
+    fun show(
+        context: Context,
+        onDismiss: () -> Unit = {},
+        /**
+         * How much of the screen this panel covers, measured from the bottom edge, once it has
+         * actually been laid out.
+         *
+         * Measured rather than assumed, because the caller needs it to put the caption
+         * *somewhere else*. A constant was tried and was wrong in both orientations: the panel
+         * is as tall as its contents, its contents differ by orientation, and a guess that is
+         * too small leaves the very thing being adjusted hidden behind the thing adjusting it.
+         */
+        onMeasured: (Float) -> Unit = {},
+    ) {
         val binding = SheetSubtitleAppearanceBinding.inflate(LayoutInflater.from(context))
         val dialog = FloatingSheet.create(context, binding.root)
         dialog.setOnDismissListener { onDismiss() }
         binding.close.setOnClickListener { dialog.dismiss() }
+
+        binding.root.post {
+            val screen = context.resources.displayMetrics.heightPixels.toFloat()
+            if (screen <= 0f) return@post
+            val inset = context.resources.getDimensionPixelSize(R.dimen.sheet_bottom_inset)
+            onMeasured((binding.root.height + inset) / screen)
+        }
 
         // The two fractional settings ride on percentage sliders; see the layout for why.
         bindSlider(binding.size, prefs.subtitleTextScale * 100f) {

@@ -63,6 +63,10 @@ the whole feature — finding a subtitle, choosing one, being rid of one — is 
   deleted, because there is nothing to delete.
 - **"Clear downloaded subtitles" deleted them on one tap with no way back.** The row is
   "Downloaded subtitles" now, with its size, and the deleting happens behind a question.
+- **The caption you were restyling could end up behind the panel restyling it.** The lift that
+  moves it clear was a fixed fraction of the screen, and a fixed fraction cannot be right for a
+  panel that is as tall as its own contents in an orientation that changes them. The panel
+  measures itself now and the caption goes just above whatever it turned out to be.
 
 ---
 
