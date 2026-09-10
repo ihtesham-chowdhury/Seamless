@@ -27,4 +27,7 @@
 
     <dimen name="sheet_group_gap">10dp</dimen>
     <dimen name="sheet_group_gap_tight">6dp</dimen>
+
+    <!-- The speed panel's number, large because it is the answer. -->
+    <dimen name="speed_readout_size">30sp</dimen>
 </resources>

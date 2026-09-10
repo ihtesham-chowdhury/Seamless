@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The rule that runs out from a section heading.
+
+  Full accent for the first part of its length and only then fading, so it reads as the heading
+  extending along its section rather than as a divider fencing it off. A line that begins fading
+  at once is a grey line by the time it is 1dp tall and a few dp long, and the accent it was
+  meant to carry is lost. The colours are theme attributes, so every accent gets its own line
+  without a drawable per colour.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient
+        android:angle="0"
+        android:centerColor="?attr/colorPrimary"
+        android:centerX="0.45"
+        android:endColor="@android:color/transparent"
+        android:startColor="?attr/colorPrimary" />
+</shape>

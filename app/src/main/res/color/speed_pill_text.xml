@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark figures on the selected white pill, near-white on the glass ones. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:color="#FF111114"
+        android:state_selected="true" />
+    <item android:color="#E6FFFFFF" />
+</selector>

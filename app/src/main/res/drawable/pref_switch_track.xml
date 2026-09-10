@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The switch's track. White, because the colour comes from app:trackTint on the view: a state
+  list that is the accent when on and a neutral grey when off.
+
+  The padding is what lets the knob sit *inside* the pill rather than touching its ends:
+  SwitchCompat reads it as the distance to keep between the track's edge and the thumb's travel.
+  It is on all four sides even though only left and right move the knob, because SwitchCompat
+  pulls the track in vertically wherever the thumb's inset is larger than this padding, and that
+  would close the gap above and below the knob. 52 by 28 with a 24dp knob is close to the
+  proportions people know from iOS, a touch more compact for a row that is not the whole screen.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <corners android:radius="14dp" />
+    <size
+        android:width="52dp"
+        android:height="28dp" />
+    <padding
+        android:bottom="2dp"
+        android:left="2dp"
+        android:right="2dp"
+        android:top="2dp" />
+    <solid android:color="#FFFFFFFF" />
+</shape>

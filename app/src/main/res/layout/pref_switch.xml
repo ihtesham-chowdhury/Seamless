@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The switch on a settings row: a pill in the accent colour when on, a quiet grey one when off,
+  and a white knob sitting inside it with a little air all round.
+
+  Replaces androidx's preference_widget_switch_compat and keeps the two things about it that are
+  not negotiable. The id is switchWidget, the name SwitchPreferenceCompat looks the view up by —
+  androidx's own id, which resolves to the same resource here because library ids merge into
+  this package by name. And it is neither clickable nor focusable: the whole row is the touch
+  target, and a switch that took its own taps would toggle twice or not at all.
+
+  Tints rather than coloured drawables, set on the view rather than left to the theme. Material
+  3's switch style tints thumbs and tracks by itself, and anything it is allowed to decide would
+  override the accent this exists to carry.
+-->
+<androidx.appcompat.widget.SwitchCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/switchWidget"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@null"
+    android:clickable="false"
+    android:focusable="false"
+    android:thumb="@drawable/pref_switch_thumb"
+    app:showText="false"
+    app:switchMinWidth="52dp"
+    app:thumbTint="#FFFFFFFF"
+    app:track="@drawable/pref_switch_track"
+    app:trackTint="@color/pref_switch_track" />

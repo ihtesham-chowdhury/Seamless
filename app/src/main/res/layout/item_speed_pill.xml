@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One preset speed: the number in a pill, and under it a word where a word helps.
+
+  Only 1x has a caption, "Normal", but every pill keeps the caption's line so the row of pills
+  stays level — the caption is set invisible, not gone, on the others. The selected pill is white
+  with dark figures, the inverse of the rest, which is the clearest "this one" there is without
+  adding a colour to a player that does not use one.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingStart="3dp"
+    android:paddingEnd="3dp">
+
+    <TextView
+        android:id="@+id/value"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:background="@drawable/speed_pill_bg"
+        android:fontFeatureSettings="tnum"
+        android:gravity="center"
+        android:minWidth="54dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:textColor="@color/speed_pill_text"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="#8AFFFFFF"
+        android:textSize="10sp"
+        android:visibility="invisible" />
+</LinearLayout>

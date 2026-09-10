@@ -39,4 +39,7 @@
     <!-- The appearance panel's gap between one control and the next label. -->
     <dimen name="sheet_group_gap">18dp</dimen>
     <dimen name="sheet_group_gap_tight">10dp</dimen>
+
+    <!-- The speed panel's number, large because it is the answer. -->
+    <dimen name="speed_readout_size">40sp</dimen>
 </resources>

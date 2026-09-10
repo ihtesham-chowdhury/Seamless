@@ -10,4 +10,7 @@
     <color name="nav_fill_top">#F52E2E36</color>
     <color name="nav_fill_bottom">#EB23232A</color>
     <color name="nav_stroke">#33FFFFFF</color>
+
+    <!-- See values/colors.xml. Dark enough to sit back, light enough that the knob has an edge. -->
+    <color name="switch_track_off">#FF3A3A3F</color>
 </resources>

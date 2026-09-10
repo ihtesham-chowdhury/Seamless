@@ -7,6 +7,11 @@
   Each group is now a card: the heading says what it is for, and the card's edge says where
   it ends. The order runs from what people change often to what they change once.
 
+  Every row carries an icon on a small disc, and every switch is the pill in pref_switch.xml.
+  The icons are Material's, the family the player's own controls come from, so the settings
+  screen and the player look like one product; the switches carry the accent so "on" is said
+  in the colour the user chose.
+
   android:layout on every entry is what draws those cards — the row layouts differ only in
   which corners they round, and each preference names the one that matches its place in its
   group. Adding, removing or moving a row means fixing its neighbours' layouts too. That is
@@ -25,12 +30,14 @@
             android:entries="@array/theme_entries"
             android:entryValues="@array/theme_values"
             android:key="theme_mode"
+            android:icon="@drawable/ic_pref_theme"
             android:layout="@layout/pref_row_top"
             android:title="@string/settings_theme_title"
             app:useSimpleSummaryProvider="true" />
 
         <Preference
             android:key="accent_color"
+            android:icon="@drawable/ic_pref_palette"
             android:layout="@layout/pref_row_bottom"
             android:title="@string/settings_accent_title" />
     </PreferenceCategory>
@@ -48,13 +55,16 @@
             android:entries="@array/shorts_source_entries"
             android:entryValues="@array/shorts_source_values"
             android:key="shorts_source"
+            android:icon="@drawable/ic_pref_source"
             android:layout="@layout/pref_row_top"
             android:title="@string/settings_shorts_source_title"
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
+            android:widgetLayout="@layout/pref_switch"
             android:defaultValue="false"
             android:key="shorts_include_short_landscape"
+            android:icon="@drawable/ic_pref_landscape"
             android:layout="@layout/pref_row_middle"
             android:summary="@string/settings_shorts_landscape_summary"
             android:title="@string/shorts_filter_landscape" />
@@ -70,13 +80,16 @@
             android:entries="@array/shorts_length_entries"
             android:entryValues="@array/shorts_length_values"
             android:key="shorts_max_landscape_label"
+            android:icon="@drawable/ic_pref_timer"
             android:layout="@layout/pref_row_middle"
             android:title="@string/shorts_max_length_title"
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
+            android:widgetLayout="@layout/pref_switch"
             android:defaultValue="true"
             android:key="shorts_auto_advance"
+            android:icon="@drawable/ic_pref_autoplay"
             android:layout="@layout/pref_row_middle"
             android:summary="@string/settings_autoadvance_summary"
             android:title="@string/settings_autoadvance_title" />
@@ -86,6 +99,7 @@
             android:entries="@array/resize_entries"
             android:entryValues="@array/resize_values"
             android:key="shorts_resize_mode"
+            android:icon="@drawable/ic_aspect_ratio"
             android:layout="@layout/pref_row_bottom"
             android:title="@string/settings_shorts_resize_title"
             app:useSimpleSummaryProvider="true" />
@@ -100,6 +114,7 @@
             android:entries="@array/resize_entries"
             android:entryValues="@array/resize_values"
             android:key="player_resize_mode"
+            android:icon="@drawable/ic_pref_fit"
             android:layout="@layout/pref_row_top"
             android:title="@string/settings_player_resize_title"
             app:useSimpleSummaryProvider="true" />
@@ -109,6 +124,7 @@
             android:entries="@array/orientation_entries"
             android:entryValues="@array/orientation_values"
             android:key="orientation_mode"
+            android:icon="@drawable/ic_pref_rotation"
             android:layout="@layout/pref_row_middle"
             android:title="@string/settings_orientation_title"
             app:useSimpleSummaryProvider="true" />
@@ -129,11 +145,13 @@
             android:entries="@array/resume_entries"
             android:entryValues="@array/resume_values"
             android:key="resume_minutes_label"
+            android:icon="@drawable/ic_pref_history"
             android:layout="@layout/pref_row_middle"
             android:title="@string/settings_resume_title" />
 
         <Preference
             android:key="clear_resume"
+            android:icon="@drawable/ic_pref_sweep"
             android:layout="@layout/pref_row_bottom"
             android:title="@string/settings_clear_resume" />
     </PreferenceCategory>
@@ -154,6 +172,7 @@
             android:entries="@array/subtitle_language_entries"
             android:entryValues="@array/subtitle_language_values"
             android:key="subtitle_language"
+            android:icon="@drawable/ic_pref_language"
             android:layout="@layout/pref_row_top"
             android:title="@string/settings_subtitle_language_title"
             app:useSimpleSummaryProvider="true" />
@@ -161,8 +180,10 @@
         <!-- The only switch in the app that turns networking on. Off, and documented in
              PRIVACY.md; with no key set below it, flipping it still reaches nothing. -->
         <SwitchPreferenceCompat
+            android:widgetLayout="@layout/pref_switch"
             android:defaultValue="false"
             android:key="subtitle_online"
+            android:icon="@drawable/ic_pref_cloud"
             android:layout="@layout/pref_row_middle"
             android:summary="@string/settings_subtitle_online_summary"
             android:title="@string/settings_subtitle_online_title" />
@@ -171,30 +192,37 @@
              actually stored, and setSummary throws on a preference that has a provider. -->
         <Preference
             android:key="subtitle_api_key"
+            android:icon="@drawable/ic_pref_key"
             android:layout="@layout/pref_row_middle"
             android:title="@string/settings_subtitle_key_title" />
 
         <Preference
             android:key="subtitle_account"
+            android:icon="@drawable/ic_pref_account"
             android:layout="@layout/pref_row_middle"
             android:title="@string/settings_subtitle_account_title" />
 
         <SwitchPreferenceCompat
+            android:widgetLayout="@layout/pref_switch"
             android:defaultValue="true"
             android:key="subtitle_auto_apply"
+            android:icon="@drawable/ic_pref_sparkle"
             android:layout="@layout/pref_row_middle"
             android:summary="@string/settings_subtitle_auto_summary"
             android:title="@string/settings_subtitle_auto_title" />
 
         <SwitchPreferenceCompat
+            android:widgetLayout="@layout/pref_switch"
             android:defaultValue="true"
             android:key="subtitle_save_beside"
+            android:icon="@drawable/ic_pref_save"
             android:layout="@layout/pref_row_middle"
             android:summary="@string/settings_subtitle_beside_summary"
             android:title="@string/settings_subtitle_beside_title" />
 
         <Preference
             android:key="subtitle_clear"
+            android:icon="@drawable/ic_pref_download"
             android:layout="@layout/pref_row_bottom"
             android:title="@string/settings_subtitle_clear" />
     </PreferenceCategory>
@@ -204,15 +232,19 @@
         android:title="@string/settings_gestures">
 
         <SwitchPreferenceCompat
+            android:widgetLayout="@layout/pref_switch"
             android:defaultValue="true"
             android:key="swipe_down_to_close"
+            android:icon="@drawable/ic_pref_swipe_down"
             android:layout="@layout/pref_row_top"
             android:summary="@string/settings_swipe_close_summary"
             android:title="@string/settings_swipe_close_title" />
 
         <SwitchPreferenceCompat
+            android:widgetLayout="@layout/pref_switch"
             android:defaultValue="false"
             android:key="external_portrait"
+            android:icon="@drawable/ic_pref_portrait"
             android:layout="@layout/pref_row_middle"
             android:summary="@string/settings_external_portrait_summary"
             android:title="@string/settings_external_portrait_title" />
@@ -225,6 +257,7 @@
             android:entries="@array/unlock_entries"
             android:entryValues="@array/unlock_values"
             android:key="unlock_method"
+            android:icon="@drawable/ic_lock_open"
             android:layout="@layout/pref_row_bottom"
             android:title="@string/settings_unlock_title"
             app:useSimpleSummaryProvider="true" />
@@ -235,19 +268,23 @@
         android:title="@string/settings_privacy">
 
         <SwitchPreferenceCompat
+            android:widgetLayout="@layout/pref_switch"
             android:defaultValue="false"
             android:key="app_lock"
+            android:icon="@drawable/ic_pref_shield"
             android:layout="@layout/pref_row_top"
             android:summary="@string/settings_app_lock_summary"
             android:title="@string/settings_app_lock_title" />
 
         <Preference
             android:key="locked_folders"
+            android:icon="@drawable/ic_lock"
             android:layout="@layout/pref_row_middle"
             android:title="@string/settings_locked_folders_title" />
 
         <Preference
             android:key="hidden_folders"
+            android:icon="@drawable/ic_hide"
             android:layout="@layout/pref_row_bottom"
             android:title="@string/settings_hidden_folders_title" />
     </PreferenceCategory>
@@ -258,17 +295,20 @@
 
         <Preference
             android:key="help"
+            android:icon="@drawable/ic_pref_touch"
             android:layout="@layout/pref_row_top"
             android:summary="@string/settings_help_summary"
             android:title="@string/settings_help_title" />
 
         <Preference
             android:key="reset_tips"
+            android:icon="@drawable/ic_tip"
             android:layout="@layout/pref_row_middle"
             android:title="@string/settings_reset_tips" />
 
         <Preference
             android:key="version"
+            android:icon="@drawable/ic_info"
             android:layout="@layout/pref_row_bottom"
             android:selectable="false"
             android:title="@string/settings_version_title" />

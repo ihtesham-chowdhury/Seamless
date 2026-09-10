@@ -9,17 +9,22 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-Nothing yet.
-
----
-
-## [0.2.3] — 2026-09-10
-
-Subtitles, and then the three rounds of fixing them that the first attempt needed. The
-engine landed in 0.2.0 and did not work at all until 0.2.2; this is the first version where
-the whole feature — finding a subtitle, choosing one, being rid of one — is worth using.
-
-#### The subtitle panel and Settings
+### Changed
+- **Settings has icons, a rule after each heading, and switches in your colour.** Every row sits
+  on a small round disc with its icon — the same plate the player's controls sit on, from the
+  same Material family, so the two screens look like one product. Each section heading runs out
+  into a line in the accent colour that fades to nothing. The switches are pills: the accent when
+  on, a quiet grey when off, a white knob inside with air around it. And the header's line is
+  broken in two on purpose, which leaves the space on the right that makes it read as a header.
+- **Playback speed is a floating card, not a list in a dialog.** A large readout of the speed; a
+  slider with a step either side for fine-tuning in 0.05s; and every preset as a pill, scrolling
+  sideways rather than trimmed to fit, with the one playing shown in white. It applies as it
+  moves, like the appearance panel, because a speed is judged by listening to it.
+- **Play, previous and next sit in glass.** A translucent capsule around the three, with a disc
+  under each and a brighter one under play. The bare glyphs before them were right that a strip
+  of tiles looks like a toolbar; what they lost was any sense of the three being one control.
+- **A rounder gear.** The navigation's settings icon is Material's Round variant: the same shape,
+  softer teeth.
 - **The subtitle panel is the floating card it was drawn as.** It was a bottom sheet, and no
   amount of margin turns one of those into a card resting on the picture: a bottom sheet belongs
   to the edge of the screen, stretches the full width, and reads as a drawer pulled out of the
@@ -42,7 +47,18 @@ the whole feature — finding a subtitle, choosing one, being rid of one — is 
   "Force portrait outside Seamless", and the unlock method finally shows which method it is set
   to instead of a sentence explaining what unlock methods are.
 
-#### Fixed in that pass
+### Fixed
+- **The subtitle delete button never appeared, and folder subtitles said "In this video".**
+  One cause, for three rounds. Each subtitle this app attaches is given an id that says where it
+  came from, and the origin was read off the *start* of the id. But Media3 plays a video with
+  subtitles as a merge of separate sources, and `MergingMediaPeriod` rewrites every track id on
+  the way through by putting the source's index in front of it — so `seamless-sub:BESIDE:0` comes
+  back as `1:seamless-sub:BESIDE:0`, the start of it is `1`, and every downloaded subtitle and
+  every file beside a video was taken for a track inside the container, which has nothing to
+  delete. Confirmed against the bytecode of Media3 1.11 rather than guessed at. The origin is
+  found wherever it sits in the id now; the delete button appears for downloaded subtitles and
+  for files beside the video (a file you put there asks first, and names itself); and
+  `tools/subtitle_probe.py` runs the merged form of the id so this cannot quietly come back.
 - **The subtitle panel ran to the bottom of the screen in both orientations.** It floats now,
   with air underneath it.
 - **Half the appearance controls did not exist on a landscape video.** A phone lying down gives
@@ -55,12 +71,6 @@ the whole feature — finding a subtitle, choosing one, being rid of one — is 
   action rows are added on top; a list allowed most of a short screen produced a card that ran
   off the top of it and covered the controls it was opened from. The cap is on the card now and
   the list gives up whatever is left.
-- **The delete button never appeared for most people who wanted it.** It was restricted to
-  subtitles this app had downloaded, and the ones that pile up are the `.srt` files sitting
-  beside your videos. Any subtitle that is a file can be removed now. A downloaded one goes on a
-  tap; a file you put there asks first and names itself, because it may be your only copy and
-  every other player on the phone can see it too. A track inside the video still cannot be
-  deleted, because there is nothing to delete.
 - **"Clear downloaded subtitles" deleted them on one tap with no way back.** The row is
   "Downloaded subtitles" now, with its size, and the deleting happens behind a question.
 - **The caption you were restyling could end up behind the panel restyling it.** The lift that
@@ -69,6 +79,12 @@ the whole feature — finding a subtitle, choosing one, being rid of one — is 
   measures itself now and the caption goes just above whatever it turned out to be.
 
 ---
+
+## [0.2.3] — 2026-09-10
+
+Subtitles, and then the three rounds of fixing them that the first attempt needed. The
+engine landed in 0.2.0 and did not work at all until 0.2.2; this is the first version where
+the whole feature — finding a subtitle, choosing one, being rid of one — is worth using.
 
 ### Changed
 - **One CC control, always in the same place, with its state on its face.** Subtitles used to be

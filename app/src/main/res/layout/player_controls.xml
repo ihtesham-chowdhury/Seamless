@@ -14,7 +14,9 @@
   piece, which is only possible because Media3's own animation is switched off — see the
   note in PlayerActivity.wireButtons().
 
-  Everything floats directly over the picture — no bars, no scrim.
+  Everything floats directly over the picture — no bars, no scrim. The one surface is the glass
+  capsule round the transport buttons, which is an object rather than a bar: it is only as wide
+  as the three buttons it holds.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -36,47 +38,62 @@
         android:paddingBottom="20dp">
 
         <!--
-          Bare white glyphs, no plate. The translucent discs that used to sit behind these
-          made the row read as a strip of tiles rather than as controls floating over the
-          picture. Feedback comes from an oval-masked ripple instead, which is invisible
-          until touched. Sizes stay square so that ripple is a circle and not an ellipse;
-          the padding sets the glyph size inside the touch target.
-        -->
-        <ImageButton
-            android:id="@+id/btn_prev"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:background="@drawable/ripple_borderless_circle"
-            android:contentDescription="@string/action_previous"
-            android:padding="12dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_skip_previous" />
+          The transport, in glass.
 
-        <!--
-          scaleType="fitCenter" with no padding used to blow Media3's 24dp play glyph up to
-          the full height of the button, which is why this one looked so unlike its
-          neighbours. The padding is what keeps it in proportion with them.
-        -->
-        <ImageButton
-            android:id="@+id/exo_play_pause"
-            android:layout_width="76dp"
-            android:layout_height="76dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/ripple_borderless_circle"
-            android:contentDescription="@null"
-            android:padding="15dp"
-            android:scaleType="fitCenter" />
+          A capsule holding three discs, the middle one larger and brighter. The bare glyphs
+          that came before were right that a strip of square tiles reads as a toolbar; what they
+          lost was any sense that these three belong together and are the thing to press. One
+          piece of glass around them says the first, and a disc under each says where a touch
+          lands.
 
-        <ImageButton
-            android:id="@+id/btn_next"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:background="@drawable/ripple_borderless_circle"
-            android:contentDescription="@string/action_next"
-            android:padding="12dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_skip_next" />
+          Sizes stay square so each oval-masked ripple is a circle and not an ellipse; the
+          padding sets the glyph size inside its disc.
+        -->
+        <LinearLayout
+            android:id="@+id/transport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/transport_capsule_bg"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="6dp">
+
+            <ImageButton
+                android:id="@+id/btn_prev"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/transport_disc_bg"
+                android:contentDescription="@string/action_previous"
+                android:padding="12dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_skip_previous" />
+
+            <!--
+              scaleType="fitCenter" with no padding used to blow Media3's 24dp play glyph up to
+              the full height of the button, which is why this one looked so unlike its
+              neighbours. The padding is what keeps it in proportion with them.
+            -->
+            <ImageButton
+                android:id="@+id/exo_play_pause"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/transport_play_disc_bg"
+                android:contentDescription="@null"
+                android:padding="16dp"
+                android:scaleType="fitCenter" />
+
+            <ImageButton
+                android:id="@+id/btn_next"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/transport_disc_bg"
+                android:contentDescription="@string/action_next"
+                android:padding="12dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_skip_next" />
+        </LinearLayout>
 
         <!-- Timeline, with elapsed on the left and time left on the right. -->
         <LinearLayout

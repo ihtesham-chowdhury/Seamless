@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The disc behind a settings row's icon.
+
+  The same object as the player's floating controls — a round plate with a glyph on it — at the
+  size of a row, so the settings screen and the player read as one product rather than an app
+  with a media player bolted inside it. Tonal rather than accented: the accent belongs to the
+  section headings and to switches that are on, and a coloured disc on every row would spend it
+  on nothing.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="?attr/colorSurfaceContainerHighest" />
+</shape>

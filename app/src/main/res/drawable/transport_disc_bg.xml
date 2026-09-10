@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A disc of glass under previous and next, inside the transport capsule. Quieter than the play
+  disc, so the eye goes to play first. Oval-masked ripple, so a press is a circle.
+-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#40FFFFFF">
+    <item android:id="@android:id/mask">
+        <shape android:shape="oval">
+            <solid android:color="#FFFFFFFF" />
+        </shape>
+    </item>
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="oval">
+                    <solid android:color="#1F000000" />
+                </shape>
+            </item>
+            <item>
+                <shape android:shape="oval">
+                    <gradient
+                        android:angle="270"
+                        android:endColor="#0AFFFFFF"
+                        android:startColor="#29FFFFFF" />
+                    <stroke
+                        android:width="1dp"
+                        android:color="#33FFFFFF" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</ripple>

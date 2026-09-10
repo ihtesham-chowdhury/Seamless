@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The switch's knob: a white disc.
+
+  Inset top and bottom only. SwitchCompat stretches its thumb to the full height of the switch
+  and works out horizontal travel from the track's padding, so a vertical inset here is what
+  leaves air above and below the knob. A horizontal one would be counted twice — once as track
+  padding and again as the thumb's optical inset — and leave the knob short of the end it
+  travels to, lopsided in one position and not the other.
+-->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetBottom="2dp"
+    android:insetTop="2dp">
+    <shape android:shape="oval">
+        <size
+            android:width="24dp"
+            android:height="24dp" />
+        <solid android:color="#FFFFFFFF" />
+    </shape>
+</inset>

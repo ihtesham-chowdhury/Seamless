@@ -403,22 +403,19 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
      * watching a long lecture at 1.5x wants the next one at 1.5x too. It is deliberately
      * separate from the long-press boost, which is momentary and always returns to this.
      */
+    /**
+     * The speed panel: a floating card like the subtitle one, applied as it moves.
+     *
+     * No HUD while it is open. The panel's own number is already saying what the speed is, in
+     * large type, and a toast-shaped echo of it on every slider tick would be the same fact
+     * twice with one of them in the way.
+     */
     private fun showSpeedPicker() {
-        val labels = SPEEDS.map { speedLabel(it) }.toTypedArray()
-        val current = SPEEDS.indexOfFirst { kotlin.math.abs(it - prefs.playbackSpeed) < 0.01f }
-        AlertDialog.Builder(this)
-            .setTitle(R.string.playback_speed)
-            .setSingleChoiceItems(labels, current) { dialog, which ->
-                prefs.playbackSpeed = SPEEDS[which]
-                applySpeed()
-                dialog.dismiss()
-            }
-            .setNeutralButton(R.string.speed_reset) { _, _ ->
-                prefs.playbackSpeed = 1f
-                applySpeed()
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
+        SpeedSheet(SPEEDS, prefs.playbackSpeed) { speed ->
+            prefs.playbackSpeed = speed
+            player?.setPlaybackSpeed(prefs.playbackSpeed)
+            updateSpeedLabel()
+        }.show(this)
     }
 
     /** Straight back to 1x, saved like any other choice so the next video starts there too. */
@@ -443,9 +440,8 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
         binding.btnSpeed.alpha = if (prefs.playbackSpeed == 1f) 0.55f else 1f
     }
 
-    private fun speedLabel(speed: Float): String =
-        if (speed == speed.toInt().toFloat()) "${speed.toInt()}x"
-        else "${speed.toString().trimEnd('0').trimEnd('.')}x"
+    /** One formatting rule for the button, the HUD and the panel, so "1.15" never reads "1.1500001". */
+    private fun speedLabel(speed: Float): String = SpeedSheet.format(speed) + "x"
 
     // ---- playback ----
 

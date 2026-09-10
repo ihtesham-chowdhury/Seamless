@@ -1,22 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  A settings section heading.
+  A settings section heading, and the rule that runs out from it.
 
-  Small, spaced and in the accent colour, with real air above it: the gap is what separates
-  one group of cards from the next, and it does more of the work than the words do.
+  Small, spaced and in the accent colour, with real air above it: the gap is what separates one
+  group of cards from the next, and it does more of the work than the words do. The line after
+  the words is the accent again, fading to nothing, so the heading reads as reaching along its
+  section rather than as a label stuck on top of it.
 
-  PreferenceCategory binds only @android:id/title, so the heading can be the TextView itself
-  rather than a layout wrapped around one.
+  PreferenceCategory binds only @android:id/title, so the rule can sit beside it in an ordinary
+  row without the preference needing to know it exists.
 -->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@android:id/title"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="34dp"
     android:layout_marginTop="26dp"
     android:layout_marginEnd="34dp"
     android:layout_marginBottom="8dp"
-    android:letterSpacing="0.07"
-    android:textAllCaps="true"
-    android:textAppearance="?attr/textAppearanceLabelMedium"
-    android:textColor="?attr/colorPrimary" />
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@android:id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:letterSpacing="0.07"
+        android:textAllCaps="true"
+        android:textAppearance="?attr/textAppearanceLabelMedium"
+        android:textColor="?attr/colorPrimary" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:alpha="0.85"
+        android:background="@drawable/pref_category_line" />
+</LinearLayout>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A settings switch's track colour by state: the chosen accent when on, a neutral grey when off,
+  both quietened when the row is disabled. ?attr/colorPrimary is the accent — the browsing UI has
+  the accent overlay applied, unlike the player — so every accent gets its own switch.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:alpha="0.38"
+        android:color="?attr/colorPrimary"
+        android:state_checked="true"
+        android:state_enabled="false" />
+    <item
+        android:alpha="0.5"
+        android:color="@color/switch_track_off"
+        android:state_enabled="false" />
+    <item
+        android:color="?attr/colorPrimary"
+        android:state_checked="true" />
+    <item android:color="@color/switch_track_off" />
+</selector>

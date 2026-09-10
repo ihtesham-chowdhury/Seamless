@@ -39,7 +39,9 @@
     <string name="speed_boost">2x</string>
 
     <!-- appearance -->
-    <string name="settings_header_subtitle">Everything that shapes your Seamless experience.</string>
+    <!-- Broken on purpose. Two short lines leave air on the right, which is what makes the
+         header read as a header rather than as a sentence that ran out of width. -->
+    <string name="settings_header_subtitle">Everything that shapes\nyour Seamless experience.</string>
     <string name="settings_appearance">Appearance</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_accent_title">Accent colour</string>
@@ -252,6 +254,8 @@
     <!-- speed -->
     <string name="playback_speed">Playback speed</string>
     <string name="speed_reset">Normal</string>
+    <string name="speed_slower">Slower</string>
+    <string name="speed_faster">Faster</string>
 
     <!-- moving files -->
     <string name="move_needs_access_title">Choose the destination folder</string>

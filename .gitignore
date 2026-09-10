@@ -20,6 +20,12 @@ keystore.properties
 *.keystore
 release/
 
+# The maintainer's local release helper and what it writes. The script hard-codes this machine's
+# JDK, SDK and keystore paths, so it is useless to anyone else and publishes a home directory to
+# everyone; the fingerprint file is a build artefact, not source.
+release-seamless.ps1
+seamless-key-fingerprint.txt
+
 # Build artifacts
 *.apk
 *.aab
