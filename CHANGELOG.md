@@ -17,14 +17,29 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   on, a quiet grey when off, a white knob inside with air around it. And the header's line is
   broken in two on purpose, which leaves the space on the right that makes it read as a header.
 - **Playback speed is a floating card, not a list in a dialog.** A large readout of the speed; a
-  slider with a step either side for fine-tuning in 0.05s; and every preset as a pill, scrolling
-  sideways rather than trimmed to fit, with the one playing shown in white. It applies as it
-  moves, like the appearance panel, because a speed is judged by listening to it.
-- **Play, previous and next sit in glass.** A translucent capsule around the three, with a disc
-  under each and a brighter one under play. The bare glyphs before them were right that a strip
-  of tiles looks like a toolbar; what they lost was any sense of the three being one control.
+  slider with a step either side for fine-tuning in 0.05s; and every preset as a pill, in two rows
+  so none of them has to be scrolled to, with the one playing shown in white. A single scrolling
+  row came first and hid most of the presets off its end. In landscape the card sits in the middle
+  of the screen. It applies as it moves, like the appearance panel, because a speed is judged by
+  listening to it.
+- **Play, previous and next sit on glass.** A translucent disc under each and a brighter one under
+  play, and nothing around the three. A capsule holding them came first and, however narrow, read
+  as a bar laid over the film — the one thing floating controls are not.
 - **A rounder gear.** The navigation's settings icon is Material's Round variant: the same shape,
   softer teeth.
+- **CC is drawn in line.** A rounded frame and two open, round-capped C's at the same weight as the
+  controls around it, in place of Material's solid tile with squared letters cut out of it.
+- **A folder's Shuffle button plays the folder, shuffled.** It used to flip a setting and say so in
+  a toast. It starts from a random video now, with shuffle on for that session only; tapping a
+  video afterwards still plays in whatever order the player's own shuffle toggle says.
+- **Volume goes past 100% in Shorts too**, up to 200%, the same as the ordinary player. The boost
+  lasts the session — swipe to the next clip and it stays as loud — and leaving the feed puts it
+  back to the device's own maximum, as leaving the player always has.
+- **Controls that are off fade less.** Shuffle, speed at 1x and CC all dim to the same 65% now; two
+  of them were at 40% and the third at 55%, which next to icons at full strength looked less like
+  "off" than like "unavailable".
+- **The navigation capsule is wider.** It was as narrow as its three tabs and read as a small badge.
+  It takes the width less a margin either side now, up to a cap, with the tabs sharing it equally.
 - **The subtitle panel is the floating card it was drawn as.** It was a bottom sheet, and no
   amount of margin turns one of those into a card resting on the picture: a bottom sheet belongs
   to the edge of the screen, stretches the full width, and reads as a drawer pulled out of the
@@ -48,6 +63,12 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   to instead of a sentence explaining what unlock methods are.
 
 ### Fixed
+- **Letting go of a press-and-hold brought up the player's controls.** A hold held still until it
+  became the 2x boost has no touch events between its down and its up, so the up was the first
+  chance to claim it — and the gesture layer cleared its claim before checking it, letting the
+  release through to Media3's player view, which read the down and the up as a tap and raised the
+  controls. The release is swallowed now: holding shows the 2x badge, letting go hides it, and
+  nothing else appears.
 - **The subtitle delete button never appeared, and folder subtitles said "In this video".**
   One cause, for three rounds. Each subtitle this app attaches is given an id that says where it
   came from, and the origin was read off the *start* of the id. But Media3 plays a video with

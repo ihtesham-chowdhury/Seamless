@@ -1,6 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  CC, drawn in line rather than cut out of a block.
+
+  Material's own closed-caption glyph is a solid rounded rectangle with two squared letters
+  knocked out of it. At the size of a floating control that reads as a heavy tile beside shuffle
+  and speed, and its letterforms are the one squared-off shape in a row of round ones. This is
+  the same idea in the language the rest of the player speaks: a frame with generous corners and
+  two open, round-capped C's, all at the same 2dp weight, so the control looks like it was drawn
+  with the others rather than borrowed from a different set.
+
+  The letters sit a little right of the frame's true centre on purpose. A C's weight is on its
+  left, where the bowl is; centring the geometry leaves the pair looking pushed to the left, and
+  centring the ink is what looks centred.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp" android:height="24dp"
-    android:viewportWidth="24" android:viewportHeight="24">
-    <path android:fillColor="#FFFFFFFF"
-        android:pathData="M19,4H5C3.9,4 3,4.9 3,6v12c0,1.1 0.9,2 2,2h14c1.1,0 2,-0.9 2,-2V6C21,4.9 20.1,4 19,4zM19,18H5V6h14V18zM7.5,10.5h3v-1c0,-0.55 -0.45,-1 -1,-1h-3c-0.55,0 -1,0.45 -1,1v5c0,0.55 0.45,1 1,1h3c0.55,0 1,-0.45 1,-1v-1h-3v-3zM13.5,10.5h3v-1c0,-0.55 -0.45,-1 -1,-1h-3c-0.55,0 -1,0.45 -1,1v5c0,0.55 0.45,1 1,1h3c0.55,0 1,-0.45 1,-1v-1h-3v-3z" />
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M6.5,4.5H17.5A4.5,4.5 0,0 1,22 9V15A4.5,4.5 0,0 1,17.5 19.5H6.5A4.5,4.5 0,0 1,2 15V9A4.5,4.5 0,0 1,6.5 4.5Z"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M10.77,10.23A2.5,2.5 0,1 0,10.77 13.77"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M17.47,10.23A2.5,2.5 0,1 0,17.47 13.77"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeWidth="2" />
 </vector>

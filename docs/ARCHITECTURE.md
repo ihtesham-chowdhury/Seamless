@@ -98,7 +98,8 @@ finger and springs back if released early. Toggle in Settings → Gestures.
 
 - **Shuffle** in the feed is a fresh permutation of the whole list per session, so the order
   is random, nothing repeats until everything has played, and the order differs next time.
-  The ordinary player has its own shuffle toggle, off by default.
+  The ordinary player has its own shuffle toggle, off by default, and a folder's Shuffle button
+  starts a shuffled session without touching it: shuffle play is an action, not a setting.
 - **End of list** asks whether to reshuffle or stop.
 - **Auto-advance depends on the shape of the video, not on where you opened it.** When a
   clip finishes in the ordinary player, a *portrait* video rolls straight into the next one

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  A disc of glass under previous and next, inside the transport capsule. Quieter than the play
-  disc, so the eye goes to play first. Oval-masked ripple, so a press is a circle.
+  A disc of glass under previous and next, on its own over the picture. The dark first layer is
+  what keeps it visible over a white sky now that no capsule sits behind it. Quieter than the
+  play disc, so the eye goes to play first. Oval-masked ripple, so a press is a circle.
 -->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
     android:color="#40FFFFFF">

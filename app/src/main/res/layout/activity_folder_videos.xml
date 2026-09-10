@@ -59,7 +59,7 @@
             android:layout_width="38dp"
             android:layout_height="38dp"
             android:background="@drawable/ripple_toolbar_icon"
-            android:contentDescription="@string/shuffle"
+            android:contentDescription="@string/shuffle_play"
             android:padding="8dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_shuffle" />

@@ -2,10 +2,12 @@
 <!--
   One preset speed: the number in a pill, and under it a word where a word helps.
 
-  Only 1x has a caption, "Normal", but every pill keeps the caption's line so the row of pills
-  stays level — the caption is set invisible, not gone, on the others. The selected pill is white
-  with dark figures, the inverse of the rest, which is the clearest "this one" there is without
-  adding a colour to a player that does not use one.
+  The pill fills its cell. SpeedSheet gives every cell in a row an equal share of the width, so
+  the six pills in a row line up in columns with the row below rather than each being as wide as
+  its own number. Only 1x has a caption, "Normal"; the other pills in its row keep the caption's
+  line (invisible, not gone) so the row stays level, and a row with no caption in it drops the
+  line altogether. The selected pill is white with dark figures, the inverse of the rest, which is
+  the clearest "this one" there is without adding a colour to a player that does not use one.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
@@ -17,14 +19,14 @@
 
     <TextView
         android:id="@+id/value"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="36dp"
         android:background="@drawable/speed_pill_bg"
         android:fontFeatureSettings="tnum"
         android:gravity="center"
-        android:minWidth="54dp"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
+        android:maxLines="1"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
         android:textColor="@color/speed_pill_text"
         android:textSize="13sp" />
 

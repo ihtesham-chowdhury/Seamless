@@ -30,6 +30,7 @@ import com.seamless.player.data.subtitle.LocalSubtitles
 import com.seamless.player.data.subtitle.SubtitleStore
 import com.seamless.player.databinding.ActivityShortsBinding
 import com.seamless.player.ui.common.ResizeModes
+import com.seamless.player.ui.common.ControlStyle
 import com.seamless.player.ui.common.SubtitleStyles
 import com.seamless.player.ui.common.Tips
 import com.seamless.player.ui.player.SubtitleTracks
@@ -263,6 +264,7 @@ class ShortsActivity : AppCompatActivity(), ShortsAdapter.Host {
             feedAdapter?.focusedPosition = position
             videos.getOrNull(position)?.let { applyFavouriteIcon(prefs.isFavourite(it.id)) }
             updateSubtitleButton()
+            attachVolumeBoost()
         }
     }
 
@@ -279,7 +281,32 @@ class ShortsActivity : AppCompatActivity(), ShortsAdapter.Host {
 
     /** A page has worked out what is in its clip. */
     override fun onTextTracksKnown(index: Int) {
-        if (index == binding.pager.currentItem) updateSubtitleButton()
+        if (index == binding.pager.currentItem) {
+            updateSubtitleButton()
+            // The page's player is bound and prepared by now, which is when its audio session
+            // is there to take the volume boost.
+            attachVolumeBoost()
+        }
+    }
+
+    /** The audio session the volume boost is attached to, so it is not rebuilt for no reason. */
+    private var boostSession = 0
+
+    /**
+     * Lets the volume drag carry on past 100% on whichever clip is playing.
+     *
+     * Every page in the feed has its own player and therefore its own audio session, and loudness
+     * is an effect on a session, so the boost has to follow the clip rather than being set once.
+     * ScreenControls carries the level across the move, which is what makes a boost last the
+     * whole session: swipe to the next clip and it is as loud as the last one was. Leaving the
+     * feed releases it — see onDestroy — so the next session starts no louder than the device's
+     * own maximum, exactly as the ordinary player does.
+     */
+    private fun attachVolumeBoost() {
+        val session = feedAdapter?.focusedPlayer()?.audioSessionId ?: return
+        if (session <= 0 || session == boostSession) return
+        boostSession = session
+        controls.attachAudioSession(session)
     }
 
     override fun subtitleStyle(view: SubtitleView) {
@@ -305,7 +332,7 @@ class ShortsActivity : AppCompatActivity(), ShortsAdapter.Host {
         // Lit when a subtitle is playing, faded when one is not -- the same treatment the
         // player gives it, and the same the favourite button gives its own state here.
         binding.btnSubtitles.alpha =
-            if (SubtitleTracks.selected(options) != null) 1f else 0.4f
+            if (SubtitleTracks.selected(options) != null) 1f else ControlStyle.INACTIVE_ALPHA
     }
 
     /**
@@ -503,6 +530,9 @@ class ShortsActivity : AppCompatActivity(), ShortsAdapter.Host {
         binding.pager.adapter = null
         playerPool?.destroy()
         preloadManager?.release()
+        // The boost ends with the session: the next time the feed opens it is back to the
+        // device's own volume, and a hardware effect is not left holding an audio session.
+        controls.releaseAudioSession()
         controls.keepScreenOn(false)
         super.onDestroy()
     }

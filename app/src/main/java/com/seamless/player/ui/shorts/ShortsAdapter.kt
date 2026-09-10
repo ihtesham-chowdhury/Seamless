@@ -579,16 +579,22 @@ class ShortsAdapter(
         private fun showHud(rightHalf: Boolean, delta: Float) {
             val controls = host.screenControls()
             if (rightHalf) {
+                // The same scale as the ordinary player: past the device's maximum the stream stays
+                // at full and the surplus becomes gain, up to 200%. ScreenControls only offers the
+                // extra range when a loudness effect is attached, so on a device without one this
+                // still stops at 100% exactly as it used to.
                 if (delta != 0f) {
                     val step = delta * controls.maxVolume * VOLUME_SENSITIVITY
-                    controls.volume = (controls.volume + step.roundToInt())
-                        .coerceIn(0, controls.maxVolume)
+                    controls.volumeLevel = controls.volumeLevel + step.roundToInt()
                 }
-                val fraction = controls.volume.toFloat() / controls.maxVolume.coerceAtLeast(1)
+                val normal = controls.volumeLevel.coerceAtMost(controls.maxVolume)
+                val extra = (controls.volumeLevel - controls.maxVolume).coerceAtLeast(0)
+                val headroom = (controls.volumeSteps - controls.maxVolume).coerceAtLeast(1)
                 binding.levelHud.show(
                     LevelHudView.Kind.VOLUME,
-                    level = fraction,
-                    label = "${(fraction * 100).roundToInt()}%",
+                    level = normal.toFloat() / controls.maxVolume.coerceAtLeast(1),
+                    label = "${controls.volumePercent}%",
+                    overflow = extra.toFloat() / headroom,
                 )
             } else {
                 if (delta != 0f) {

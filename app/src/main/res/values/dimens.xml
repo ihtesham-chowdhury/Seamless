@@ -9,6 +9,11 @@
     <dimen name="nav_pill_margin">12dp</dimen>
     <dimen name="nav_pill_reserve">86dp</dimen>
 
+    <!-- How far the capsule stops short of each edge, and the widest it will get. See the note
+         on nav_pill in activity_main.xml. -->
+    <dimen name="nav_pill_side_margin">28dp</dimen>
+    <dimen name="nav_pill_max_width">380dp</dimen>
+
     <!--
       The player's floating panels, and the reason they are dimensions rather than numbers
       typed into the layouts.

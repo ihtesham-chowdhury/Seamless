@@ -39,6 +39,7 @@ import com.seamless.player.data.OrientationMode
 import com.seamless.player.data.Prefs
 import com.seamless.player.data.Video
 import com.seamless.player.databinding.ActivityPlayerBinding
+import com.seamless.player.ui.common.ControlStyle
 import com.seamless.player.ui.common.LevelHudView
 import com.seamless.player.ui.common.MediaInfo
 import com.seamless.player.ui.common.ResizeModes
@@ -135,7 +136,9 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
         controls = ScreenControls(this)
         controls.keepScreenOn(true)
         controls.restoreBrightness(prefs.playerBrightness)
-        shuffle = prefs.folderShuffle
+        // The folder's Shuffle button starts a shuffled session; the saved setting is only what
+        // an ordinary tap on a video gets.
+        shuffle = intent.getBooleanExtra(EXTRA_SHUFFLE, false) || prefs.folderShuffle
         subtitles = SubtitleController(
             activity = this,
             prefs = prefs,
@@ -393,7 +396,7 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
     }
 
     private fun updateShuffleIcon() {
-        binding.btnShuffle.alpha = if (shuffle) 1f else 0.4f
+        binding.btnShuffle.alpha = if (shuffle) 1f else ControlStyle.INACTIVE_ALPHA
     }
 
     // ---- playback speed ----
@@ -437,7 +440,7 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
     private fun updateSpeedLabel() {
         binding.btnSpeed.text = speedLabel(prefs.playbackSpeed)
         // Normal speed is the uninteresting case; let it recede.
-        binding.btnSpeed.alpha = if (prefs.playbackSpeed == 1f) 0.55f else 1f
+        binding.btnSpeed.alpha = if (prefs.playbackSpeed == 1f) ControlStyle.INACTIVE_ALPHA else 1f
     }
 
     /** One formatting rule for the button, the HUD and the panel, so "1.15" never reads "1.1500001". */
@@ -602,7 +605,7 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
      * menu as a second entrance under the same name.
      */
     private fun updateSubtitleButton() {
-        binding.btnSubtitles.alpha = if (subtitles.hasActiveTrack()) 1f else 0.4f
+        binding.btnSubtitles.alpha = if (subtitles.hasActiveTrack()) 1f else ControlStyle.INACTIVE_ALPHA
     }
 
     // ---- overflow menu ----
@@ -1028,10 +1031,19 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
 
         private const val EXTRA_FOLDER_PATH = "folder_path"
         private const val EXTRA_START_ID = "start_id"
+        private const val EXTRA_SHUFFLE = "shuffle"
 
-        /** Plays [video] with the rest of its folder queued behind it. */
-        fun intent(context: Context, video: Video): Intent =
-            intent(context, video.relativePath, video.id)
+        /**
+         * Plays [video] with the rest of its folder queued behind it.
+         *
+         * [shuffle] turns shuffle on for this session without touching the saved setting. It is
+         * what the folder's Shuffle button asks for; tapping a video afterwards still plays in
+         * whatever order the player's own toggle was left in.
+         */
+        fun intent(context: Context, video: Video, shuffle: Boolean = false): Intent =
+            intent(context, video.relativePath, video.id).apply {
+                if (shuffle) putExtra(EXTRA_SHUFFLE, true)
+            }
 
         /**
          * The same thing addressed by id, for reopening something remembered rather than

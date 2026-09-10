@@ -2,10 +2,10 @@
 <!--
   Playback speed, as a floating card.
 
-  The same card as the subtitle panel — inset from every edge, rounded all round, grown out of
-  the corner its control sits in — because it is the same kind of thing: a setting for what is
-  playing, changed while it plays. It was an AlertDialog listing twelve numbers, which is the one
-  shape nothing else in this player is.
+  The same card as the subtitle panel — inset from every edge, rounded all round — because it is
+  the same kind of thing: a setting for what is playing, changed while it plays. It was an
+  AlertDialog listing twelve numbers, which is the one shape nothing else in this player is. In
+  landscape it sits in the middle of the screen; see FloatingSheet.Placement.
 
   Three ways to arrive at a speed, arranged by how precisely someone knows what they want:
 
@@ -13,12 +13,15 @@
       ──────────────────────────────────────────
                        1.75×
           (−)  ━━━━━━━━━━━●━━━━━━━━━━━━  (+)
-        [0.5] [0.75] [1] [1.25] [1.5] [1.75] …
-                     Normal
+       [0.5] [0.75] [0.85] [ 1 ] [1.15] [1.25]
+                            Normal
+       [1.35] [1.5] [1.75] [ 2 ] [2.5] [ 3 ]
 
   The number, large, because it is the answer. The slider for "a bit faster", and a step either
-  side of it for "exactly 1.1". The presets for the speeds people actually use, which scroll
-  sideways rather than being trimmed to what fits.
+  side of it for "exactly 1.1". The presets in two rows, slowest first, so every one of them is on
+  screen at once: they scrolled sideways in a single row at first, and a row you have to scroll
+  along hides the speed you came for off its end. The rows are built in code from the preset
+  list, so adding a speed does not mean editing this file.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -129,21 +132,14 @@
                 app:tint="#FFFFFFFF" />
         </LinearLayout>
 
-        <HorizontalScrollView
-            android:id="@+id/presets_scroll"
+        <!-- The preset rows go in here; SpeedSheet builds them from the preset list. -->
+        <LinearLayout
+            android:id="@+id/presets"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/sheet_group_gap_tight"
-            android:clipToPadding="false"
+            android:orientation="vertical"
             android:paddingStart="4dp"
-            android:paddingEnd="4dp"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:id="@+id/presets"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" />
-        </HorizontalScrollView>
+            android:paddingEnd="4dp" />
     </LinearLayout>
 </FrameLayout>

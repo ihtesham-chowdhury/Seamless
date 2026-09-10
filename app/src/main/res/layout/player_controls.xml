@@ -14,9 +14,9 @@
   piece, which is only possible because Media3's own animation is switched off — see the
   note in PlayerActivity.wireButtons().
 
-  Everything floats directly over the picture — no bars, no scrim. The one surface is the glass
-  capsule round the transport buttons, which is an object rather than a bar: it is only as wide
-  as the three buttons it holds.
+  Everything floats directly over the picture — no bars, no scrim. The transport buttons each sit
+  on a disc of glass and nothing holds the three together: a capsule around them was tried, and
+  however narrow it was made, it read as a bar.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -38,13 +38,13 @@
         android:paddingBottom="20dp">
 
         <!--
-          The transport, in glass.
+          The transport, on glass.
 
-          A capsule holding three discs, the middle one larger and brighter. The bare glyphs
-          that came before were right that a strip of square tiles reads as a toolbar; what they
-          lost was any sense that these three belong together and are the thing to press. One
-          piece of glass around them says the first, and a disc under each says where a touch
-          lands.
+          Three discs, the middle one larger and brighter, and nothing around them. A glass
+          capsule holding all three was the first version, and it made the row read as a bar
+          laid over the film — the very thing the rest of this player avoids. A disc under each
+          button keeps what the capsule was for, saying where a touch lands, without the object
+          that turned three controls into a strip.
 
           Sizes stay square so each oval-masked ripple is a circle and not an ellipse; the
           padding sets the glyph size inside its disc.
@@ -53,10 +53,8 @@
             android:id="@+id/transport"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/transport_capsule_bg"
             android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="6dp">
+            android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/btn_prev"
@@ -77,8 +75,8 @@
                 android:id="@+id/exo_play_pause"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
                 android:background="@drawable/transport_play_disc_bg"
                 android:contentDescription="@null"
                 android:padding="16dp"

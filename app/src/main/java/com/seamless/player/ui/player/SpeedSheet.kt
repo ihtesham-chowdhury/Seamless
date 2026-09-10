@@ -6,6 +6,8 @@ import android.text.Spanned
 import android.text.style.RelativeSizeSpan
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import com.seamless.player.R
 import com.seamless.player.databinding.ItemSpeedPillBinding
 import com.seamless.player.databinding.SheetSpeedBinding
@@ -25,9 +27,13 @@ import kotlin.math.roundToInt
  * judged by listening to it, not by reading it — and nothing is confirmed. [onChanged] is called
  * on every change and is expected to be cheap.
  *
- * The presets scroll sideways rather than being trimmed to what fits. Each one is in the list
- * because it is a speed someone actually uses, and a picker that quietly drops 0.85 on a narrow
- * phone is making a decision it has no business making.
+ * The presets are laid out in two rows, slowest first. They scrolled sideways in one row at
+ * first, which kept every preset but hid most of them: a row you have to scroll along puts the
+ * speed you came for off its end, and scrolling to find a number is not something a speed picker
+ * should ask for. Two rows show all twelve at once and still fit a phone held upright.
+ *
+ * In landscape the card sits in the middle of the screen rather than against the side its button
+ * is on; see [FloatingSheet.Placement].
  */
 class SpeedSheet(
     private val presets: List<Float>,
@@ -39,20 +45,42 @@ class SpeedSheet(
 
     fun show(context: Context, onDismiss: () -> Unit = {}) {
         val binding = SheetSpeedBinding.inflate(LayoutInflater.from(context))
-        val dialog = FloatingSheet.create(context, binding.root)
+        val dialog = FloatingSheet.create(context, binding.root, FloatingSheet.Placement.CENTRE)
         dialog.setOnDismissListener { onDismiss() }
         binding.close.setOnClickListener { dialog.dismiss() }
 
         val inflater = LayoutInflater.from(context)
-        val pills = presets.map { speed ->
-            val pill = ItemSpeedPillBinding.inflate(inflater, binding.presets, false)
-            pill.value.text = format(speed)
-            if (speed == 1f) {
-                pill.caption.setText(R.string.speed_reset)
-                pill.caption.visibility = View.VISIBLE
+        val rowGap = (ROW_GAP_DP * context.resources.displayMetrics.density).roundToInt()
+        val perRow = ((presets.size + ROWS - 1) / ROWS).coerceAtLeast(1)
+
+        val pills = presets.chunked(perRow).flatMapIndexed { rowIndex, speeds ->
+            val row = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
+            binding.presets.addView(
+                row,
+                LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                ).apply { if (rowIndex > 0) topMargin = rowGap },
+            )
+            // A row keeps a caption line only if one of its pills has a caption, so the pills in
+            // it stay level with each other and a row with no "Normal" under it does not carry an
+            // empty line for nothing.
+            val captioned = speeds.any { it == 1f }
+            speeds.map { speed ->
+                val pill = ItemSpeedPillBinding.inflate(inflater, row, false)
+                pill.value.text = format(speed)
+                if (speed == 1f) pill.caption.setText(R.string.speed_reset)
+                pill.caption.visibility = when {
+                    speed == 1f -> View.VISIBLE
+                    captioned -> View.INVISIBLE
+                    else -> View.GONE
+                }
+                row.addView(
+                    pill.root,
+                    LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f),
+                )
+                speed to pill
             }
-            binding.presets.addView(pill.root)
-            speed to pill
         }
 
         fun render(fromSlider: Boolean) {
@@ -85,15 +113,6 @@ class SpeedSheet(
         binding.faster.setOnClickListener { choose(current + STEP) }
         pills.forEach { (speed, pill) -> pill.value.setOnClickListener { choose(speed) } }
 
-        // Once there are widths to work with, bring the selected preset into view rather than
-        // leaving 2.5x off the end of a row the user has to go looking along.
-        binding.presetsScroll.post {
-            val selected = pills.firstOrNull { (speed, _) -> abs(speed - current) < EPSILON }
-                ?.second ?: return@post
-            val offset = selected.root.left - (binding.presetsScroll.width - selected.root.width) / 2
-            binding.presetsScroll.scrollTo(offset.coerceAtLeast(0), 0)
-        }
-
         dialog.show()
     }
 
@@ -110,6 +129,10 @@ class SpeedSheet(
 
         private const val EPSILON = 0.001f
         private const val DISABLED_ALPHA = 0.35f
+
+        /** Twelve presets, six to a row. */
+        private const val ROWS = 2
+        private const val ROW_GAP_DP = 8f
 
         /**
          * Rounded to the nearest step and held in range.

@@ -28,10 +28,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!--
+      Wider than three tabs strictly need, and still well short of the screen's edges.
+
+      It was as narrow as its tabs, which made it read as a small badge sitting at the bottom
+      rather than as the way around the app. The other extreme, edge to edge, is a bar again,
+      which is what this capsule exists not to be. So it takes the width less a generous margin
+      either side and stops at a cap, and the three tabs share it equally: on a phone held upright
+      that is most of the width, and on a wide screen it stays a capsule in the middle instead of
+      stretching into a strip.
+    -->
     <LinearLayout
         android:id="@+id/nav_pill"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="@dimen/nav_pill_height"
+        android:layout_marginStart="@dimen/nav_pill_side_margin"
+        android:layout_marginEnd="@dimen/nav_pill_side_margin"
         android:layout_marginBottom="@dimen/nav_pill_margin"
         android:background="@drawable/glass_nav_bg"
         android:elevation="6dp"
@@ -41,11 +53,13 @@
         android:paddingEnd="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_max="@dimen/nav_pill_max_width">
 
         <LinearLayout
             android:id="@+id/nav_library"
-            android:layout_width="78dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="50dp"
             android:layout_marginStart="2dp"
             android:layout_marginEnd="2dp"
@@ -74,7 +88,8 @@
 
         <LinearLayout
             android:id="@+id/nav_shorts"
-            android:layout_width="78dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="50dp"
             android:layout_marginStart="2dp"
             android:layout_marginEnd="2dp"
@@ -103,7 +118,8 @@
 
         <LinearLayout
             android:id="@+id/nav_settings"
-            android:layout_width="78dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="50dp"
             android:layout_marginStart="2dp"
             android:layout_marginEnd="2dp"

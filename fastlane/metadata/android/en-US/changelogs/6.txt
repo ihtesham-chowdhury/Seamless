@@ -1,9 +1,9 @@
-The delete button on subtitles finally appears, for downloads and for files beside your videos. Media3 renames track ids, and that hid it.
+The subtitle delete button finally appears, for downloads and for files beside your videos.
 
-The subtitle panel is a floating card, sized for landscape, with every control reachable.
+The subtitle panel floats, and every control is reachable in landscape.
 
-A new speed panel: a large readout, a slider with fine steps, and every preset as a pill.
+A speed panel with a large readout, fine steps and every preset in two rows.
 
-Play, previous and next sit in glass.
+Shuffle in a folder plays it shuffled. Volume boost to 200% works in Shorts too.
 
-Settings has icons, an accent rule after each heading, and switches in your accent colour.
+Glass discs under play and skip; icons, accent rules and switches in Settings; a wider navigation bar.

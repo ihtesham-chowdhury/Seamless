@@ -152,14 +152,14 @@ class FolderVideosActivity : AppCompatActivity() {
     private fun wireToolbarActions() {
         binding.btnSearch.setOnClickListener { searchField.toggle() }
         binding.btnViewOptions.setOnClickListener { showViewOptions() }
+        // Shuffle play, not a shuffle setting. It used to flip a preference and say so in a
+        // toast, which answered a question nobody pressing a shuffle button is asking: they want
+        // the folder playing, in a random order, now. It starts from a random video with shuffle
+        // on for that session only, and leaves the player's own toggle as it was, so tapping a
+        // video afterwards plays in whatever order that toggle says.
         binding.btnShuffle.setOnClickListener {
-            prefs.folderShuffle = !prefs.folderShuffle
-            applyShuffleState()
-            Toast.makeText(
-                this,
-                if (prefs.folderShuffle) R.string.shuffle_on else R.string.shuffle_off,
-                Toast.LENGTH_SHORT,
-            ).show()
+            val start = videos.randomOrNull() ?: return@setOnClickListener
+            startActivity(PlayerActivity.intent(this, start, shuffle = true))
         }
     }
 
@@ -182,7 +182,6 @@ class FolderVideosActivity : AppCompatActivity() {
             binding.toolbar.setNavigationIcon(R.drawable.ic_back)
             binding.toolbar.title = intent.getStringExtra(EXTRA_NAME).orEmpty()
             binding.toolbarActions.visibility = View.VISIBLE
-            applyShuffleState()
         } else {
             binding.toolbarActions.visibility = View.GONE
             binding.toolbar.setNavigationIcon(R.drawable.ic_back)
@@ -343,16 +342,6 @@ class FolderVideosActivity : AppCompatActivity() {
             },
             onSortChanged = { showSorted() },
         ).show(this)
-    }
-
-    /**
-     * Bright when shuffle is on, dimmed when off.
-     *
-     * Now that this is an ordinary view rather than a menu item, the old mutate() dance is
-     * unnecessary: the view's alpha belongs to the view, and nothing re-inflates it.
-     */
-    private fun applyShuffleState() {
-        binding.btnShuffle.alpha = if (prefs.folderShuffle) 1f else 0.4f
     }
 
     override fun onBackPressed() {

@@ -2,6 +2,7 @@ package com.seamless.player.ui.player
 
 import android.app.Dialog
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Point
 import android.view.Gravity
 import android.view.View
@@ -41,8 +42,22 @@ import com.seamless.player.R
  */
 internal object FloatingSheet {
 
-    fun create(context: Context, content: View): Dialog {
-        val dialog = FloatingDialog(context, content)
+    /**
+     * Where a panel sits.
+     *
+     * [END] is the subtitle panel's place: against the side its control is on, where a tall list
+     * leaves the picture visible beside it. [CENTRE] is for a compact panel with nothing to sit
+     * beside — the speed card — which is a question about the whole video and belongs in the
+     * middle of it. The two only differ in landscape: held upright the width cap is wider than
+     * the screen, so both come out centred along the bottom.
+     */
+    enum class Placement { END, CENTRE }
+
+    fun create(context: Context, content: View, placement: Placement = Placement.END): Dialog {
+        val landscape =
+            context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val centred = placement == Placement.CENTRE && landscape
+        val dialog = FloatingDialog(context, content, centred)
         dialog.setContentView(content)
         dialog.setCanceledOnTouchOutside(true)
 
@@ -59,12 +74,13 @@ internal object FloatingSheet {
                 minOf(screenWidth - insetPx * 2, maxWidth),
                 WindowManager.LayoutParams.WRAP_CONTENT,
             )
-            window.setGravity(Gravity.END or Gravity.BOTTOM)
+            window.setGravity(if (centred) Gravity.CENTER else Gravity.END or Gravity.BOTTOM)
             // x and y are offsets from the gravity edges on a floating window, which is how the
-            // card gets air underneath it rather than sitting on the bottom of the screen.
+            // card gets air underneath it rather than sitting on the bottom of the screen. A
+            // centred window has no edge to be offset from.
             window.attributes = window.attributes.apply {
-                x = insetPx
-                y = bottomPx
+                x = if (centred) 0 else insetPx
+                y = if (centred) 0 else bottomPx
             }
             window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
         }
@@ -106,13 +122,15 @@ internal object FloatingSheet {
     private class FloatingDialog(
         context: Context,
         private val content: View,
+        /** Grows from its own middle, rather than from the corner of a control it is not beside. */
+        private val centred: Boolean,
     ) : Dialog(context, R.style.Theme_Seamless_FloatingSheet) {
 
         private var leaving = false
 
         fun animateIn() {
-            content.pivotX = content.width.toFloat()
-            content.pivotY = 0f
+            content.pivotX = if (centred) content.width / 2f else content.width.toFloat()
+            content.pivotY = if (centred) content.height / 2f else 0f
             content.alpha = 0f
             content.scaleX = OPENING_SCALE
             content.scaleY = OPENING_SCALE
