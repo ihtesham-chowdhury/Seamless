@@ -202,24 +202,35 @@ finger and springs back if released early. Toggle in Settings → Gestures.
   panel shows the sentence and hides the trace behind Copy details. A subtitle search fails on
   someone else's phone, network and account, and without the exchange in hand there is nothing
   to debug from but a description.
-- **A control with two states needs three.** The CC button has to say both "a subtitle is
-  playing" and "this panel is open", and those are different facts about different things — one
-  about the film, one about the screen. Collapsing them leaves the user unable to tell, on
-  closing the panel, whether they changed anything. They are drawn rather than declared, because
-  the accent that distinguishes them is a runtime preference and the player deliberately runs
-  without the accent theme overlay; there is no `?attr/colorPrimary` here for a selector to point
-  at. See `ui/player/CcButton.kt`.
+- **A control says one thing.** The CC button was given three states — plain, an accent ring for
+  "a subtitle is playing", a filled accent disc for "the panel is open" — on the reasoning that
+  those are different facts and the user needs both. They are different facts, and the user did
+  not need both: what it produced was one control in a row of six that was louder than the other
+  five and drew the eye to a distinction nobody was asking about. It is lit or dimmed now, like
+  the shuffle button next to it. When a control's neighbours already have a language for state,
+  the answer is almost always that language.
 - **One door per room.** Anything reachable from two places under the same name is reachable
   from neither: the user learns no route. Subtitles were on the CC button *and* in the overflow
   menu, and the reason was a button that came and went — so the fix was to stop it going away,
   not to keep the second entrance. A control that is always in the same spot is worth more than
   a control that is only there when it has something to say.
-- **A floating panel is a column that must not grow.** Everything in `sheet_tracks.xml` used to
-  be `wrap_content`, so a file with five subtitle tracks pushed the actions off the bottom of the
-  screen — and a panel with nothing below the fold has no fold to find. The list carries the
-  weight and gives up its height first; `CappedScrollView` stops it taking the screen even when
-  there is screen to take. A panel that covers the video is a settings page, and this app has one
-  of those already.
+- **A floating panel is a column that must not grow, and the cap belongs on the column.**
+  Everything in `sheet_tracks.xml` used to be `wrap_content`, so a file with five subtitle tracks
+  pushed the actions off the bottom of the screen — and a panel with nothing below the fold has
+  no fold to find. The list carries the weight and gives up its height first. The cap then went
+  on the *list*, which was the same mistake one level down: a list held to most of a landscape
+  screen still yields a card that runs off the top of it, because the header, the hairlines and
+  the action rows are added afterwards. `CappedColumn` caps the whole card and lets
+  `LinearLayout`'s weight rule distribute the shortfall. A panel that covers the video is a
+  settings page, and this app has one of those already.
+- **A panel that floats is a different object from a sheet that slides.** `BottomSheetDialog`
+  gave the drag, the scrim and the dismissal for free, and cost the thing the design was for: a
+  bottom sheet is anchored to the edge of the screen and stretches the full width, so it reads as
+  a drawer pulled out of the frame however much margin it is given. A plain floating window with
+  a gravity, an inset and a width cap is less machinery and the right object. It also puts the
+  enter and exit animation under our control, which is why `dismiss()` is overridden rather than
+  animated at each call site — four of the five ways out of that panel are the system calling
+  `dismiss` directly, and any of them left un-animated is the one that cuts to black.
 - **A subtitle track's id says where it came from.** Every subtitle file this app attaches to
   a media item is given an id like `seamless-sub:SAVED:0`, which Media3 hands back as
   `Format.id`; anything without that prefix came out of the container. Once subtitles are

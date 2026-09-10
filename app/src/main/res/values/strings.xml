@@ -39,6 +39,7 @@
     <string name="speed_boost">2x</string>
 
     <!-- appearance -->
+    <string name="settings_header_subtitle">Everything that shapes your Seamless experience.</string>
     <string name="settings_appearance">Appearance</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_accent_title">Accent colour</string>
@@ -55,12 +56,12 @@
     <string name="accent_pink">Pink</string>
 
     <string name="settings_playback">Playback</string>
-    <string name="settings_resume_title">Resume long videos after</string>
-    <string name="settings_resume_summary">Videos shorter than this always start from the beginning. Currently %1$d minutes.</string>
+    <string name="settings_resume_title">Resume threshold</string>
+    <string name="settings_resume_summary">%1$d minutes. Anything shorter starts from the beginning.</string>
     <string name="settings_orientation_title">Screen orientation</string>
-    <string name="settings_autoadvance_title">Auto-advance in the shorts feed</string>
-    <string name="settings_autoadvance_summary">When a clip ends, move to the next one. Turn off to loop the current clip instead.</string>
-    <string name="settings_clear_resume">Clear all saved positions</string>
+    <string name="settings_autoadvance_title">Auto-advance</string>
+    <string name="settings_autoadvance_summary">Move to the next clip when one ends. Off to loop.</string>
+    <string name="settings_clear_resume">Clear saved positions</string>
     <string name="settings_clear_resume_done">Saved positions cleared</string>
 
     <!-- lock -->
@@ -69,7 +70,6 @@
     <string name="lock_hint_corners">Locked. Tap the four corners, clockwise from the top left.</string>
     <string name="lock_hint_corners_progress">Locked. %1$d of 4 corners.</string>
     <string name="settings_unlock_title">Unlock method</string>
-    <string name="settings_unlock_summary">How to release the screen lock inside a video.</string>
 
     <!-- resize -->
     <string name="resize_mode">Aspect ratio</string>
@@ -113,7 +113,7 @@
     <string name="cover_pick_title">Thumbnail for %1$s</string>
     <string name="cover_use_default">Use first video</string>
     <string name="settings_hidden_folders_title">Hidden folders</string>
-    <string name="settings_hidden_folders_summary">%1$d hidden. Tap to manage.</string>
+    <string name="settings_hidden_folders_summary">%1$d hidden</string>
     <string name="no_hidden_folders">Nothing is hidden. Long press a folder in the library to hide it.</string>
     <string name="unhide_all">Unhide all</string>
 
@@ -161,7 +161,7 @@
     <!-- gestures / external playback -->
     <string name="settings_shorts">Shorts feed</string>
     <string name="settings_shorts_source_title">Where clips come from</string>
-    <string name="settings_shorts_landscape_summary">Portrait clips always qualify. This adds short landscape ones.</string>
+    <string name="settings_shorts_landscape_summary">Portrait clips are always included</string>
     <string name="minutes_1">1 minute</string>
     <string name="minutes_5">5 minutes</string>
     <string name="minutes_10">10 minutes</string>
@@ -182,7 +182,7 @@
     <string name="tip_player">Drag up and down for brightness and volume. Drag down from the top to close. Hold for 2x.</string>
 
     <string name="settings_help_title">Gestures and tips</string>
-    <string name="settings_help_summary">Everything the player can do, and how to reach it.</string>
+    <string name="settings_help_summary">Everything the player can do, and how to reach it</string>
     <string name="settings_reset_tips">Show first-run tips again</string>
     <string name="settings_reset_tips_done">Tips will appear again</string>
     <string name="settings_version_title">Version</string>
@@ -198,15 +198,15 @@
 
     <string name="settings_gestures">Gestures</string>
     <string name="settings_swipe_close_title">Swipe down to close</string>
-    <string name="settings_swipe_close_summary">Drag down anywhere on the video to leave the player.</string>
-    <string name="settings_external_portrait_title">Force portrait for other apps</string>
-    <string name="settings_external_portrait_summary">When a video is opened from a gallery or file manager, keep the screen upright instead of following the video.</string>
+    <string name="settings_swipe_close_summary">Drag down on the video to exit</string>
+    <string name="settings_external_portrait_title">Force portrait outside Seamless</string>
+    <string name="settings_external_portrait_summary">Keep the screen upright for videos opened from other apps</string>
 
     <!-- shorts sources -->
     <string name="shorts_source_folders">Play from folders I pick</string>
     <string name="shorts_source_device">Scan the whole device</string>
-    <string name="shorts_filter_landscape">Also include short landscape videos</string>
-    <string name="shorts_max_length_title">Count landscape videos shorter than</string>
+    <string name="shorts_filter_landscape">Include short landscape videos</string>
+    <string name="shorts_max_length_title">Landscape clips must be under</string>
 
     <!-- file operations -->
     <string name="action_rename">Rename</string>
@@ -218,10 +218,10 @@
 
     <!-- locking -->
     <string name="settings_privacy">Privacy</string>
-    <string name="settings_app_lock_title">Lock the app</string>
-    <string name="settings_app_lock_summary">Ask for your fingerprint, face or device PIN when the app opens.</string>
+    <string name="settings_app_lock_title">App lock</string>
+    <string name="settings_app_lock_summary">Require fingerprint, face or device PIN to open Seamless</string>
     <string name="settings_locked_folders_title">Locked folders</string>
-    <string name="settings_locked_folders_summary">%1$d locked. Tap to manage.</string>
+    <string name="settings_locked_folders_summary">%1$d locked</string>
     <string name="no_locked_folders">No folders are locked. Long press a folder in the library to lock it.</string>
     <string name="unlock_all">Unlock all</string>
     <string name="action_lock_folder">Lock or unlock</string>
@@ -337,8 +337,8 @@ Picking the folder yourself grants access to it, which gets around that restrict
     <!-- Settings. -->
     <string name="settings_subtitles">Subtitles</string>
     <string name="settings_subtitle_language_title">Preferred language</string>
-    <string name="settings_subtitle_online_title">Look up subtitles online</string>
-    <string name="settings_subtitle_online_summary">Off by default. Nothing leaves the device until you tap Find subtitles on a video.</string>
+    <string name="settings_subtitle_online_title">Online subtitle lookup</string>
+    <string name="settings_subtitle_online_summary">Nothing leaves this device until you tap Find subtitles</string>
     <string name="settings_subtitle_key_title">OpenSubtitles API key</string>
     <string name="settings_subtitle_key_missing">Not set — online search is unavailable</string>
     <string name="settings_subtitle_key_present">Set</string>
@@ -348,12 +348,13 @@ Picking the folder yourself grants access to it, which gets around that restrict
     <string name="settings_subtitle_account_message">Only sent to OpenSubtitles’ sign-in, and only to raise the download limit. Leave both blank to stay anonymous.</string>
     <string name="settings_subtitle_username">Username</string>
     <string name="settings_subtitle_password">Password</string>
-    <string name="settings_subtitle_auto_title">Apply certain matches at once</string>
-    <string name="settings_subtitle_auto_summary">When the file’s own fingerprint matches an upload, use it without asking</string>
-    <string name="settings_subtitle_beside_title">Save beside the video</string>
-    <string name="settings_subtitle_beside_summary">Where you have shared the folder with Seamless, so other players find them too</string>
-    <string name="settings_subtitle_clear">Clear downloaded subtitles</string>
-    <string name="settings_subtitle_clear_summary">%1$d file(s), %2$s</string>
+    <string name="settings_subtitle_auto_title">Auto-apply exact matches</string>
+    <string name="settings_subtitle_auto_summary">Use a subtitle without asking when the file’s fingerprint matches</string>
+    <string name="settings_subtitle_beside_title">Save subtitles beside videos</string>
+    <string name="settings_subtitle_beside_summary">Other players can find them too, where you have shared the folder</string>
+    <string name="settings_subtitle_clear">Downloaded subtitles</string>
+    <string name="settings_subtitle_clear_action">Clear downloaded subtitles</string>
+    <string name="settings_subtitle_clear_confirm">Every subtitle Seamless has downloaded will be deleted. Videos with a subtitle beside them in a folder keep it.</string>
     <string name="settings_subtitle_clear_none">Nothing downloaded yet</string>
     <string name="settings_subtitle_clear_done">Downloaded subtitles removed</string>
 

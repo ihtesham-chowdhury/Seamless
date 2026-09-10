@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Counts that are shown to the user rather than only logged.
+
+  "1 files" is the sort of thing that makes an interface feel unfinished, and it is free to
+  avoid. Only counts that actually appear on screen live here; a number in a diagnostic can
+  stay a number.
+-->
+<resources>
+    <plurals name="settings_subtitle_clear_summary">
+        <item quantity="one">%1$d file · %2$s</item>
+        <item quantity="other">%1$d files · %2$s</item>
+    </plurals>
+</resources>

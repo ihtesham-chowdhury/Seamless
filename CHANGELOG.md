@@ -19,6 +19,53 @@ Subtitles, and then the three rounds of fixing them that the first attempt neede
 engine landed in 0.2.0 and did not work at all until 0.2.2; this is the first version where
 the whole feature — finding a subtitle, choosing one, being rid of one — is worth using.
 
+#### The subtitle panel and Settings
+- **The subtitle panel is the floating card it was drawn as.** It was a bottom sheet, and no
+  amount of margin turns one of those into a card resting on the picture: a bottom sheet belongs
+  to the edge of the screen, stretches the full width, and reads as a drawer pulled out of the
+  frame. It is inset from the end and the bottom now, capped in width, and it grows out of the
+  corner the CC button sits in and shrinks back into it — scale and opacity together, weighted
+  so it appears to come *from* the control rather than fade in over it.
+- **Radios rather than ticks, hairlines rather than boxes, a chevron on the rows that open
+  something, and no grabber.** An unselected row shows an empty ring, which says it could be
+  chosen; a blank space says nothing.
+- **The CC button is a plain fade, like shuffle beside it.** Lit when a subtitle is playing,
+  dimmed when one is not. An accent ring for "on" and a filled accent disc for "panel open" was
+  more information than anyone wanted, and it made one control in a row of six louder than the
+  rest.
+- **Settings has a header, shorter words and a line between its rows.** "Settings", one line
+  saying what the page is for, then the same sections in the same order — but with the toolbar
+  replaced by plain text, because a `MaterialToolbar` centres its title and subtitle as one
+  group and pushes the title off the top edge at Material 3 sizes. That bug has already been
+  fixed once on the Shorts tab. Roughly twenty settings lost words they did not need: "Apply
+  certain matches at once" is "Auto-apply exact matches", "Force portrait for other apps" is
+  "Force portrait outside Seamless", and the unlock method finally shows which method it is set
+  to instead of a sentence explaining what unlock methods are.
+
+#### Fixed in that pass
+- **The subtitle panel ran to the bottom of the screen in both orientations.** It floats now,
+  with air underneath it.
+- **Half the appearance controls did not exist on a landscape video.** A phone lying down gives
+  a panel about 360dp, the appearance column wants more than that, and there was no scroll — so
+  Background and Position were simply unreachable unless you happened to open a portrait video.
+  The controls scroll now with Reset pinned below them, and everything in the player's panels is
+  a size smaller in landscape.
+- **A panel could grow taller than the screen it was on.** The height cap was on the track list,
+  which says nothing about how tall the *panel* ends up once a header, two hairlines and three
+  action rows are added on top; a list allowed most of a short screen produced a card that ran
+  off the top of it and covered the controls it was opened from. The cap is on the card now and
+  the list gives up whatever is left.
+- **The delete button never appeared for most people who wanted it.** It was restricted to
+  subtitles this app had downloaded, and the ones that pile up are the `.srt` files sitting
+  beside your videos. Any subtitle that is a file can be removed now. A downloaded one goes on a
+  tap; a file you put there asks first and names itself, because it may be your only copy and
+  every other player on the phone can see it too. A track inside the video still cannot be
+  deleted, because there is nothing to delete.
+- **"Clear downloaded subtitles" deleted them on one tap with no way back.** The row is
+  "Downloaded subtitles" now, with its size, and the deleting happens behind a question.
+
+---
+
 ### Changed
 - **One CC control, always in the same place, with its state on its face.** Subtitles used to be
   reachable from the button *and* from the overflow menu, because the button only appeared once a

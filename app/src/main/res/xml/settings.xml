@@ -226,8 +226,8 @@
             android:entryValues="@array/unlock_values"
             android:key="unlock_method"
             android:layout="@layout/pref_row_bottom"
-            android:summary="@string/settings_unlock_summary"
-            android:title="@string/settings_unlock_title" />
+            android:title="@string/settings_unlock_title"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory

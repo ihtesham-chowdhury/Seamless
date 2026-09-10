@@ -210,35 +210,31 @@ be: the CC button appeared only when a video already had captions, so "go and fi
 to live in the overflow menu as well, under the same name. Two entries to one panel do not make
 it twice as findable — they make neither of them the answer to "where is that".
 
-So the control is always there, and it carries its own state instead of a badge:
+So the control is always there, and it says whether a subtitle is playing by being lit or
+dimmed — the same thing the shuffle button beside it does, because it is the same kind of fact.
+An earlier version gave it an accent ring for "on" and a filled accent disc for "the panel is
+open", which was more information than anyone had asked for and made one control in a row of
+six louder than the other five.
 
-| | What it means |
-|---|---|
-| plain disc | nothing switched on |
-| thin accent ring | a subtitle is playing |
-| accent ring and fill | the panel is open |
+The panel is a card that floats over the picture, inset from the end and the bottom, capped in
+width and in height. It is deliberately not a bottom sheet: a bottom sheet belongs to the edge
+of the screen, stretches the full width and reads as a drawer pulled out of the frame, and no
+amount of margin turns one into the other. It grows out of the corner the CC button sits in
+when it opens and shrinks back into it when it closes.
 
-The last two are separate on purpose. Closing the panel is the moment you find out whether
-anything changed, and if "on" and "open" looked the same there would be nothing to find out.
-The accent is the one chosen in Settings, mixed a third of the way to white so it separates
-from a dark disc on a bright frame and from a bright disc on a dark one. The player itself
-stays uncoloured; a whole video player tinted in someone's chosen purple would be a strange
-thing to insist on, but one control with a state is exactly what an accent is for.
-
-The panel answers one question and puts everything else beneath it:
+It answers one question and puts everything else beneath it:
 
 ```
-Subtitles                    ×
-
-  Off
-✓ English      Downloaded   🗑
-  English      In this video
-  বাংলা          In this folder
-─────────────────────────────
-🔍 Find subtitles
-📁 Choose subtitle file…
-─────────────────────────────
-Aa Appearance
+Subtitles                     ×
+────────────────────────────────
+◉ English       In this folder 🗑
+○ English       Downloaded     🗑
+○ বাংলা          In this video
+────────────────────────────────
+🔍 Find subtitles              ›
+📁 Choose subtitle file…       ›
+────────────────────────────────
+Aa Appearance                  ›
 ```
 
 Above the first line: what am I watching. Between the lines: what to do when the answer is
@@ -248,9 +244,21 @@ opening this panel.
 **Only the list scrolls.** Everything used to be one column that grew, which meant a file with
 five text tracks pushed all three actions off the bottom of the screen — and in landscape,
 where films are actually watched, off the bottom of a fairly short screen. It looked exactly
-like the appearance controls disappearing once you added a subtitle. The list now gives up its
-own height first, and is capped at a little under half the screen so the panel stays a panel
+like the appearance controls disappearing once you added a subtitle. The list gives up its own
+height first now, and the *card* is capped at a share of the screen so the panel stays a panel
 with the film visible around it.
+
+That the cap is on the card and not on the list is worth stating, because getting it the other
+way round was a bug of its own: capping the list says nothing about how tall the panel ends up
+once a header, two hairlines and three action rows are stacked on top of it, and a list allowed
+most of a landscape screen produced a card that ran off the top of it and covered the control
+that opened it. `CappedColumn` caps the card; `LinearLayout`'s own weight rule shrinks the list
+to whatever is left.
+
+**Landscape gets its own sizes, not its own features.** Type, row heights, gaps and insets all
+come from `values-land` a size down. Nothing is hidden. A control that exists in one orientation
+and not the other is worse than a missing one, because the person who found it once now knows it
+is there — which is exactly how "I only found the position slider on a portrait video" happens.
 
 ---
 
@@ -270,12 +278,19 @@ existing mess there for ever.
 Two rows can still both say English, and should: one inside the video and one downloaded are
 different files with different timings, and the second line says which is which.
 
-**Deleting.** A subtitle this app put on the device carries a quiet delete at the end of its
-row. Nothing else does, and the distinction is not squeamishness:
+**Deleting.** Any subtitle that is a *file* carries a quiet delete at the end of its row — one
+this app downloaded, and one sitting beside the video in a folder it has been given. A track
+inside the container does not, because there is nothing to delete: it is part of the video.
 
-- a track inside the video has no file of its own to remove;
-- a `.srt` in your own folder is a file you put there, and a caption menu is not where anyone
-  should be able to delete files they did not know were listed.
+The two files are not treated the same. A downloaded subtitle is the app's own and goes on one
+tap; it can be fetched again in a second. A `.srt` beside the video is the user's file, visible
+to every other player they own, and possibly the only copy, so that one asks first and names
+itself — "delete this subtitle" is a different question from "delete Movie.en.srt" when there
+are three in the folder and two belong to other episodes.
+
+Restricting this to downloaded subtitles was the first answer and it was wrong. The button then
+never appeared at all for anyone whose subtitles live in their own folders, which is most people
+who have a subtitle problem in the first place.
 
 Deleting the track that is playing falls back the same way opening a video does — the preferred
 language if something else carries it, off if nothing does. The panel stays open, because
@@ -386,7 +401,6 @@ data/subtitle/
 ui/player/
   SubtitleController.kt   all of it, for the ordinary player
   SubtitleTracks.kt       reading and selecting tracks — subtitles and audio alike
-  CcButton.kt             the control's three states, drawn from the accent
   TrackSheet.kt           the floating panel
   SubtitleAppearanceSheet.kt
   SubtitleCandidatesSheet.kt
@@ -394,7 +408,7 @@ ui/player/
 
 ui/common/
   SubtitleStyles.kt       preferences → CaptionStyleCompat
-  CappedScrollView.kt     a list that will not take the whole screen
+  CappedColumn.kt         a panel that will not take the whole screen
 
 util/
   Http.kt                 the whole of this app's networking

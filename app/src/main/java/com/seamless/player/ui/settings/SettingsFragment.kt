@@ -174,12 +174,31 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
         findPreference<Preference>("subtitle_clear")?.setOnPreferenceClickListener {
-            SubtitleStore(requireContext()).clear()
-            toast(getString(R.string.settings_subtitle_clear_done))
-            updateSubtitleSummaries()
+            confirmClearSubtitles()
             true
         }
         updateSubtitleSummaries()
+    }
+
+    /**
+     * Asks before deleting the lot.
+     *
+     * The row used to be called "Clear downloaded subtitles" and did exactly that on one tap,
+     * with nothing to undo it. It is called "Downloaded subtitles" now — a thing you have,
+     * with its size, sitting among the other settings — and the destructive half of it lives
+     * where a destructive action belongs: behind a question that says what will go.
+     */
+    private fun confirmClearSubtitles() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.settings_subtitle_clear_action)
+            .setMessage(R.string.settings_subtitle_clear_confirm)
+            .setPositiveButton(R.string.settings_subtitle_clear_action) { _, _ ->
+                SubtitleStore(requireContext()).clear()
+                toast(getString(R.string.settings_subtitle_clear_done))
+                updateSubtitleSummaries()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     private fun updateSubtitleSummaries() {
@@ -198,8 +217,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<Preference>("subtitle_clear")?.summary = if (held == 0) {
             getString(R.string.settings_subtitle_clear_none)
         } else {
-            getString(
-                R.string.settings_subtitle_clear_summary,
+            resources.getQuantityString(
+                R.plurals.settings_subtitle_clear_summary,
+                held,
                 held,
                 Formatter.formatFileSize(requireContext(), store.totalBytes()),
             )
