@@ -231,13 +231,17 @@ finger and springs back if released early. Toggle in Settings → Gestures.
   enter and exit animation under our control, which is why `dismiss()` is overridden rather than
   animated at each call site — four of the five ways out of that panel are the system calling
   `dismiss` directly, and any of them left un-animated is the one that cuts to black.
-- **A subtitle track's id says where it came from.** Every subtitle file this app attaches to
-  a media item is given an id like `seamless-sub:SAVED:0`, which Media3 hands back as
-  `Format.id`; anything without that prefix came out of the container. Once subtitles are
-  handed to Media3, the player's own track list is the only thing that knows what exists, and
-  a table kept alongside it would have to be held in step through every prepare, rebuild and
-  recycle. The id survives all of that for free. See `data/subtitle/LocalSubtitles.kt` and
-  [SUBTITLES.md](SUBTITLES.md).
+- **A subtitle track's id says where it came from, though not where in the id.** Every subtitle
+  file this app attaches is given an id like `seamless-sub:SAVED:0`, and Media3 hands it back as
+  `1:seamless-sub:SAVED:0`, because `MergingMediaPeriod` prefixes every track id with its source
+  index to keep ids unique across a merged item. Reading the origin off the front of the id
+  classed every sidecar as embedded for three releases. The general rule: an id handed to a
+  library is not promised to come back as it went in, so match on the part that is yours, and
+  find out what actually comes back — here, by reading the bytecode — before building on it.
+  Once subtitles are handed to Media3, the player's own track list is the only thing that knows
+  what exists, and a table kept alongside it would have to be held in step through every
+  prepare, rebuild and recycle. The id survives all of that. See
+  `data/subtitle/LocalSubtitles.kt` and [SUBTITLES.md](SUBTITLES.md).
 - **Subtitles are attached after playback has started, not before.** Local discovery is file
   I/O, and putting a directory listing between the tap and the first frame would tax every
   video for the benefit of the few that have a subtitle beside them. So the player prepares a

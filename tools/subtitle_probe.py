@@ -61,6 +61,7 @@ import com.seamless.player.data.subtitle.SubtitleCandidate
 import com.seamless.player.data.subtitle.SubtitleScoring
 import com.seamless.player.data.subtitle.SubtitleLanguages
 import com.seamless.player.data.subtitle.SubtitleNames
+import com.seamless.player.data.subtitle.SubtitleOrigin
 
 /**
  * Exercises the parser and the scorer the way a search does, and reports rather than throws.
@@ -114,6 +115,26 @@ fun main(args: Array<String>) {
         }
         println()
     }
+
+    // Track ids as Media3 actually hands them back. A merged media item puts its source index in
+    // front of every track id, so the id this app gives a subtitle is never the one it gets back,
+    // and reading the origin off the front of it classed every sidecar as embedded.
+    try {
+        val given = SubtitleOrigin.trackId(SubtitleOrigin.BESIDE, 0)
+        val saved = SubtitleOrigin.trackId(SubtitleOrigin.SAVED, 2)
+        listOf(given, "1:" + given, "3:" + saved, "1:eng", "0:1", null).forEach { id ->
+            println("  origin  '" + id + "' -> " + SubtitleOrigin.of(id) + "  own=" + SubtitleOrigin.ownId(id))
+        }
+        check(SubtitleOrigin.of("1:" + given) == SubtitleOrigin.BESIDE) { "merged folder id read as embedded" }
+        check(SubtitleOrigin.of("3:" + saved) == SubtitleOrigin.SAVED) { "merged saved id read as embedded" }
+        check(SubtitleOrigin.ownId("1:" + given) == given) { "ownId kept the merge prefix" }
+        check(SubtitleOrigin.of("1:eng") == SubtitleOrigin.EMBEDDED) { "a container track was mistaken for ours" }
+        check(SubtitleOrigin.of(null) == SubtitleOrigin.EMBEDDED) { "a missing id was mistaken for ours" }
+    } catch (error: Throwable) {
+        failures++
+        println("  FAIL    origin: " + error.javaClass.simpleName + ": " + error.message)
+    }
+    println()
 
     listOf("en", "eng", "English", "bn", "bangla", "Bengali", "pt-BR", "", "zzz").forEach {
         println("  lang    '" + it + "' -> " + SubtitleLanguages.normalise(it) +

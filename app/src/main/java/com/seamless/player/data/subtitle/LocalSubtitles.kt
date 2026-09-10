@@ -26,18 +26,40 @@ enum class SubtitleOrigin {
     companion object {
         private const val PREFIX = "seamless-sub"
 
-        /** The id given to a sidecar track, which comes back as `Format.id`. */
+        /** The id given to a sidecar track. What comes back as `Format.id` is not this; see [ownId]. */
         fun trackId(origin: SubtitleOrigin, index: Int) = "$PREFIX:${origin.name}:$index"
 
         /**
-         * Reads an origin back off a track id.
+         * Our part of a track id, or null when the track is not one this app attached.
+         *
+         * Not the id as given, because Media3 does not hand it back as given. A media item with
+         * subtitle configurations plays as a merge of the video and one source per subtitle, and
+         * `MergingMediaPeriod` rewrites every track's id on the way through as
+         * `"<source index>:" + id`, so that ids stay unique across the merge. A subtitle given
+         * `seamless-sub:BESIDE:0` therefore comes back as `1:seamless-sub:BESIDE:0`.
+         *
+         * The first version compared the *start* of the id with the prefix, found `1`, and
+         * classed every downloaded subtitle and every file beside a video as a track inside the
+         * container. That one comparison is why the delete button never appeared and why folder
+         * subtitles were labelled "In this video": three rounds of reports, one cause, confirmed
+         * against the bytecode of Media3 1.11 rather than inferred. So the prefix is searched
+         * for, never assumed to be first, and `tools/subtitle_probe.py` runs the merged form.
+         */
+        fun ownId(formatId: String?): String? {
+            if (formatId == null) return null
+            val at = formatId.indexOf("$PREFIX:")
+            return if (at < 0) null else formatId.substring(at)
+        }
+
+        /**
+         * Reads an origin back off a track id, wherever Media3 has put our part of it.
          *
          * Anything not of our making is [EMBEDDED] — which is exactly right, because a track
          * we did not attach came out of the container.
          */
         fun of(formatId: String?): SubtitleOrigin {
-            val parts = formatId?.split(':') ?: return EMBEDDED
-            if (parts.size < 2 || parts[0] != PREFIX) return EMBEDDED
+            val parts = ownId(formatId)?.split(':') ?: return EMBEDDED
+            if (parts.size < 2) return EMBEDDED
             return entries.firstOrNull { it.name == parts[1] } ?: EMBEDDED
         }
     }

@@ -402,7 +402,9 @@ class SubtitleController(
     private fun removalOf(option: SubtitleTracks.Option): (() -> Unit)? {
         val origin = SubtitleOrigin.of(option.format.id)
         if (origin == SubtitleOrigin.EMBEDDED) return null
-        val sidecar = sidecars.firstOrNull { it.id == option.format.id } ?: return null
+        // Compared on our own part of the id: Media3 puts the merge index in front of it.
+        val own = SubtitleOrigin.ownId(option.format.id)
+        val sidecar = sidecars.firstOrNull { it.id == own } ?: return null
         return when (origin) {
             SubtitleOrigin.SAVED -> ({ remove(sidecar, option) })
             SubtitleOrigin.BESIDE -> ({ confirmThenRemove(sidecar, option) })

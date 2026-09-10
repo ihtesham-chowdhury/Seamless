@@ -420,11 +420,22 @@ Two seams are worth knowing about:
 local engine, the scoring, the panels, the store — depends on the interface and not on any
 particular website. Swapping provider is one new class and one line in `SubtitleSearch`.
 
-**A track's id carries where it came from.** Every subtitle the app attaches is given an id
-like `seamless-sub:SAVED:0`, which Media3 hands back as `Format.id`. Anything without that
-prefix came out of the container. This is why there is no table of subtitles kept alongside the
-player's own track list — such a table would have to be kept in step through every prepare,
-rebuild and recycle, and the id survives all of it for free.
+**A track's id carries where it came from — somewhere inside it.** Every subtitle the app
+attaches is given an id like `seamless-sub:SAVED:0`. Media3 does not hand that back unchanged. A
+media item with subtitle configurations plays as a merge of the video and one source per
+subtitle, and `MergingMediaPeriod` rewrites every track's id as `<source index>:<id>` to keep ids
+unique across the merge, so it comes back as `1:seamless-sub:SAVED:0`.
+`SubtitleOrigin.ownId` searches for the prefix rather than expecting it first.
+
+Expecting it first was the original version, and it classed every downloaded subtitle and every
+file beside a video as a track inside the container. That is why the delete button did not
+appear and why folder subtitles were labelled "In this video", for three rounds, before the
+Media3 1.11 bytecode was read to find out what the id really looked like on the way back.
+`tools/subtitle_probe.py` runs the merged form so it cannot regress unnoticed.
+
+There is still no table of subtitles kept alongside the player's own track list: such a table
+would have to be held in step through every prepare, rebuild and recycle, and the id survives
+all of it, prefix and all.
 
 ---
 
