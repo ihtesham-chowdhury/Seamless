@@ -180,8 +180,18 @@ class PlayerGestureLayout @JvmOverloads constructor(
         if (ev.actionMasked == MotionEvent.ACTION_UP ||
             ev.actionMasked == MotionEvent.ACTION_CANCEL
         ) {
+            val claimed = claimedByDetector
             endBoost()
             claimedByDetector = false
+            // Swallow the release of a gesture that was ours.
+            //
+            // A press held still until it became the speed boost has no events between its
+            // down and its up, so this up is the first chance there is to claim it. Clearing the
+            // claim and then letting the up through handed PlayerView a down and an up it reads
+            // as a tap — and a tap on a hidden controller raises it, the moment the finger
+            // lifted off a hold. Intercepting here sends PlayerView a cancel instead, so a hold
+            // shows the 2x badge while held and nothing at all when released.
+            if (claimed) return true
         }
 
         if (claimedByDetector) return true
