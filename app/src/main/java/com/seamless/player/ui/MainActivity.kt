@@ -1,5 +1,6 @@
 package com.seamless.player.ui
 
+import android.view.animation.PathInterpolator
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -41,10 +42,19 @@ class MainActivity : AppCompatActivity() {
         binding.navShorts.setOnClickListener { select(R.id.nav_shorts) }
         binding.navSettings.setOnClickListener { select(R.id.nav_settings) }
 
+        // Rotation, a resized window: the tabs change width, so the island follows them without
+        // animating, since nothing was chosen. Posted, because resizing the island from inside a
+        // layout pass would ask for another layout in the middle of this one.
+        binding.navRow.addOnLayoutChangeListener { _, left, _, right, _, oldLeft, _, oldRight, _ ->
+            if (right - left != oldRight - oldLeft) {
+                binding.navRow.post { placeIsland(selectedTab, animate = false) }
+            }
+        }
+
         // A rotation rebuilds the activity, but the fragment manager restores the tab that
         // was showing, so only the capsule needs putting back where it was.
         selectedTab = savedInstanceState?.getInt(STATE_TAB) ?: R.id.nav_library
-        if (savedInstanceState == null) select(selectedTab) else markSelected(selectedTab)
+        if (savedInstanceState == null) select(selectedTab) else markSelected(selectedTab, animate = false)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -62,7 +72,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         selectedTab = id
-        markSelected(id)
+        markSelected(id, animate = true)
         show(
             when (id) {
                 R.id.nav_shorts -> ShortsTabFragment()
@@ -73,13 +83,49 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * setSelected on a ViewGroup is dispatched down to its children, so one call moves the
-     * capsule and recolours both the icon and its label.
+     * setSelected on a ViewGroup is dispatched down to its children, so one call recolours both
+     * the icon and its label. The island moves separately, because it belongs to no one tab.
      */
-    private fun markSelected(id: Int) {
+    private fun markSelected(id: Int, animate: Boolean) {
         binding.navLibrary.isSelected = id == R.id.nav_library
         binding.navShorts.isSelected = id == R.id.nav_shorts
         binding.navSettings.isSelected = id == R.id.nav_settings
+        placeIsland(id, animate)
+    }
+
+    /**
+     * Puts the accent island under [id]'s tab.
+     *
+     * Width as well as position, because the tabs share the capsule by weight and nobody knows how
+     * wide they are until layout has run. Before then this waits a frame and places the island
+     * without animating; there is nothing to animate from when the screen has just appeared.
+     *
+     * The move is translation only, on the render thread, with the emphasised curve Material
+     * uses for things changing place: quick to leave, slow to settle, so the island reads as
+     * gliding to the tab rather than being dragged there.
+     */
+    private fun placeIsland(id: Int, animate: Boolean) {
+        val tab = binding.navRow.findViewById<View>(id) ?: return
+        if (tab.width == 0) {
+            binding.navRow.post { placeIsland(id, animate = false) }
+            return
+        }
+        val island = binding.navIsland
+        if (island.layoutParams.width != tab.width) {
+            island.layoutParams = island.layoutParams.apply { width = tab.width }
+        }
+        val target = tab.left.toFloat()
+        island.animate().cancel()
+        if (!animate || island.visibility != View.VISIBLE) {
+            island.translationX = target
+            island.visibility = View.VISIBLE
+            return
+        }
+        island.animate()
+            .translationX(target)
+            .setDuration(ISLAND_MOVE_MS)
+            .setInterpolator(PathInterpolator(0.2f, 0f, 0f, 1f))
+            .start()
     }
 
     override fun onStart() {
@@ -118,6 +164,9 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val STATE_TAB = "selected_tab"
+
+        /** Long enough to be seen travelling, short enough not to be waited for. */
+        const val ISLAND_MOVE_MS = 320L
 
         /** The permission that lets us read the video library, which differs by OS version. */
         val videoPermission: String

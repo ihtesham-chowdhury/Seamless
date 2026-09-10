@@ -120,44 +120,56 @@
     <!--
       What happened, once, without asking anything.
 
-      This is the other half of applying a certain match automatically: a line of text that says
-      what was done and offers to undo it, then leaves. A confirmation dialog before the fact
-      would have interrupted the film to ask a question whose answer was already known; a silent
-      change with no way back would have been worse.
+      This is the other half of applying a certain match automatically: a line that says what was
+      done and offers to undo it, then leaves. A confirmation dialog before the fact would have
+      interrupted the film to ask a question whose answer was already known; a silent change with
+      no way back would have been worse.
+
+      A floating pill, centred along the bottom and clear of the transport controls, in the same
+      glass as the navigation capsule and the player's panels. It was a grey HUD box near the top
+      with UNDO in capitals, which looked like a system toast that had wandered into the player.
+      Undo is a small pill button of its own now — the one thing on the notice that can be
+      pressed — and the notice rises in and fades away rather than appearing and vanishing.
     -->
     <LinearLayout
         android:id="@+id/subtitle_notice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="86dp"
-        android:layout_marginEnd="24dp"
-        android:background="@drawable/hud_background"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="@dimen/notice_bottom_margin"
+        android:background="@drawable/notice_pill_bg"
+        android:elevation="6dp"
         android:gravity="center_vertical"
+        android:minHeight="56dp"
         android:orientation="horizontal"
-        android:paddingStart="14dp"
-        android:paddingTop="10dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="10dp"
+        android:padding="8dp"
         android:visibility="gone">
 
+        <!-- A tick on its own disc of glass, the shape the transport buttons sit on. -->
         <ImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginEnd="10dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/notice_check_bg"
             android:contentDescription="@null"
-            android:src="@drawable/ic_check" />
+            android:padding="9dp"
+            android:src="@drawable/ic_check"
+            app:tint="#FFFFFFFF" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/notice_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
                 android:textColor="#FFFFFFFF"
                 android:textSize="14sp" />
 
@@ -165,27 +177,27 @@
                 android:id="@+id/notice_detail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="#A6FFFFFF"
+                android:textColor="#99FFFFFF"
                 android:textSize="12sp" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/notice_action"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
-            android:background="@drawable/ripple_borderless_circle"
-            android:letterSpacing="0.04"
-            android:minHeight="36dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/notice_action_bg"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             android:text="@string/action_undo"
-            android:textAllCaps="true"
+            android:textAllCaps="false"
             android:textColor="#FFFFFFFF"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:textSize="13sp" />
     </LinearLayout>
 
     <!-- "2x >>" in a black capsule, the shape everyone already reads as press-and-hold. -->

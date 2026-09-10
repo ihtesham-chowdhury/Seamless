@@ -29,16 +29,26 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!--
-      Wider than three tabs strictly need, and still well short of the screen's edges.
+      The navigation capsule: a glass surface, and a single island of the accent colour that slides
+      to whichever tab you are on.
 
-      It was as narrow as its tabs, which made it read as a small badge sitting at the bottom
-      rather than as the way around the app. The other extreme, edge to edge, is a bar again,
-      which is what this capsule exists not to be. So it takes the width less a generous margin
-      either side and stops at a cap, and the three tabs share it equally: on a phone held upright
-      that is most of the width, and on a wide screen it stays a capsule in the middle instead of
-      stretching into a strip.
+      Wider than three tabs strictly need, and still well short of the screen's edges. As narrow as
+      its tabs it read as a small badge rather than as the way around the app; edge to edge it would
+      be a bar again, which is what a capsule is for not being. So it takes the width less a margin
+      either side, stops at a cap, and the three tabs share it equally.
+
+      The island is one view behind all three tabs rather than a background on each, and that is
+      what lets it travel: choosing another tab moves the same island across, so the change reads
+      as the selection moving rather than as one capsule switching off and another switching on. It
+      carries a soft highlight along its top and a glow of its own colour beneath it; the shadow is
+      tinted, which needs API 28, and this app starts at 29.
+
+      Two details that are not decoration. clipChildren is off so the glow can spill into the
+      capsule's padding instead of stopping at a hard edge. And the row of tabs has the same
+      elevation as the island: views are drawn in order of elevation first, so a row at zero would
+      be painted underneath the island and the selected tab's icon and label would disappear.
     -->
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/nav_pill"
         android:layout_width="0dp"
         android:layout_height="@dimen/nav_pill_height"
@@ -46,104 +56,127 @@
         android:layout_marginEnd="@dimen/nav_pill_side_margin"
         android:layout_marginBottom="@dimen/nav_pill_margin"
         android:background="@drawable/glass_nav_bg"
-        android:elevation="6dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:elevation="10dp"
+        android:outlineAmbientShadowColor="#66000000"
+        android:outlineSpotShadowColor="#99000000"
+        android:padding="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintWidth_max="@dimen/nav_pill_max_width">
 
-        <LinearLayout
-            android:id="@+id/nav_library"
+        <!--
+          Sized and positioned from MainActivity once the tabs have widths. Gravity is left rather
+          than start: the island is placed by the tab's left coordinate, which is absolute, and a
+          start gravity would put it at the right-hand end in a right-to-left layout before any
+          translation was applied.
+        -->
+        <View
+            android:id="@+id/nav_island"
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="50dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp"
-            android:background="@drawable/nav_item_bg"
-            android:clickable="true"
-            android:contentDescription="@string/tab_library"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_folder"
-                android:tint="@color/nav_item_tint" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:text="@string/tab_library"
-                android:textColor="@color/nav_item_tint"
-                android:textSize="10sp" />
-        </LinearLayout>
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:background="@drawable/nav_island_bg"
+            android:elevation="4dp"
+            android:outlineAmbientShadowColor="@color/nav_island"
+            android:outlineSpotShadowColor="@color/nav_island"
+            android:visibility="invisible" />
 
         <LinearLayout
-            android:id="@+id/nav_shorts"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="50dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp"
-            android:background="@drawable/nav_item_bg"
-            android:clickable="true"
-            android:contentDescription="@string/tab_shorts"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:id="@+id/nav_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="4dp"
+            android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_shorts"
-                android:tint="@color/nav_item_tint" />
+            <LinearLayout
+                android:id="@+id/nav_library"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/nav_item_bg"
+                android:clickable="true"
+                android:contentDescription="@string/tab_library"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:text="@string/tab_shorts"
-                android:textColor="@color/nav_item_tint"
-                android:textSize="10sp" />
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_folder"
+                    android:tint="@color/nav_item_tint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/tab_library"
+                    android:textColor="@color/nav_item_tint"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/nav_shorts"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/nav_item_bg"
+                android:clickable="true"
+                android:contentDescription="@string/tab_shorts"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_shorts"
+                    android:tint="@color/nav_item_tint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/tab_shorts"
+                    android:textColor="@color/nav_item_tint"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/nav_settings"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/nav_item_bg"
+                android:clickable="true"
+                android:contentDescription="@string/tab_settings"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_settings"
+                    android:tint="@color/nav_item_tint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/tab_settings"
+                    android:textColor="@color/nav_item_tint"
+                    android:textSize="11sp" />
+            </LinearLayout>
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_settings"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="50dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp"
-            android:background="@drawable/nav_item_bg"
-            android:clickable="true"
-            android:contentDescription="@string/tab_settings"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_settings"
-                android:tint="@color/nav_item_tint" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:text="@string/tab_settings"
-                android:textColor="@color/nav_item_tint"
-                android:textSize="10sp" />
-        </LinearLayout>
-    </LinearLayout>
+    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

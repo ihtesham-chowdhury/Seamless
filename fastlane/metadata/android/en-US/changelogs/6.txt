@@ -6,4 +6,4 @@ A speed panel with a large readout, fine steps and every preset in two rows.
 
 Shuffle in a folder plays it shuffled. Volume boost to 200% works in Shorts too.
 
-Glass discs under play and skip; icons, accent rules and switches in Settings; a wider navigation bar.
+Glass discs under play and skip; icons and accent switches in Settings; a navigation bar whose accent island slides between tabs.

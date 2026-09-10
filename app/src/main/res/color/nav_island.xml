@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The island's colour in a light theme: the accent at full strength, with white on it.
+
+  The dark theme uses the accent's container tone instead; see color-night/nav_island.xml. The two
+  differ because the accents themselves differ by theme. In light, the primary tone is the
+  saturated one and white reads on it; in dark, the primary tone is a pale pastel meant to be read
+  *as text*, and the deep, saturated tone is the container. Using one attribute for both would give
+  a vivid island in one theme and a washed-out one in the other.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/colorPrimary" />
+</selector>

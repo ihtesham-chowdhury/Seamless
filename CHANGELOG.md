@@ -19,8 +19,8 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Playback speed is a floating card, not a list in a dialog.** A large readout of the speed; a
   slider with a step either side for fine-tuning in 0.05s; and every preset as a pill, in two rows
   so none of them has to be scrolled to, with the one playing shown in white. A single scrolling
-  row came first and hid most of the presets off its end. In landscape the card sits in the middle
-  of the screen. It applies as it moves, like the appearance panel, because a speed is judged by
+  row came first and hid most of the presets off its end. In landscape it is centred across the
+  bottom, with the same air beneath it as the subtitle panel. It applies as it moves, like the appearance panel, because a speed is judged by
   listening to it.
 - **Play, previous and next sit on glass.** A translucent disc under each and a brighter one under
   play, and nothing around the three. A capsule holding them came first and, however narrow, read
@@ -38,8 +38,15 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Controls that are off fade less.** Shuffle, speed at 1x and CC all dim to the same 65% now; two
   of them were at 40% and the third at 55%, which next to icons at full strength looked less like
   "off" than like "unavailable".
-- **The navigation capsule is wider.** It was as narrow as its three tabs and read as a small badge.
-  It takes the width less a margin either side now, up to a cap, with the tabs sharing it equally.
+- **The navigation capsule is wider, and the selected tab is an island that moves.** It was as narrow
+  as its three tabs and read as a small badge; it takes the width less a margin either side now, up to
+  a cap, with the tabs sharing it equally. The selected tab sits on one island of your accent colour —
+  a soft highlight along its top, a glow of its own colour beneath — and choosing another tab slides
+  that island across rather than switching one capsule off and another on.
+- **A subtitle found automatically is announced at the bottom, in glass.** The notice was a grey box
+  near the top with UNDO in capitals, which looked like a system toast that had wandered into the
+  player. It is a floating pill centred along the bottom now, clear of the transport controls, with a
+  tick on a glass disc and Undo as a small pill button of its own; it rises in and fades away.
 - **The subtitle panel is the floating card it was drawn as.** It was a bottom sheet, and no
   amount of margin turns one of those into a card resting on the picture: a bottom sheet belongs
   to the edge of the screen, stretches the full width, and reads as a drawer pulled out of the

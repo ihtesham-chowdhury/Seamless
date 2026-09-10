@@ -47,4 +47,8 @@
 
     <!-- The speed panel's number, large because it is the answer. -->
     <dimen name="speed_readout_size">40sp</dimen>
+
+    <!-- Where the subtitle notice floats: centred, and high enough to clear the transport
+         controls, which are about 96dp tall with their padding. -->
+    <dimen name="notice_bottom_margin">116dp</dimen>
 </resources>

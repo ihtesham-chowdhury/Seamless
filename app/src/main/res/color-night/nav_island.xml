@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The island's colour in a dark theme: the accent's deep container tone. See color/nav_island.xml. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/colorSecondaryContainer" />
+</selector>

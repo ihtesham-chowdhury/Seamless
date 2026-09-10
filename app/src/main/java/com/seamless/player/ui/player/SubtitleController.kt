@@ -4,6 +4,7 @@ import android.net.Uri
 import android.widget.Toast
 import android.provider.OpenableColumns
 import android.view.View
+import android.view.animation.DecelerateInterpolator
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -596,16 +597,44 @@ class SubtitleController(
             activity.getString(R.string.subtitle_match_excellent),
         ).joinToString(" · ")
         binding.noticeAction.setOnClickListener { undoDownload() }
-        binding.subtitleNotice.visibility = View.VISIBLE
-        binding.subtitleNotice.removeCallbacks(hideNoticeRunnable)
-        binding.subtitleNotice.postDelayed(hideNoticeRunnable, NOTICE_LINGER_MS)
+
+        // Rises a short way into place as it fades in, rather than appearing. Translation and
+        // alpha only, both handled on the render thread, because this lands on playing video.
+        val notice = binding.subtitleNotice
+        notice.removeCallbacks(hideNoticeRunnable)
+        notice.animate().cancel()
+        if (notice.visibility != View.VISIBLE) {
+            notice.alpha = 0f
+            notice.translationY = notice.resources.displayMetrics.density * NOTICE_RISE_DP
+            notice.visibility = View.VISIBLE
+        }
+        notice.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(NOTICE_IN_MS)
+            .setInterpolator(DecelerateInterpolator(2f))
+            .start()
+        notice.postDelayed(hideNoticeRunnable, NOTICE_LINGER_MS)
     }
 
     private val hideNoticeRunnable = Runnable { hideNotice() }
 
+    /** Sinks a little as it fades, the way it arrived, then gets out of the layout. */
     private fun hideNotice() {
-        binding.subtitleNotice.removeCallbacks(hideNoticeRunnable)
-        binding.subtitleNotice.visibility = View.GONE
+        val notice = binding.subtitleNotice
+        notice.removeCallbacks(hideNoticeRunnable)
+        if (notice.visibility != View.VISIBLE) return
+        notice.animate().cancel()
+        notice.animate()
+            .alpha(0f)
+            .translationY(notice.resources.displayMetrics.density * NOTICE_RISE_DP / 2f)
+            .setDuration(NOTICE_OUT_MS)
+            .withEndAction {
+                notice.visibility = View.GONE
+                notice.alpha = 1f
+                notice.translationY = 0f
+            }
+            .start()
     }
 
     private fun undoDownload() {
@@ -739,6 +768,11 @@ class SubtitleController(
 
         /** Long enough to read two lines and reach Undo, short enough not to be chrome. */
         const val NOTICE_LINGER_MS = 6_000L
+
+        /** How far the notice rises as it arrives: enough to read as arriving, not as moving. */
+        const val NOTICE_RISE_DP = 16f
+        const val NOTICE_IN_MS = 240L
+        const val NOTICE_OUT_MS = 180L
 
         /**
          * What the document picker will offer.

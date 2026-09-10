@@ -30,4 +30,7 @@
 
     <!-- The speed panel's number, large because it is the answer. -->
     <dimen name="speed_readout_size">30sp</dimen>
+
+    <!-- See values/dimens.xml. A little lower on a short screen, still clear of the controls. -->
+    <dimen name="notice_bottom_margin">104dp</dimen>
 </resources>

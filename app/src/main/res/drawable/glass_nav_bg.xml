@@ -7,14 +7,33 @@
   blur what is behind an in-app view. It carries more opacity than the toolbar capsule does
   because content scrolls underneath it — a bar you cannot read the labels on is not glass,
   it is a mistake.
+
+  The second layer is the top highlight: a faint lighter band that is gone by the middle. It is
+  most of what makes a dark capsule look like a surface catching light rather than a hole cut in
+  the page, and it is faint enough to disappear on the light theme's white glass, where the
+  capsule's own shadow does that job instead.
 -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <corners android:radius="100dp" />
-    <gradient
-        android:angle="270"
-        android:endColor="@color/nav_fill_bottom"
-        android:startColor="@color/nav_fill_top" />
-    <stroke
-        android:width="1dp"
-        android:color="@color/nav_stroke" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="100dp" />
+            <gradient
+                android:angle="270"
+                android:endColor="@color/nav_fill_bottom"
+                android:startColor="@color/nav_fill_top" />
+            <stroke
+                android:width="1dp"
+                android:color="@color/nav_stroke" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="100dp" />
+            <gradient
+                android:angle="270"
+                android:centerColor="#00FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:startColor="#14FFFFFF" />
+        </shape>
+    </item>
+</layer-list>

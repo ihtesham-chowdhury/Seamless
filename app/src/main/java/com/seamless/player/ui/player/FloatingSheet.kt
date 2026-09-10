@@ -47,9 +47,10 @@ internal object FloatingSheet {
      *
      * [END] is the subtitle panel's place: against the side its control is on, where a tall list
      * leaves the picture visible beside it. [CENTRE] is for a compact panel with nothing to sit
-     * beside — the speed card — which is a question about the whole video and belongs in the
-     * middle of it. The two only differ in landscape: held upright the width cap is wider than
-     * the screen, so both come out centred along the bottom.
+     * beside — the speed card — which is a question about the whole video and belongs across the
+     * middle of it. Both keep the same air beneath them, so they sit on one line. The two only
+     * differ in landscape: held upright the width cap is wider than the screen, so both come out
+     * centred along the bottom.
      */
     enum class Placement { END, CENTRE }
 
@@ -74,13 +75,19 @@ internal object FloatingSheet {
                 minOf(screenWidth - insetPx * 2, maxWidth),
                 WindowManager.LayoutParams.WRAP_CONTENT,
             )
-            window.setGravity(if (centred) Gravity.CENTER else Gravity.END or Gravity.BOTTOM)
+            // Centred across, never up and down. The first version centred on both axes and the
+            // card floated off the bottom into the middle of the picture; a centred panel keeps the
+            // same air beneath it as the subtitle panel, so the two sit on one line and only the
+            // side they hug differs.
+            window.setGravity(
+                if (centred) Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
+                else Gravity.END or Gravity.BOTTOM,
+            )
             // x and y are offsets from the gravity edges on a floating window, which is how the
-            // card gets air underneath it rather than sitting on the bottom of the screen. A
-            // centred window has no edge to be offset from.
+            // card gets air underneath it rather than sitting on the bottom of the screen.
             window.attributes = window.attributes.apply {
                 x = if (centred) 0 else insetPx
-                y = if (centred) 0 else bottomPx
+                y = bottomPx
             }
             window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
         }
@@ -122,7 +129,7 @@ internal object FloatingSheet {
     private class FloatingDialog(
         context: Context,
         private val content: View,
-        /** Grows from its own middle, rather than from the corner of a control it is not beside. */
+        /** Grows up from the middle of its base, not from the corner of a control it is not by. */
         private val centred: Boolean,
     ) : Dialog(context, R.style.Theme_Seamless_FloatingSheet) {
 
@@ -130,7 +137,7 @@ internal object FloatingSheet {
 
         fun animateIn() {
             content.pivotX = if (centred) content.width / 2f else content.width.toFloat()
-            content.pivotY = if (centred) content.height / 2f else 0f
+            content.pivotY = if (centred) content.height.toFloat() else 0f
             content.alpha = 0f
             content.scaleX = OPENING_SCALE
             content.scaleY = OPENING_SCALE
