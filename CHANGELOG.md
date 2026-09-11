@@ -9,7 +9,34 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **Three navigation bars, chosen in Settings.** Under Appearance, *Navigation bar* offers:
+  - *Frosted glass*, the new default, after Orion Store's bar. A translucent capsule that blurs
+    whatever scrolls behind it, only as wide as its tabs. The selected tab is a solid pill in your
+    accent colour holding its icon and its name; the others are icons alone. Changing tab folds the
+    old pill back into a circle and fades it while the new one fades in and opens, with a soft glow
+    in its own colour beneath.
+  - *Accent island*, the capsule from before, with its glide slowed down and smoothed out.
+  - *Liquid glass*: a clear capsule with a drop of glass under the selected tab. Touch the bar and
+    the drop lifts and swells; drag and it follows your finger; let go and it travels to the tab,
+    stretching with its speed and settling with a little give. The icon under it grows as it
+    passes, as if seen through a lens.
+
+  The choice applies the moment it is made. The blur needs Android 12 or later; on Android 10 and
+  11 the two glass styles are solid.
+- **The OpenSubtitles address is a link.** In the API key dialog, tapping
+  *opensubtitles.com/consumers* opens the registration page in your browser.
+- **A new install starts dark, in amber, with the library as a grid in name order.** Shorts
+  already scanned the whole device for portrait clips and the player's lock already opened by
+  sliding; a new install now has those written down as well. An update changes none of this:
+  every setting stays as it was, including the ones that were never touched.
+
 ### Changed
+- **The island's glide is slower and smooth.** It used to cover most of its distance in the first
+  tenth of a second, which on a one-tab hop read as a jump, and the new tab being built stalled the
+  very frames the motion was in, so the glide skipped. The motion is now a spring stepped from the
+  frame clock: a slow frame pauses it instead of making it jump, and a second tap mid-glide bends
+  its path instead of restarting it. The other two styles move the same way.
 - **Settings has icons, a rule after each heading, and switches in your colour.** Every row sits
   on a small round disc with its icon — the same plate the player's controls sit on, from the
   same Material family, so the two screens look like one product. Each section heading runs out

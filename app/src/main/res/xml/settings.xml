@@ -38,8 +38,20 @@
         <Preference
             android:key="accent_color"
             android:icon="@drawable/ic_pref_palette"
-            android:layout="@layout/pref_row_bottom"
+            android:layout="@layout/pref_row_middle"
             android:title="@string/settings_accent_title" />
+
+        <!-- Three looks for the same three tabs. Applied to the capsule underneath this screen
+             as soon as it is picked, so the choice is made by seeing it. -->
+        <ListPreference
+            android:defaultValue="GLASS"
+            android:entries="@array/nav_style_entries"
+            android:entryValues="@array/nav_style_values"
+            android:key="nav_style"
+            android:icon="@drawable/ic_pref_nav"
+            android:layout="@layout/pref_row_bottom"
+            android:title="@string/settings_nav_style_title"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -2,27 +2,17 @@
     <!--
       The floating navigation capsule, and the room a scrolling list has to leave for it.
 
-      The reserve is the pill's height plus its margin plus a little air, so the last row of
-      a list can be scrolled clear of the glass rather than stopping underneath it.
+      The reserve is the tallest style's height (the island, 70dp) plus the margin plus a little
+      air, so the last row of a list can be scrolled clear of the glass whichever style is in use.
+      The capsule's own heights and insets are in FloatingNavBar, because they differ by style.
     -->
-    <dimen name="nav_pill_height">70dp</dimen>
     <dimen name="nav_pill_margin">12dp</dimen>
     <dimen name="nav_pill_reserve">94dp</dimen>
 
-    <!-- How far the capsule stops short of each edge, and the widest it will get. See the note
-         on nav_pill in activity_main.xml. -->
+    <!-- How far the capsule stops short of each edge, and the widest it will get. The frosted
+         capsule is narrower than this, and centred. -->
     <dimen name="nav_pill_side_margin">22dp</dimen>
     <dimen name="nav_pill_max_width">360dp</dimen>
-
-    <!--
-      The island's air inside the capsule. 6dp above and below; at either end, 2dp of capsule
-      padding plus 4dp of island inset, so the island is inset by the same 6dp on all four sides and
-      never touches the edge. Between two tabs the island's possible positions sit 8dp apart, which
-      is what stops it looking as if it fills its third of the capsule.
-    -->
-    <dimen name="nav_pill_inset">6dp</dimen>
-    <dimen name="nav_pill_inset_horizontal">2dp</dimen>
-    <dimen name="nav_island_inset">4dp</dimen>
 
     <!--
       The player's floating panels, and the reason they are dimensions rather than numbers

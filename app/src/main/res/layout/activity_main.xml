@@ -5,21 +5,26 @@
 
   This is not a BottomNavigationView. That view is a full-width surface by definition — it
   measures its items across the whole width and paints its own background edge to edge — and
-  every route to making it a narrow floating pill fights its own measuring. Three rows of
-  icon and label with a shared background is a small enough thing to build outright, and
-  building it means the selected state, the capsule behind it and the glass are all under
-  this app's control instead of Material's.
+  every route to making it a narrow floating pill fights its own measuring. Three tabs of icon
+  and name inside a view that lays them out itself is a small enough thing to build outright,
+  and building it means the selection, the capsule and the glass are all under this app's
+  control instead of Material's.
 
   Content sits behind it, full height. The lists inside each tab reserve room at the bottom
   so nothing is permanently hidden, and what scrolls past shows through the glass.
+
+  clipChildren is off on the root so the liquid style's drop of glass can swell past the capsule's
+  edge when it lifts, and so no shadow is cut to a hard line.
 -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipChildren="false">
 
-    <FrameLayout
+    <!-- An ordinary frame for the tabs, which can also hand what it draws to the glass. -->
+    <com.seamless.player.ui.nav.BackdropFrame
         android:id="@+id/content"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -29,159 +34,102 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!--
-      The navigation: one floating object with a movable island inside it.
+      The navigation capsule.
 
-      Not three buttons in a long container. The capsule is a single piece of dark material floating
-      over the page — only just lighter than the background, an almost invisible highlight along its
-      top, a soft shadow beneath — and the selected destination is an island of the accent colour
-      sitting *inside* it. The island is inset from the capsule by the same few dp on all four sides,
-      so it never touches the edge; it is lit from within rather than glowing; and choosing another
-      tab glides that one island across while the capsule stays exactly where it is.
+      How it looks is decided in FloatingNavBar, from the setting: frosted glass, the accent
+      island, or liquid glass. What is declared here is only what the three share — three tabs,
+      each an icon and a name, and where the capsule sits. Its height comes from the style, so the
+      layout asks for wrap_content; its width is the screen less a margin either side, up to a cap,
+      and the frosted capsule is narrower still and centred within that.
 
-      Compact rather than stretched: 70dp tall, a margin either side, and a cap on the width, because
-      a capsule that spans a large screen reads as a toolbar again and leaves dead space between the
-      tabs. The three tabs are equal regions of it and each is a full-height touch target.
-
-      Details that are structure rather than decoration:
-      - The island is one view behind the tabs, not a background on each. That is what lets it move.
-      - The row of tabs has the same elevation as the island. Views are drawn by elevation first, so a
-        row at zero would be painted underneath the island and the selected tab would vanish.
-      - clipChildren is off so the island's faint bloom is not cut to a hard edge by the padding.
-      - The tabs have no ripple. A pressed tab compresses slightly instead; see nav_tab_press.
+      The icons and names carry no colour of their own. Their ink changes continuously as the
+      selection passes over them, which a colour state list cannot express.
     -->
-    <FrameLayout
+    <com.seamless.player.ui.nav.FloatingNavBar
         android:id="@+id/nav_pill"
         android:layout_width="0dp"
-        android:layout_height="@dimen/nav_pill_height"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/nav_pill_side_margin"
         android:layout_marginEnd="@dimen/nav_pill_side_margin"
         android:layout_marginBottom="@dimen/nav_pill_margin"
-        android:background="@drawable/glass_nav_bg"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:elevation="8dp"
-        android:outlineAmbientShadowColor="#4D000000"
-        android:outlineSpotShadowColor="#80000000"
-        android:paddingStart="@dimen/nav_pill_inset_horizontal"
-        android:paddingTop="@dimen/nav_pill_inset"
-        android:paddingEnd="@dimen/nav_pill_inset_horizontal"
-        android:paddingBottom="@dimen/nav_pill_inset"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintWidth_max="@dimen/nav_pill_max_width">
 
-        <!--
-          Sized and placed from MainActivity once the tabs have widths. Gravity is left rather than
-          start: the island is positioned from the tab's left coordinate, which is absolute, and a
-          start gravity would put it at the right-hand end in a right-to-left layout before any
-          translation was applied. The shadow is tinted with the island's own colour and kept low,
-          which gives it a bloom you notice only when it is gone.
-        -->
-        <View
-            android:id="@+id/nav_island"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="left"
-            android:background="@drawable/nav_island_bg"
-            android:elevation="3dp"
-            android:outlineAmbientShadowColor="#33000000"
-            android:outlineSpotShadowColor="@color/nav_island"
-            android:visibility="invisible" />
+        <com.seamless.player.ui.nav.NavTabView
+            android:id="@+id/nav_library"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:contentDescription="@string/tab_library"
+            android:focusable="true">
 
-        <LinearLayout
-            android:id="@+id/nav_row"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:elevation="3dp"
-            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_nav_library" />
 
-            <LinearLayout
-                android:id="@+id/nav_library"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:contentDescription="@string/tab_library"
-                android:focusable="true"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:stateListAnimator="@animator/nav_tab_press">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:importantForAccessibility="no"
+                android:maxLines="1"
+                android:text="@string/tab_library"
+                android:textSize="11sp" />
+        </com.seamless.player.ui.nav.NavTabView>
 
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_nav_library"
-                    android:tint="@color/nav_item_tint" />
+        <com.seamless.player.ui.nav.NavTabView
+            android:id="@+id/nav_shorts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:contentDescription="@string/tab_shorts"
+            android:focusable="true">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/tab_library"
-                    android:textColor="@color/nav_item_tint"
-                    android:textSize="11sp" />
-            </LinearLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_nav_shorts" />
 
-            <LinearLayout
-                android:id="@+id/nav_shorts"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:contentDescription="@string/tab_shorts"
-                android:focusable="true"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:stateListAnimator="@animator/nav_tab_press">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:importantForAccessibility="no"
+                android:maxLines="1"
+                android:text="@string/tab_shorts"
+                android:textSize="11sp" />
+        </com.seamless.player.ui.nav.NavTabView>
 
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_nav_shorts"
-                    android:tint="@color/nav_item_tint" />
+        <com.seamless.player.ui.nav.NavTabView
+            android:id="@+id/nav_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:contentDescription="@string/tab_settings"
+            android:focusable="true">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/tab_shorts"
-                    android:textColor="@color/nav_item_tint"
-                    android:textSize="11sp" />
-            </LinearLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_nav_settings" />
 
-            <LinearLayout
-                android:id="@+id/nav_settings"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:contentDescription="@string/tab_settings"
-                android:focusable="true"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:stateListAnimator="@animator/nav_tab_press">
-
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_nav_settings"
-                    android:tint="@color/nav_item_tint" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/tab_settings"
-                    android:textColor="@color/nav_item_tint"
-                    android:textSize="11sp" />
-            </LinearLayout>
-        </LinearLayout>
-    </FrameLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:importantForAccessibility="no"
+                android:maxLines="1"
+                android:text="@string/tab_settings"
+                android:textSize="11sp" />
+        </com.seamless.player.ui.nav.NavTabView>
+    </com.seamless.player.ui.nav.FloatingNavBar>
 </androidx.constraintlayout.widget.ConstraintLayout>

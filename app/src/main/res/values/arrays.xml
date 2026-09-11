@@ -44,6 +44,18 @@
         <item>DARK</item>
     </string-array>
 
+    <!-- Navigation bar style. Values match the NavStyle enum's constant names. -->
+    <string-array name="nav_style_entries">
+        <item>@string/nav_style_glass</item>
+        <item>@string/nav_style_island</item>
+        <item>@string/nav_style_liquid</item>
+    </string-array>
+    <string-array name="nav_style_values">
+        <item>GLASS</item>
+        <item>ISLAND</item>
+        <item>LIQUID</item>
+    </string-array>
+
     <!-- Shorts source. Values match the ShortsSource enum's constant names. -->
     <string-array name="shorts_source_entries">
         <item>@string/shorts_source_folders</item>

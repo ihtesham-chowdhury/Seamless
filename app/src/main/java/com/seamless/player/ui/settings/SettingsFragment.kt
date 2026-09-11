@@ -1,8 +1,15 @@
 package com.seamless.player.ui.settings
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.graphics.drawable.GradientDrawable
+import android.net.Uri
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
 import android.text.format.Formatter
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,12 +25,14 @@ import androidx.preference.SwitchPreferenceCompat
 import com.seamless.player.R
 import com.seamless.player.SeamlessApp
 import com.seamless.player.data.AccentColor
+import com.seamless.player.data.NavStyle
 import com.seamless.player.data.Prefs
 import com.seamless.player.data.ShortsSource
 import com.seamless.player.data.ThemeMode
 import com.seamless.player.data.subtitle.SubtitleStore
 import com.seamless.player.databinding.DialogSubtitleAccountBinding
 import com.seamless.player.databinding.DialogSubtitleKeyBinding
+import com.seamless.player.ui.MainActivity
 import com.seamless.player.ui.common.AccentColors
 import com.seamless.player.ui.common.AppLock
 import com.seamless.player.ui.common.ThemeManager
@@ -86,6 +95,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
         updateAccentSummary()
+
+        findPreference<ListPreference>("nav_style")?.setOnPreferenceChangeListener { _, newValue ->
+            // The capsule is right there under this screen, so it changes in place rather than
+            // after a restart: the choice is made by looking at it.
+            (activity as? MainActivity)?.applyNavStyle(NavStyle.from(newValue as String))
+            true
+        }
 
         wireResumeThreshold()
 
@@ -228,6 +244,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun showApiKeyDialog() {
         val binding = DialogSubtitleKeyBinding.inflate(layoutInflater)
+        binding.explain.text = linkedExplanation()
+        binding.explain.movementMethod = LinkMovementMethod.getInstance()
         binding.key.setText(prefs.subtitleApiKey)
         AlertDialog.Builder(requireContext())
             .setTitle(R.string.settings_subtitle_key_title)
@@ -244,6 +262,40 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
+    }
+
+    /**
+     * The explanation, with the registration address as a link.
+     *
+     * An address to read, remember and type into a browser is two steps too many for something
+     * the dialog can simply open. Only the address is tappable, and it opens in the browser: the
+     * page is fetched there, not by this app, so nothing about Seamless's networking changes.
+     * If the address is ever missing from a translation, the text is shown as it is.
+     */
+    private fun linkedExplanation(): CharSequence {
+        val message = getString(R.string.settings_subtitle_key_message)
+        val address = getString(R.string.settings_subtitle_key_link)
+        val start = message.indexOf(address)
+        if (start < 0) return message
+        return SpannableString(message).apply {
+            setSpan(
+                object : ClickableSpan() {
+                    override fun onClick(widget: View) = openRegistration()
+                },
+                start,
+                start + address.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        }
+    }
+
+    private fun openRegistration() {
+        val page = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.opensubtitles_consumers_url)))
+        try {
+            startActivity(page)
+        } catch (_: ActivityNotFoundException) {
+            toast(getString(R.string.settings_link_no_browser))
+        }
     }
 
     private fun showAccountDialog() {

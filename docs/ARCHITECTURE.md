@@ -27,7 +27,8 @@ data/
   ShortsQuery.kt     The single definition of what belongs in the feed.
   Prefs.kt           Settings, resume positions, hidden and locked folders.
 ui/
-  MainActivity.kt    Bottom nav: Library / Shorts / Settings.
+  MainActivity.kt    The three tabs, and the fragment each one shows.
+  nav/               The floating navigation capsule: three styles, springs, the glass.
   library/           Folder list, folder contents.
   shorts/
     ShortsActivity.kt        The feed. Portrait-locked, immersive.
@@ -283,11 +284,20 @@ finger and springs back if released early. Toggle in Settings → Gestures.
   stays in the tree for anyone who would rather have themed icons.
 - **The bottom navigation is not a `BottomNavigationView`.** That view measures its items
   across the full width and paints its own background edge to edge, so a narrow floating
-  capsule means fighting its measuring at every step. Three rows of icon and label sharing a
-  background is small enough to build outright, and building it puts the selected state, the
-  capsule behind it and the glass under this app's control. `setSelected` on a `ViewGroup` is
-  dispatched to its children, so one call moves the capsule and recolours both the icon and
-  its label through a single `ColorStateList`.
+  capsule means fighting its measuring at every step. `ui/nav/FloatingNavBar` lays out three
+  `NavTabView`s itself and wears one of three styles (`NavStyle`): frosted glass, the accent
+  island, liquid glass. All its motion is springs (`Spring`, an exact solution per step) driven
+  from the `Choreographer`, with a cap on how far one frame may advance them, so a frame stalled
+  by the new tab being built pauses the motion instead of making it jump. It takes the touches
+  itself — the liquid drop follows a finger across all three tabs — but a tap still ends in the
+  tab's own `performClick`, so listeners and accessibility are unchanged.
+- **The frosted glass is really blurred, on Android 12 and later.** A view cannot see its
+  neighbours, so `BackdropFrame`, the frame the tabs live in, records its children into a
+  `RenderNode` and draws that node, and the capsule's `GlassView` draws the same node a second
+  time inside a `RenderEffect` blur: a second reference to one display list, not a second paint.
+  The glass is invalidated from `onDescendantInvalidated`, never from a pre-draw listener, which
+  would request a frame from inside every frame. Its floor is painted opaque first, or the sharp
+  content would show through the transparent gaps in its own blurred copy.
 - **Sorting is scoped, not global.** `Prefs.sortFor(scope)` takes `SCOPE_LIBRARY`,
   `SCOPE_SHORTS`, or a folder's MediaStore `RELATIVE_PATH`. Those three namespaces cannot
   collide, because a `RELATIVE_PATH` always ends in a separator and neither constant contains

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- One list for both the icon and its label, so the two can never disagree. Selected is whatever
-     reads on the island, which differs by theme; see color/nav_island.xml. -->
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/nav_on_island" android:state_selected="true" />
-    <item android:color="?attr/colorOnSurfaceVariant" />
-</selector>

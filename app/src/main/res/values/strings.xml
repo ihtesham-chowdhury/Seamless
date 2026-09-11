@@ -45,6 +45,10 @@
     <string name="settings_appearance">Appearance</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_accent_title">Accent colour</string>
+    <string name="settings_nav_style_title">Navigation bar</string>
+    <string name="nav_style_glass">Frosted glass</string>
+    <string name="nav_style_island">Accent island</string>
+    <string name="nav_style_liquid">Liquid glass</string>
     <string name="accent_default">Default</string>
     <string name="accent_red">Red</string>
     <string name="accent_orange">Orange</string>
@@ -345,6 +349,12 @@ Picking the folder yourself grants access to it, which gets around that restrict
     <string name="settings_subtitle_online_title">Online subtitle lookup</string>
     <string name="settings_subtitle_online_summary">Nothing leaves this device until you tap Find subtitles</string>
     <string name="settings_subtitle_key_title">OpenSubtitles API key</string>
+    <!-- The words in settings_subtitle_key_message that open the registration page. They must
+         appear in that message exactly; a translation that words it differently shows the
+         message without a link rather than linking the wrong words. -->
+    <string name="settings_subtitle_key_link">opensubtitles.com/consumers</string>
+    <string name="opensubtitles_consumers_url" translatable="false">https://www.opensubtitles.com/en/consumers</string>
+    <string name="settings_link_no_browser">No browser is installed to open the link</string>
     <string name="settings_subtitle_key_missing">Not set — online search is unavailable</string>
     <string name="settings_subtitle_key_present">Set</string>
     <string name="settings_subtitle_key_message">Registration is free at opensubtitles.com/consumers. Seamless ships no key of its own: the terms do not allow sharing one, and a key published in an open repository is a key that stops working.\n\nThe key is stored on this device only.</string>

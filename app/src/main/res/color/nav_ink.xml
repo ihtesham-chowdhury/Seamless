@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Plain ink for the liquid style's unselected tabs, which sit on clear glass and need the
+     full-contrast text colour rather than the softer variant. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/colorOnSurface" />
+</selector>

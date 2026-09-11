@@ -168,6 +168,33 @@ enum class AccentColor {
 }
 
 /**
+ * Which navigation capsule the browsing UI wears.
+ *
+ * Three looks for the same three destinations; nothing about where the tabs go changes. They
+ * differ in material and in how the selection moves.
+ */
+enum class NavStyle {
+    /**
+     * Frosted glass: a translucent capsule that blurs what scrolls behind it, with the selected tab
+     * as a solid pill in the accent colour that carries its name. The default.
+     */
+    GLASS,
+
+    /** A dark capsule with an accent island gliding beneath the tabs. */
+    ISLAND,
+
+    /**
+     * Liquid glass: a clear capsule with a drop of glass under the selected tab that lifts when
+     * touched, stretches as it travels and settles with a little give.
+     */
+    LIQUID;
+
+    companion object {
+        fun from(value: String?) = entries.firstOrNull { it.name == value } ?: GLASS
+    }
+}
+
+/**
  * All persisted settings and playback state.
  *
  * Resume positions live in their own file so a few hundred of them never slow down
@@ -259,6 +286,45 @@ class Prefs(context: Context) {
         get() = AccentColor.from(settings.getString(KEY_ACCENT_COLOR, null))
         set(value) = settings.edit { putString(KEY_ACCENT_COLOR, value.name) }
 
+    /** Which navigation capsule the browsing UI wears. Written by its row in Settings. */
+    var navStyle: NavStyle
+        get() = NavStyle.from(settings.getString(KEY_NAV_STYLE, null))
+        set(value) = settings.edit { putString(KEY_NAV_STYLE, value.name) }
+
+    // ---- a new install's starting point ----
+
+    /**
+     * Writes where a new install starts, exactly once.
+     *
+     * A new install starts dark, in amber, with the library as a grid in name order, the shorts tab
+     * scanning the whole device for portrait clips and the player's lock opened by sliding. Those
+     * are written out as ordinary stored values rather than made the getters' fallbacks, and that
+     * is the point. A fallback is what everyone who installed an earlier version has been living
+     * with without ever saving a value — someone who never touched the theme has been following the
+     * system all along — so changing a fallback would change their app under them on update. A
+     * written value exists only where it was written, and Settings shows it as what it is.
+     *
+     * Only an install that has never been updated counts as new, and only while its settings file
+     * is still empty, so a restore from backup onto a new phone keeps what it restored. The marker
+     * is set either way, so this never runs twice.
+     */
+    fun settleDefaults(freshInstall: () -> Boolean) {
+        if (settings.contains(KEY_DEFAULTS_SETTLED)) return
+        val startFresh = settings.all.isEmpty() && freshInstall()
+        settings.edit {
+            if (startFresh) {
+                putString(KEY_THEME_MODE, ThemeMode.DARK.name)
+                putString(KEY_ACCENT_COLOR, AccentColor.AMBER.name)
+                putString(KEY_LIBRARY_VIEW, LibraryView.GRID.name)
+                putBoolean(KEY_NAME_ORDER, true)
+                putString(KEY_SHORTS_SOURCE, ShortsSource.WHOLE_DEVICE.name)
+                putBoolean(KEY_SHORT_LANDSCAPE, false)
+                putString(KEY_UNLOCK, UnlockMethod.SLIDER.name)
+            }
+            putBoolean(KEY_DEFAULTS_SETTLED, true)
+        }
+    }
+
     // ---- library ----
 
     /** Folders excluded from every scan, by RELATIVE_PATH. */
@@ -328,9 +394,17 @@ class Prefs(context: Context) {
     fun sortFor(scope: String): SortSetting {
         val stored = settings.getString(KEY_SORT_KEY_PREFIX + scope, null)
             ?: inheritsFrom(scope)?.let { settings.getString(KEY_SORT_KEY_PREFIX + it, null) }
-        val key = if (stored != null) SortKey.from(stored) else defaultSortKey(scope)
+        // A new install's library starts in name order, A to Z — only while nothing has been
+        // chosen for the screen. Pick another key and that key's usual direction applies.
+        val byName = stored == null && isLibraryScope(scope) &&
+            settings.getBoolean(KEY_NAME_ORDER, false)
+        val key = when {
+            stored != null -> SortKey.from(stored)
+            byName -> SortKey.TITLE
+            else -> defaultSortKey(scope)
+        }
 
-        val fallbackAscending = inheritsFrom(scope)?.let {
+        val fallbackAscending = if (byName) true else inheritsFrom(scope)?.let {
             settings.getBoolean(KEY_SORT_ASC_PREFIX + it, settings.getBoolean(KEY_SORT_ASC, false))
         } ?: settings.getBoolean(KEY_SORT_ASC, false)
         val ascending = settings.getBoolean(KEY_SORT_ASC_PREFIX + scope, fallbackAscending)
@@ -371,6 +445,9 @@ class Prefs(context: Context) {
         shortsScope(ShortsFilter.ALL), shortsScope(ShortsFilter.FAVOURITES) -> SCOPE_SHORTS
         else -> null
     }
+
+    /** The folder list, or the videos inside one folder, whose RELATIVE_PATH ends in a separator. */
+    private fun isLibraryScope(scope: String) = scope == SCOPE_LIBRARY || scope.endsWith("/")
 
     /**
      * Writing Random draws a fresh seed, every time, including when Random was already the
@@ -745,6 +822,9 @@ class Prefs(context: Context) {
 
         private const val KEY_THEME_MODE = "theme_mode"
         private const val KEY_ACCENT_COLOR = "accent_color"
+        private const val KEY_NAV_STYLE = "nav_style"
+        private const val KEY_DEFAULTS_SETTLED = "defaults_settled"
+        private const val KEY_NAME_ORDER = "library_name_order"
         private const val KEY_SHORTS_FOLDERS = "shorts_folders"
         private const val KEY_AUTO_ADVANCE = "shorts_auto_advance"
         private const val KEY_SHORTS_RESIZE = "shorts_resize_mode"

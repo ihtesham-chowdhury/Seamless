@@ -1,9 +1,9 @@
-The subtitle delete button finally appears, for downloads and for files beside your videos.
+A frosted-glass navigation bar, with accent island and liquid glass to pick from in Settings, all with smoother motion.
 
-The subtitle panel floats, and every control is reachable in landscape.
+New installs start dark, in amber, with a grid library in name order.
 
-A speed panel with a large readout, fine steps and every preset in two rows.
+The subtitle delete button appears, the subtitle panel floats, and the OpenSubtitles address is a link.
 
-Shuffle in a folder plays it shuffled. Volume boost to 200% works in Shorts too.
+A speed panel with every preset in two rows. Folder shuffle plays shuffled. Volume boost to 200% in Shorts.
 
-Glass discs under play and skip; icons and accent switches in Settings; a navigation bar whose accent island slides between tabs.
+Glass under play and skip; icons and accent switches in Settings.

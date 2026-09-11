@@ -234,7 +234,10 @@ def resource_names() -> dict[str, set[str]]:
             path = os.path.join(base, name)
             stem = os.path.splitext(name)[0]
 
-            if folder in ("layout", "drawable", "mipmap", "menu", "xml", "anim", "raw"):
+            # Folders where each file is one resource. color/ matters as much as drawable/: a
+            # colour state list file is R.color.<name>, exactly like a <color> in values/.
+            if folder in ("layout", "drawable", "mipmap", "menu", "xml", "anim", "animator",
+                          "raw", "color", "font"):
                 names.setdefault(folder, set()).add(stem)
 
             if not name.endswith(".xml"):
