@@ -7,9 +7,9 @@
 
     <!-- See values/colors.xml. A dark pane rather than a light one, lifted just off the
          background so the capsule has an edge without needing a hard border. -->
-    <color name="nav_fill_top">#F52E2E36</color>
-    <color name="nav_fill_bottom">#EB23232A</color>
-    <color name="nav_stroke">#33FFFFFF</color>
+    <color name="nav_fill_top">#F0262429</color>
+    <color name="nav_fill_bottom">#F01B1A1F</color>
+    <color name="nav_stroke">#14FFFFFF</color>
 
     <!-- See values/colors.xml. Dark enough to sit back, light enough that the knob has an edge. -->
     <color name="switch_track_off">#FF3A3A3F</color>

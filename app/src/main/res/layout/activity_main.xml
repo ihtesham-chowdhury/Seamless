@@ -29,24 +29,25 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!--
-      The navigation capsule: a glass surface, and a single island of the accent colour that slides
-      to whichever tab you are on.
+      The navigation: one floating object with a movable island inside it.
 
-      Wider than three tabs strictly need, and still well short of the screen's edges. As narrow as
-      its tabs it read as a small badge rather than as the way around the app; edge to edge it would
-      be a bar again, which is what a capsule is for not being. So it takes the width less a margin
-      either side, stops at a cap, and the three tabs share it equally.
+      Not three buttons in a long container. The capsule is a single piece of dark material floating
+      over the page — only just lighter than the background, an almost invisible highlight along its
+      top, a soft shadow beneath — and the selected destination is an island of the accent colour
+      sitting *inside* it. The island is inset from the capsule by the same few dp on all four sides,
+      so it never touches the edge; it is lit from within rather than glowing; and choosing another
+      tab glides that one island across while the capsule stays exactly where it is.
 
-      The island is one view behind all three tabs rather than a background on each, and that is
-      what lets it travel: choosing another tab moves the same island across, so the change reads
-      as the selection moving rather than as one capsule switching off and another switching on. It
-      carries a soft highlight along its top and a glow of its own colour beneath it; the shadow is
-      tinted, which needs API 28, and this app starts at 29.
+      Compact rather than stretched: 70dp tall, a margin either side, and a cap on the width, because
+      a capsule that spans a large screen reads as a toolbar again and leaves dead space between the
+      tabs. The three tabs are equal regions of it and each is a full-height touch target.
 
-      Two details that are not decoration. clipChildren is off so the glow can spill into the
-      capsule's padding instead of stopping at a hard edge. And the row of tabs has the same
-      elevation as the island: views are drawn in order of elevation first, so a row at zero would
-      be painted underneath the island and the selected tab's icon and label would disappear.
+      Details that are structure rather than decoration:
+      - The island is one view behind the tabs, not a background on each. That is what lets it move.
+      - The row of tabs has the same elevation as the island. Views are drawn by elevation first, so a
+        row at zero would be painted underneath the island and the selected tab would vanish.
+      - clipChildren is off so the island's faint bloom is not cut to a hard edge by the padding.
+      - The tabs have no ripple. A pressed tab compresses slightly instead; see nav_tab_press.
     -->
     <FrameLayout
         android:id="@+id/nav_pill"
@@ -58,20 +59,24 @@
         android:background="@drawable/glass_nav_bg"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:elevation="10dp"
-        android:outlineAmbientShadowColor="#66000000"
-        android:outlineSpotShadowColor="#99000000"
-        android:padding="6dp"
+        android:elevation="8dp"
+        android:outlineAmbientShadowColor="#4D000000"
+        android:outlineSpotShadowColor="#80000000"
+        android:paddingStart="@dimen/nav_pill_inset_horizontal"
+        android:paddingTop="@dimen/nav_pill_inset"
+        android:paddingEnd="@dimen/nav_pill_inset_horizontal"
+        android:paddingBottom="@dimen/nav_pill_inset"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintWidth_max="@dimen/nav_pill_max_width">
 
         <!--
-          Sized and positioned from MainActivity once the tabs have widths. Gravity is left rather
-          than start: the island is placed by the tab's left coordinate, which is absolute, and a
+          Sized and placed from MainActivity once the tabs have widths. Gravity is left rather than
+          start: the island is positioned from the tab's left coordinate, which is absolute, and a
           start gravity would put it at the right-hand end in a right-to-left layout before any
-          translation was applied.
+          translation was applied. The shadow is tinted with the island's own colour and kept low,
+          which gives it a bloom you notice only when it is gone.
         -->
         <View
             android:id="@+id/nav_island"
@@ -79,8 +84,8 @@
             android:layout_height="match_parent"
             android:layout_gravity="left"
             android:background="@drawable/nav_island_bg"
-            android:elevation="4dp"
-            android:outlineAmbientShadowColor="@color/nav_island"
+            android:elevation="3dp"
+            android:outlineAmbientShadowColor="#33000000"
             android:outlineSpotShadowColor="@color/nav_island"
             android:visibility="invisible" />
 
@@ -88,7 +93,7 @@
             android:id="@+id/nav_row"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:elevation="4dp"
+            android:elevation="3dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -96,18 +101,18 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@drawable/nav_item_bg"
                 android:clickable="true"
                 android:contentDescription="@string/tab_library"
                 android:focusable="true"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:stateListAnimator="@animator/nav_tab_press">
 
                 <ImageView
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_folder"
+                    android:src="@drawable/ic_nav_library"
                     android:tint="@color/nav_item_tint" />
 
                 <TextView
@@ -125,18 +130,18 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@drawable/nav_item_bg"
                 android:clickable="true"
                 android:contentDescription="@string/tab_shorts"
                 android:focusable="true"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:stateListAnimator="@animator/nav_tab_press">
 
                 <ImageView
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_shorts"
+                    android:src="@drawable/ic_nav_shorts"
                     android:tint="@color/nav_item_tint" />
 
                 <TextView
@@ -154,18 +159,18 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@drawable/nav_item_bg"
                 android:clickable="true"
                 android:contentDescription="@string/tab_settings"
                 android:focusable="true"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:stateListAnimator="@animator/nav_tab_press">
 
                 <ImageView
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_settings"
+                    android:src="@drawable/ic_nav_settings"
                     android:tint="@color/nav_item_tint" />
 
                 <TextView

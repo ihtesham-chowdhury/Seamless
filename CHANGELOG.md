@@ -38,11 +38,16 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Controls that are off fade less.** Shuffle, speed at 1x and CC all dim to the same 65% now; two
   of them were at 40% and the third at 55%, which next to icons at full strength looked less like
   "off" than like "unavailable".
-- **The navigation capsule is wider, and the selected tab is an island that moves.** It was as narrow
-  as its three tabs and read as a small badge; it takes the width less a margin either side now, up to
-  a cap, with the tabs sharing it equally. The selected tab sits on one island of your accent colour —
-  a soft highlight along its top, a glow of its own colour beneath — and choosing another tab slides
-  that island across rather than switching one capsule off and another on.
+- **The navigation is one floating object with an island that moves inside it.** A compact dark
+  capsule, only just lighter than the page, with an almost invisible highlight along its top and a
+  soft shadow beneath. Inside it sits one island of your accent colour, inset from the capsule by the
+  same few dp on every side, which glides to the tab you choose while the capsule stays put. The
+  island is lit from within rather than glowing: a faint highlight at its top, a slightly deeper tone
+  at its bottom, and only the faintest bloom of its own colour. The three icons are a family drawn
+  for it — a rounded folder, a vertical frame with a play mark, a six-tooth gear — in the same 2dp
+  line as the player's CC control, and a pressed tab gives slightly under the finger instead of
+  spreading a ripple. It was a wider capsule with a brighter edge, an island that filled its whole
+  third, and icons from three different sets.
 - **A subtitle found automatically is announced at the bottom, in glass.** The notice was a grey box
   near the top with UNDO in capitals, which looked like a system toast that had wandered into the
   player. It is a floating pill centred along the bottom now, clear of the transport controls, with a

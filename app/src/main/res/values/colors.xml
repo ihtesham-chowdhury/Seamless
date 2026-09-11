@@ -15,9 +15,9 @@
       The floating navigation capsule. Denser than the toolbar's: the list scrolls underneath
       this one, so the labels have to stay readable over whatever happens to be passing.
     -->
-    <color name="nav_fill_top">#F7FFFFFF</color>
-    <color name="nav_fill_bottom">#EDF2EEF6</color>
-    <color name="nav_stroke">#1F000000</color>
+    <color name="nav_fill_top">#F5FFFFFF</color>
+    <color name="nav_fill_bottom">#EEF6F2FA</color>
+    <color name="nav_stroke">#14000000</color>
 
     <!-- A settings switch that is off: a light neutral the white knob still stands out against.
          On is the accent; see color/pref_switch_track.xml. -->

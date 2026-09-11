@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  The accent island that sits under the selected tab.
+  The island under the selected tab: the accent, lit from within.
 
-  The accent, with a soft highlight that is brightest along the top edge and gone by the middle,
-  and a faint light rim. The highlight is what turns a flat coloured capsule into something that
-  looks lit, the same trick the glass surfaces use; the rim keeps the island's edge crisp against
-  a glass capsule of a similar darkness.
+  Four quiet layers rather than one loud one. The accent itself; a faint highlight that is brightest
+  along the top and gone by the middle; a slightly deeper tone gathering at the bottom; and a rim at
+  a few percent so the island keeps a crisp edge against a capsule of a similar darkness. Together
+  they make the colour look like light coming up through the surface instead of paint laid on it,
+  and none of them is strong enough to read as a gradient on its own.
 
-  The first layer is a plain rounded rectangle on purpose. A layer list takes its outline from its
-  first layer, and the outline is what the island's tinted shadow — its glow — is cast from.
+  The first layer is a plain rounded rectangle on purpose: a layer list takes its outline from its
+  first layer, and the outline is what the island's low, tinted shadow is cast from.
 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
@@ -22,12 +23,27 @@
             <corners android:radius="100dp" />
             <gradient
                 android:angle="270"
-                android:centerColor="#0AFFFFFF"
+                android:centerColor="#05FFFFFF"
                 android:endColor="#00FFFFFF"
-                android:startColor="#38FFFFFF" />
+                android:startColor="#24FFFFFF" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="100dp" />
+            <gradient
+                android:angle="270"
+                android:centerColor="#00000000"
+                android:endColor="#1A000000"
+                android:startColor="#00000000" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="100dp" />
             <stroke
                 android:width="1dp"
-                android:color="#26FFFFFF" />
+                android:color="#12FFFFFF" />
         </shape>
     </item>
 </layer-list>

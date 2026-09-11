@@ -166,36 +166,57 @@ def dependency_jars() -> list[str]:
     Transitive dependencies are picked up too: everything of the right name already in the
     cache is included, which is coarser than a real resolution but errs towards having a
     class available rather than missing.
+
+    Only the newest version of each artifact is kept, as Gradle's resolution would. The cache
+    holds every version anything on this machine ever fetched, and with two versions of one
+    library on the classpath the compiler takes whichever comes first — which once meant
+    RecyclerView 1.1.0, from before bindingAdapterPosition existed, instead of the 1.4.0 the
+    build uses.
     """
     out = os.path.join(BUILD, "libs")
     os.makedirs(out, exist_ok=True)
-    jars = []
-    seen = set()
 
+    # (group, artifact, file name with its version taken out) -> (version, path)
+    newest: dict[tuple[str, str, str], tuple[tuple, str]] = {}
     for base, _, files in os.walk(CACHE):
+        # Laid out group/artifact/version/hash/file.
+        version_dir = os.path.dirname(base)
+        version = os.path.basename(version_dir)
+        artifact_dir = os.path.dirname(version_dir)
+        owner = (os.path.basename(os.path.dirname(artifact_dir)), os.path.basename(artifact_dir))
         for name in files:
-            path = os.path.join(base, name)
-            if name.endswith("-sources.jar") or name.endswith("-javadoc.jar"):
+            if name.endswith(("-sources.jar", "-javadoc.jar")) or not name.endswith((".jar", ".aar")):
                 continue
-            if name.endswith(".jar"):
-                if name not in seen:
-                    seen.add(name)
-                    jars.append(path)
-            elif name.endswith(".aar"):
-                if name in seen:
-                    continue
-                seen.add(name)
-                extracted = os.path.join(out, name[:-4] + ".jar")
-                if not os.path.exists(extracted):
-                    try:
-                        with zipfile.ZipFile(path) as archive:
-                            with archive.open("classes.jar") as source:
-                                with open(extracted, "wb") as target:
-                                    shutil.copyfileobj(source, target)
-                    except (KeyError, zipfile.BadZipFile):
-                        continue
-                jars.append(extracted)
+            key = owner + (name.replace(version, "", 1),)
+            candidate = (version_key(version), os.path.join(base, name))
+            if key not in newest or candidate[0] > newest[key][0]:
+                newest[key] = candidate
+
+    jars = []
+    for _, path in sorted(newest.values(), key=lambda entry: entry[1]):
+        name = os.path.basename(path)
+        if name.endswith(".jar"):
+            jars.append(path)
+            continue
+        extracted = os.path.join(out, name[:-4] + ".jar")
+        if not os.path.exists(extracted):
+            try:
+                with zipfile.ZipFile(path) as archive:
+                    with archive.open("classes.jar") as source:
+                        with open(extracted, "wb") as target:
+                            shutil.copyfileobj(source, target)
+            except (KeyError, zipfile.BadZipFile):
+                continue
+        jars.append(extracted)
     return jars
+
+
+def version_key(version: str) -> tuple:
+    """Orders versions near enough as Gradle does: numerically, and a release after its own
+    alpha, beta or release candidate."""
+    numbers, _, qualifier = version.partition("-")
+    return (tuple(int(p) if p.isdigit() else 0 for p in numbers.split(".")),
+            qualifier == "", qualifier)
 
 
 # ---- generated sources: R, BuildConfig, view bindings ----

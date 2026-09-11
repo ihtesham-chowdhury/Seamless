@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  The floating navigation capsule.
+  The navigation capsule's surface.
 
-  Same idea as glass_pill_bg and, for the same reason, the same honest limitation: this is a
-  translucent surface with a gradient, not a backdrop blur, because Android exposes no way to
-  blur what is behind an in-app view. It carries more opacity than the toolbar capsule does
-  because content scrolls underneath it — a bar you cannot read the labels on is not glass,
-  it is a mistake.
+  A dark translucent material only just lighter than the page, not a grey pill: a very slight
+  vertical tonal change, a 1dp edge at a few percent, and a top highlight so faint that it is only
+  missed when it is taken away. It is not a blur — Android cannot blur what is behind an in-app
+  view — and it does not try to look like frosted glass; what it borrows from glass is the way a
+  surface catches light along its top. The shadow comes from the view's elevation, not from here.
 
-  The second layer is the top highlight: a faint lighter band that is gone by the middle. It is
-  most of what makes a dark capsule look like a surface catching light rather than a hole cut in
-  the page, and it is faint enough to disappear on the light theme's white glass, where the
-  capsule's own shadow does that job instead.
+  On the light theme the same layers give a soft lifted white surface; the highlight disappears
+  into it, and the shadow carries the lift instead.
 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
@@ -33,7 +31,7 @@
                 android:angle="270"
                 android:centerColor="#00FFFFFF"
                 android:endColor="#00FFFFFF"
-                android:startColor="#14FFFFFF" />
+                android:startColor="#0DFFFFFF" />
         </shape>
     </item>
 </layer-list>

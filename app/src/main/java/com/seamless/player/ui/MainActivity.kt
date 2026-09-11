@@ -4,9 +4,11 @@ import android.view.animation.PathInterpolator
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -84,12 +86,18 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * setSelected on a ViewGroup is dispatched down to its children, so one call recolours both
-     * the icon and its label. The island moves separately, because it belongs to no one tab.
+     * the icon and its label. The label also takes a step more weight — never more size, which
+     * would nudge its icon up as the island arrived. The island moves separately, because it
+     * belongs to no one tab.
      */
     private fun markSelected(id: Int, animate: Boolean) {
-        binding.navLibrary.isSelected = id == R.id.nav_library
-        binding.navShorts.isSelected = id == R.id.nav_shorts
-        binding.navSettings.isSelected = id == R.id.nav_settings
+        for (tab in listOf(binding.navLibrary, binding.navShorts, binding.navSettings)) {
+            val selected = tab.id == id
+            tab.isSelected = selected
+            for (i in 0 until tab.childCount) {
+                (tab.getChildAt(i) as? TextView)?.typeface = if (selected) LABEL_SELECTED else LABEL
+            }
+        }
         placeIsland(id, animate)
     }
 
@@ -111,10 +119,14 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val island = binding.navIsland
-        if (island.layoutParams.width != tab.width) {
-            island.layoutParams = island.layoutParams.apply { width = tab.width }
+        // Narrower than its tab by an inset either side, so the island floats inside the capsule
+        // with the same air around it as above and below, instead of filling its third edge to edge.
+        val inset = resources.getDimensionPixelSize(R.dimen.nav_island_inset)
+        val islandWidth = (tab.width - inset * 2).coerceAtLeast(0)
+        if (island.layoutParams.width != islandWidth) {
+            island.layoutParams = island.layoutParams.apply { width = islandWidth }
         }
-        val target = tab.left.toFloat()
+        val target = (tab.left + inset).toFloat()
         island.animate().cancel()
         if (!animate || island.visibility != View.VISIBLE) {
             island.translationX = target
@@ -166,7 +178,14 @@ class MainActivity : AppCompatActivity() {
         private const val STATE_TAB = "selected_tab"
 
         /** Long enough to be seen travelling, short enough not to be waited for. */
-        const val ISLAND_MOVE_MS = 320L
+        const val ISLAND_MOVE_MS = 280L
+
+        /**
+         * Tab labels: medium at rest, one step heavier under the island. 600 is a true semibold
+         * where the system font is variable (Android 12 and later) and the nearest weight before.
+         */
+        private val LABEL: Typeface = Typeface.create(Typeface.DEFAULT, 500, false)
+        private val LABEL_SELECTED: Typeface = Typeface.create(Typeface.DEFAULT, 600, false)
 
         /** The permission that lets us read the video library, which differs by OS version. */
         val videoPermission: String

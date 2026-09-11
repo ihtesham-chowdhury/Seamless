@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Shorts: a rounded vertical frame with a play mark — portrait video, said plainly, and
+  deliberately not any platform's logo. The mark sits a touch right of centre, because a
+  triangle's weight is on its flat side.
+
+  One of three drawn together for the navigation capsule: Library, Shorts and Settings share a 2dp
+  line, round joins and caps, and the same optical size, so the three read as one family rather than
+  a folder from one set, a logo from another and a gear from a third. The weight matches the CC
+  control in the player, which is the point — the capsule is meant to look like a larger cousin of
+  those controls. Tinted where it is used; the glyph is the same when its tab is selected, only
+  brighter.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M9,3 H15 A3.5,3.5 0,0 1,18.5 6.5 V17.5 A3.5,3.5 0,0 1,15 21 H9 A3.5,3.5 0,0 1,5.5 17.5 V6.5 A3.5,3.5 0,0 1,9 3 Z"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M10.25,8.75 L15.25,12 L10.25,15.25 Z"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.5" />
+</vector>

@@ -181,9 +181,13 @@ def icon(name: str, size: float, colour: str | None = "#FFFFFF",
         if stroke:
             width = child.get(f"{{{NS}}}strokeWidth", "1")
             cap = child.get(f"{{{NS}}}strokeLineCap", "butt")
+            join = child.get(f"{{{NS}}}strokeLineJoin", "miter")
             extra = (f' stroke="{colour or own}" stroke-width="{width}" '
-                     f'stroke-linecap="{cap}" fill="none"')
-            painted = "none"
+                     f'stroke-linecap="{cap}" stroke-linejoin="{join}"')
+            # A stroked path is only filled when it says so: Android's fill defaults to nothing,
+            # and a path that is both (the play mark in ic_nav_shorts) wants both.
+            if child.get(f"{{{NS}}}fillColor") in (None, "#00000000"):
+                painted = "none"
         rule = child.get(f"{{{NS}}}fillType", "nonZero")
         svg_rule = "evenodd" if rule == "evenOdd" else "nonzero"
         parts.append(f'<path d="{data}" fill="{painted}" fill-opacity="{alpha}" '
@@ -263,32 +267,45 @@ def palette(dark: bool) -> dict:
 
 
 def nav_pill(selected: str, dark: bool) -> str:
-    """The floating navigation capsule, at the colours in values/ and values-night/."""
+    """The floating navigation capsule and its island, at the colours in values/ and values-night/.
+
+    One capsule 70dp tall, 22dp in from either side of a 300dp scene; the island inset 6dp from
+    the capsule on every side (2dp capsule padding plus 4dp island inset at the ends).
+    """
     if dark:
-        top, bottom = "rgba(46,46,54,0.961)", "rgba(35,35,42,0.922)"
-        stroke = "rgba(255,255,255,0.20)"
+        top, bottom = "rgba(38,36,41,0.941)", "rgba(27,26,31,0.941)"
+        stroke = "rgba(255,255,255,0.078)"
     else:
-        top, bottom = "rgba(255,255,255,0.969)", "rgba(242,238,246,0.929)"
-        stroke = "rgba(0,0,0,0.122)"
+        top, bottom = "rgba(255,255,255,0.961)", "rgba(246,242,250,0.933)"
+        stroke = "rgba(0,0,0,0.078)"
     p = palette(dark)
+    island = p["secondary_container"] if dark else p["primary"]
+    on_island = p["on_secondary_container"] if dark else "#FFFFFF"
 
+    keys = ("library", "shorts", "settings")
     tabs = []
-    for key, label, glyph in (("library", "Library", "ic_folder"),
-                              ("shorts", "Shorts", "ic_shorts"),
-                              ("settings", "Settings", "ic_settings")):
+    for key, label in zip(keys, ("Library", "Shorts", "Settings")):
         on = key == selected
-        fill = p["secondary_container"] if on else "transparent"
-        tint = p["on_secondary_container"] if on else p["on_variant"]
+        tint = on_island if on else p["on_variant"]
         tabs.append(
-            f'<div style="width:78px;height:50px;margin:0 2px;border-radius:100px;'
-            f'background:{fill};display:flex;flex-direction:column;align-items:center;'
-            f'justify-content:center;gap:3px">{icon(glyph, 22, tint)}'
-            f'<span style="font-size:10px;color:{tint};line-height:1">{label}</span></div>')
+            f'<div style="flex:1;display:flex;flex-direction:column;align-items:center;'
+            f'justify-content:center;gap:3px">{icon("ic_nav_" + key, 22, tint)}'
+            f'<span style="font-size:11px;font-weight:{600 if on else 500};color:{tint};'
+            f'line-height:1">{label}</span></div>')
 
-    return (f'<div style="height:62px;display:inline-flex;align-items:center;padding:0 5px;'
-            f'border-radius:100px;border:1px solid {stroke};'
-            f'box-shadow:0 6px 18px rgba(0,0,0,0.22);'
-            f'background:linear-gradient(180deg,{top},{bottom})">{"".join(tabs)}</div>')
+    slot = keys.index(selected)
+    return (f'<div style="position:relative;display:inline-block;vertical-align:bottom;'
+            f'width:256px;height:70px;box-sizing:border-box;border-radius:100px;'
+            f'border:1px solid {stroke};box-shadow:0 6px 16px rgba(0,0,0,0.22);'
+            f'background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0) 50%),'
+            f'linear-gradient(180deg,{top},{bottom})">'
+            f'<div style="position:absolute;top:6px;bottom:6px;'
+            f'left:calc(6px + {slot} * (100% - 4px) / 3);width:calc((100% - 4px) / 3 - 8px);'
+            f'border-radius:100px;box-sizing:border-box;border:1px solid rgba(255,255,255,0.07);'
+            f'background:linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.02) 50%,'
+            f'rgba(0,0,0,0) 60%,rgba(0,0,0,0.10)),{island}"></div>'
+            f'<div style="position:absolute;top:6px;bottom:6px;left:2px;right:2px;display:flex">'
+            f'{"".join(tabs)}</div></div>')
 
 
 def nav_scene(selected: str, dark: bool) -> str:
