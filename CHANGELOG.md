@@ -9,6 +9,43 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **Four timelines, chosen in Settings.** The waveform is unchanged and stays the default.
+  Beside it now: *Thread*, a hairline that lifts into a smooth hill under the play position with
+  a bead at its crest; *Bold*, a thick rounded bar with a standing pill, both growing under the
+  finger; and *Soft*, a track pressed into the surface with a glowing pill in it. Only the wave
+  animates; the others are redrawn when the position moves and at no other time.
+- **Settings can be exported and put back.** Everything the app remembers about how you like it
+  — settings, hidden and locked folders, pins, favourites, the thumbnails you chose, each
+  screen's order, the hints you have seen and your saved playback positions — written as one
+  readable file, and read back the same way. Both directions go through Android's own file
+  picker, so a backup can be saved to the phone, an SD card or Google Drive without the app
+  knowing anything about any of them. Your OpenSubtitles key is deliberately left out: a backup
+  is a file people mail to themselves, and a key is yours to place. Importing replaces what is
+  there and asks first, in those words.
+
+### Changed
+- **The Shorts tab's wall runs under glass.** The tab used to stop dead at its quick views: a
+  wall of clips ending flush against a header with nothing in common with the capsule at the
+  other end of the screen. The list runs the full height now and passes under a panel of the
+  same glass — blurred on Android 12 and later, solid before that — with the title and quick
+  views on it. The quick-view chips take their colours from the navigation style you chose, so
+  both ends of the screen agree about what the app is made of.
+- **Swiping down to close no longer blanks the picture.** The gesture could leave a black screen
+  with the subtitle still floating on it, the video simply gone. The card is rounded as it
+  travels, and rounding it by clipping to an outline is not something every GPU applies to the
+  layer the video arrives on — on some it drops the layer entirely. The corners are painted over
+  the picture now instead of clipping it: same look, nothing touched about how the video is
+  composited.
+- **A flicked dismissal can be seen leaving.** It committed after a tenth of the screen and then
+  covered the remaining nine tenths in a fixed fifth of a second from a standing start, which
+  reads as absence rather than movement. It now takes as long as the distance left and the speed
+  of the throw ask for, easing out of the throw.
+- **Shuffle and speed swap places** in the player's top row: shuffle sits outermost, with speed
+  beside it.
+- **A new install writes down frosted glass** as its navigation bar, so Settings shows what is
+  really in effect from the first launch.
+
 ## [0.2.4] — 2026-09-12
 
 ### Added

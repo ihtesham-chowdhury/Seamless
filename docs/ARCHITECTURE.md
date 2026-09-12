@@ -298,6 +298,18 @@ finger and springs back if released early. Toggle in Settings → Gestures.
   The glass is invalidated from `onDescendantInvalidated`, never from a pre-draw listener, which
   would request a frame from inside every frame. Its floor is painted opaque first, or the sharp
   content would show through the transparent gaps in its own blurred copy.
+- **The timeline is one view with four hands.** Media3 drives whatever carries the id
+  `exo_progress` and implements `TimeBar`, so `ui/player/TimelineBar` owns position,
+  buffering, scrubbing and touch once, and `SeekBarStyle` decides only what is drawn. The
+  waveform is the default and the only one that animates; the rest redraw when the position
+  moves.
+- **Backups go through the file picker, not a cloud SDK.** `data/SettingsBackup` writes both
+  preference files as typed JSON — the type is stored beside each value, because
+  SharedPreferences is typed and a string where an int belongs throws on the next read — and
+  the Settings screen hands it to `ActivityResultContracts.CreateDocument`. That covers local
+  storage and Google Drive alike with no dependency, which matters: the Drive SDK needs Play
+  Services, and this app depends on nothing proprietary. The credentials file is not
+  included, for the same reason it is excluded from Android's own backup.
 - **Sorting is scoped, not global.** `Prefs.sortFor(scope)` takes `SCOPE_LIBRARY`,
   `SCOPE_SHORTS`, or a folder's MediaStore `RELATIVE_PATH`. Those three namespaces cannot
   collide, because a `RELATIVE_PATH` always ends in a separator and neither constant contains

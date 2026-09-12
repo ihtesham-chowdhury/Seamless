@@ -237,6 +237,7 @@ twice.
 | Missing `buildConfig = true` | `Unresolved reference: BuildConfig` | Off by default since AGP 8 |
 | Referencing `exo_*` drawables from Media3 | Lint `PrivateResource`, or a missing resource | The Media3 AAR marks nothing public. Use `@+id/` for its ids and ship your own drawables |
 | `gradlew clean` on Windows | `Unable to delete directory 'app\build'` | Windows will not delete a directory another process has open, and Android Studio holds one for every loaded project. Drop `clean`, or close Studio |
+| `clipToOutline` on an ancestor of a `TextureView` | The video goes black mid-gesture while everything else keeps drawing | A TextureView is composited from a hardware layer of its own, and a clip against a rounded outline is not applied to it on every driver. Paint the corners over the children instead |
 | A `.ps1` with an em dash, no BOM | `Unexpected token '}'`, `string is missing the terminator` | Windows PowerShell 5.1 decodes a BOM-less file as the ANSI codepage. An em dash's last byte becomes U+201D, which PowerShell accepts as a closing quote. Keep helper scripts ASCII |
 
 Before bumping **any** AndroidX dependency, check what compileSdk its AAR demands:
