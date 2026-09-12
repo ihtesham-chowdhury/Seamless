@@ -312,6 +312,30 @@
             android:title="@string/settings_hidden_folders_title" />
     </PreferenceCategory>
 
+    <!--
+      Backup. Both rows go through the system file picker, which is what lets a backup be
+      written to the phone, to an SD card, or to Google Drive without this app knowing
+      anything about any of them.
+    -->
+    <PreferenceCategory
+        android:layout="@layout/pref_category"
+        android:title="@string/settings_backup">
+
+        <Preference
+            android:key="export_settings"
+            android:icon="@drawable/ic_pref_backup"
+            android:layout="@layout/pref_row_top"
+            android:summary="@string/settings_backup_summary"
+            android:title="@string/settings_backup_title" />
+
+        <Preference
+            android:key="import_settings"
+            android:icon="@drawable/ic_pref_restore"
+            android:layout="@layout/pref_row_bottom"
+            android:summary="@string/settings_restore_summary"
+            android:title="@string/settings_restore_title" />
+    </PreferenceCategory>
+
     <PreferenceCategory
         android:layout="@layout/pref_category"
         android:title="@string/settings_help_title">

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Import settings: off the shelf and back into the app. Tinted where it is used. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M13,5v6.2l2.6,-2.6L17,10l-5,5 -5,-5 1.4,-1.4 2.6,2.6V5z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M5,17h14a1,1 0,0 1,0 2H5a1,1 0,0 1,0 -2z" />
+</vector>

@@ -193,6 +193,19 @@
     <string name="tip_shorts">Swipe up for the next clip. Drag sideways for brightness on the left, volume on the right.</string>
     <string name="tip_player">Drag up and down for brightness and volume. Drag down from the top to close. Hold for 2x.</string>
 
+    <!-- backup -->
+    <string name="settings_backup">Backup</string>
+    <string name="settings_backup_title">Export settings</string>
+    <string name="settings_backup_summary">Save your settings, hidden and locked folders, favourites, thumbnails and saved positions to a file</string>
+    <string name="settings_backup_saved">Settings saved</string>
+    <string name="settings_backup_failed">That file could not be written</string>
+    <string name="settings_restore_title">Import settings</string>
+    <string name="settings_restore_summary">Replace everything here with a saved file</string>
+    <string name="settings_restore_confirm">This replaces your settings, hidden and locked folders, favourites, thumbnails and saved positions with what is in the file. Your subtitle key is not touched.</string>
+    <string name="settings_restore_action">Replace</string>
+    <string name="settings_restore_done">%1$d settings restored</string>
+    <string name="settings_restore_failed">That is not a Seamless backup</string>
+
     <string name="settings_help_title">Gestures and tips</string>
     <string name="settings_help_summary">Everything the player can do, and how to reach it</string>
     <string name="settings_reset_tips">Show first-run tips again</string>

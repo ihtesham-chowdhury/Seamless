@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Export settings: out of the app and onto a shelf. Material's family, tinted where used. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11,15V8.8L8.4,11.4 7,10l5,-5 5,5 -1.4,1.4L13,8.8V15z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M5,17h14a1,1 0,0 1,0 2H5a1,1 0,0 1,0 -2z" />
+</vector>

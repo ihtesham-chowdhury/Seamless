@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.preference.ListPreference
@@ -27,6 +28,7 @@ import com.seamless.player.SeamlessApp
 import com.seamless.player.data.AccentColor
 import com.seamless.player.data.NavStyle
 import com.seamless.player.data.Prefs
+import com.seamless.player.data.SettingsBackup
 import com.seamless.player.data.ShortsSource
 import com.seamless.player.data.ThemeMode
 import com.seamless.player.data.subtitle.SubtitleStore
@@ -37,12 +39,32 @@ import com.seamless.player.ui.common.AccentColors
 import com.seamless.player.ui.common.AppLock
 import com.seamless.player.ui.common.ThemeManager
 import com.seamless.player.ui.help.HelpActivity
+import com.seamless.player.util.Background
 import com.seamless.player.util.appVersionName
 import com.seamless.player.util.applyFloatingNavInset
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
     private val prefs: Prefs by lazy { (requireActivity().application as SeamlessApp).prefs }
+
+    /**
+     * Where a backup goes, and where one comes from: the system's own file picker, both ways.
+     *
+     * Not the Google Drive API. That means Play Services, which is proprietary, and an app that
+     * depends on nothing of the sort would stop being publishable on F-Droid for the sake of one
+     * feature. The picker already offers Drive as a destination wherever Drive is installed,
+     * along with every other provider on the device, so where a backup lives stays the user's
+     * choice rather than this app's.
+     *
+     * Registered as properties because a launcher has to exist before the fragment starts.
+     */
+    private val exportBackup = registerForActivityResult(
+        ActivityResultContracts.CreateDocument(SettingsBackup.MIME)
+    ) { uri -> if (uri != null) writeBackup(uri) }
+
+    private val importBackup = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri -> if (uri != null) confirmRestore(uri) }
 
     /**
      * Wraps the preference list in a frame that carries a title, so this tab looks like the
@@ -118,6 +140,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         wireShortsSource()
         wireSubtitles()
+        wireBackup()
 
         findPreference<Preference>("clear_resume")?.setOnPreferenceClickListener {
             prefs.clearAllPositions()
@@ -314,6 +337,65 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
+    }
+
+    // ---- backup ----
+
+    private fun wireBackup() {
+        findPreference<Preference>("export_settings")?.setOnPreferenceClickListener {
+            exportBackup.launch(SettingsBackup.suggestedName())
+            true
+        }
+        findPreference<Preference>("import_settings")?.setOnPreferenceClickListener {
+            // Anything, rather than only application/json: a file that has been round a cloud
+            // drive and back often arrives claiming to be octet-stream, and refusing to show it
+            // in the picker would be a puzzle. What is in it is checked when it is read.
+            importBackup.launch(arrayOf("*/*"))
+            true
+        }
+    }
+
+    private fun writeBackup(uri: Uri) {
+        val context = requireContext().applicationContext
+        Background.run(
+            work = {
+                val text = SettingsBackup.write(context)
+                val stream = context.contentResolver.openOutputStream(uri)
+                    ?: error("the file could not be opened for writing")
+                stream.use { it.write(text.toByteArray()) }
+            },
+            then = { toast(getString(R.string.settings_backup_saved)) },
+            onFailure = { toast(getString(R.string.settings_backup_failed)) },
+        )
+    }
+
+    /** Restoring replaces what is here, so it is asked about first, in those words. */
+    private fun confirmRestore(uri: Uri) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.settings_restore_title)
+            .setMessage(R.string.settings_restore_confirm)
+            .setPositiveButton(R.string.settings_restore_action) { _, _ -> readBackup(uri) }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun readBackup(uri: Uri) {
+        val context = requireContext().applicationContext
+        Background.run(
+            work = {
+                val stream = context.contentResolver.openInputStream(uri)
+                    ?: error("the file could not be opened")
+                SettingsBackup.read(context, stream.use { it.readBytes().decodeToString() })
+            },
+            then = { restored ->
+                toast(getString(R.string.settings_restore_done, restored))
+                // Night mode is process-wide and an accent only applies while views inflate, so
+                // the way to show restored appearance settings is to build the screen again.
+                ThemeManager.applyNightMode(prefs.themeMode)
+                activity?.recreate()
+            },
+            onFailure = { toast(getString(R.string.settings_restore_failed)) },
+        )
     }
 
     private fun updateLockedSummary() {
