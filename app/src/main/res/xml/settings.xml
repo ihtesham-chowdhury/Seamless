@@ -131,6 +131,17 @@
             android:title="@string/settings_player_resize_title"
             app:useSimpleSummaryProvider="true" />
 
+        <!-- Four hands for the same timeline; the waveform is the one it has always had. -->
+        <ListPreference
+            android:defaultValue="WAVE"
+            android:entries="@array/seek_bar_entries"
+            android:entryValues="@array/seek_bar_values"
+            android:key="seek_bar_style"
+            android:icon="@drawable/ic_pref_seek"
+            android:layout="@layout/pref_row_middle"
+            android:title="@string/settings_seek_bar_title"
+            app:useSimpleSummaryProvider="true" />
+
         <ListPreference
             android:defaultValue="FOLLOW_VIDEO"
             android:entries="@array/orientation_entries"

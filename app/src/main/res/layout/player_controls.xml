@@ -104,9 +104,10 @@
             <!--
               Not a DefaultTimeBar. Media3 drives whatever view carries the id exo_progress
               so long as it implements TimeBar, which is what makes a completely different
-              timeline possible without touching the controller.
+              timeline possible without touching the controller. Which of the four it draws
+              is a setting, applied by PlayerActivity once the controller has inflated.
             -->
-            <com.seamless.player.ui.player.WaveformTimeBar
+            <com.seamless.player.ui.player.TimelineBar
                 android:id="@+id/exo_progress"
                 android:layout_width="match_parent"
                 android:layout_height="30dp" />

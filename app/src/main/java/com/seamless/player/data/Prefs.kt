@@ -168,6 +168,30 @@ enum class AccentColor {
 }
 
 /**
+ * How the player's timeline is drawn.
+ *
+ * Four hands for the same bar. Everything about scrubbing, buffering and position is
+ * shared; the difference is what is under the finger.
+ */
+enum class SeekBarStyle {
+    /** A waveform for what has been watched, a flat line for what is left. The default. */
+    WAVE,
+
+    /** A hairline that lifts into a smooth hill under the play position, with a bead. */
+    THREAD,
+
+    /** A thick rounded bar with a standing pill, both growing under the finger. */
+    BOLD,
+
+    /** Pressed into the surface: a recessed track, a soft fill and a glowing pill. */
+    SOFT;
+
+    companion object {
+        fun from(value: String?) = entries.firstOrNull { it.name == value } ?: WAVE
+    }
+}
+
+/**
  * Which navigation capsule the browsing UI wears.
  *
  * Three looks for the same three destinations; nothing about where the tabs go changes. They
@@ -601,6 +625,11 @@ class Prefs(context: Context) {
         get() = OrientationMode.from(settings.getString(KEY_ORIENTATION, null))
         set(value) = settings.edit { putString(KEY_ORIENTATION, value.name) }
 
+    /** Which of the four timelines the player draws. */
+    var seekBarStyle: SeekBarStyle
+        get() = SeekBarStyle.from(settings.getString(KEY_SEEK_BAR, null))
+        set(value) = settings.edit { putString(KEY_SEEK_BAR, value.name) }
+
     var playerResizeMode: ResizeMode
         get() = ResizeMode.from(settings.getString(KEY_PLAYER_RESIZE, null))
         set(value) = settings.edit { putString(KEY_PLAYER_RESIZE, value.name) }
@@ -848,6 +877,7 @@ class Prefs(context: Context) {
         private const val KEY_RESUME_MINUTES = "resume_minutes"
         private const val KEY_ORIENTATION = "orientation_mode"
         private const val KEY_PLAYER_RESIZE = "player_resize_mode"
+        private const val KEY_SEEK_BAR = "seek_bar_style"
         private const val KEY_FOLDER_SHUFFLE = "folder_shuffle"
         private const val KEY_PLAYBACK_SPEED = "playback_speed"
         private const val KEY_UNLOCK = "unlock_method"

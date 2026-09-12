@@ -44,6 +44,20 @@
         <item>DARK</item>
     </string-array>
 
+    <!-- Seek bar style. Values match the SeekBarStyle enum's constant names. -->
+    <string-array name="seek_bar_entries">
+        <item>@string/seek_bar_wave</item>
+        <item>@string/seek_bar_thread</item>
+        <item>@string/seek_bar_bold</item>
+        <item>@string/seek_bar_soft</item>
+    </string-array>
+    <string-array name="seek_bar_values">
+        <item>WAVE</item>
+        <item>THREAD</item>
+        <item>BOLD</item>
+        <item>SOFT</item>
+    </string-array>
+
     <!-- Navigation bar style. Values match the NavStyle enum's constant names. -->
     <string-array name="nav_style_entries">
         <item>@string/nav_style_glass</item>

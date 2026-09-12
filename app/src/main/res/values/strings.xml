@@ -83,6 +83,11 @@
     <string name="resize_crop">Crop to fill</string>
     <string name="resize_stretch">Stretch</string>
     <string name="settings_shorts_resize_title">Shorts aspect ratio</string>
+    <string name="settings_seek_bar_title">Seek bar</string>
+    <string name="seek_bar_wave">Waveform</string>
+    <string name="seek_bar_thread">Thread</string>
+    <string name="seek_bar_bold">Bold</string>
+    <string name="seek_bar_soft">Soft</string>
     <string name="settings_player_resize_title">Player aspect ratio</string>
 
     <!-- library view and sorting -->

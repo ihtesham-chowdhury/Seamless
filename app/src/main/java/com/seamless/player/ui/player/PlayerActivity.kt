@@ -189,6 +189,9 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
 
         // Previous and next drive our own queue; Media3's exo_prev / exo_next would act on
         // the player's playlist, which only ever holds the current item.
+        // The timeline is whichever of the four the setting names; the controller has
+        // already inflated it by now, under the id Media3 drives it by.
+        binding.playerView.findViewById<TimelineBar>(R.id.exo_progress)?.style = prefs.seekBarStyle
         binding.playerView.findViewById<View>(R.id.btn_prev)?.setOnClickListener { playPrevious() }
         binding.playerView.findViewById<View>(R.id.btn_next)?.setOnClickListener { playNext() }
 
