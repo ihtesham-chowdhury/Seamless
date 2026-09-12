@@ -315,6 +315,7 @@ class Prefs(context: Context) {
             if (startFresh) {
                 putString(KEY_THEME_MODE, ThemeMode.DARK.name)
                 putString(KEY_ACCENT_COLOR, AccentColor.AMBER.name)
+                putString(KEY_NAV_STYLE, NavStyle.GLASS.name)
                 putString(KEY_LIBRARY_VIEW, LibraryView.GRID.name)
                 putBoolean(KEY_NAME_ORDER, true)
                 putString(KEY_SHORTS_SOURCE, ShortsSource.WHOLE_DEVICE.name)

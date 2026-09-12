@@ -1,15 +1,15 @@
 package com.seamless.player.ui.player
 
 import android.content.Context
-import android.graphics.Outline
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.VelocityTracker
-import android.view.View
 import android.view.ViewConfiguration
-import android.view.ViewOutlineProvider
-import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import kotlin.math.abs
@@ -98,17 +98,52 @@ class PlayerGestureLayout @JvmOverloads constructor(
 
     private var velocity: VelocityTracker? = null
 
-    /** Grows as the dismiss drag progresses; drives the outline below. */
+    /**
+     * The card's corners are painted, not clipped, and that is a fix rather than a preference.
+     *
+     * Rounding them by giving this view an outline and switching on clipToOutline made the
+     * picture vanish the instant a drag began. Everything drawn the ordinary way - the subtitle,
+     * the controls - kept rendering, while the TextureView the video arrives on went blank and
+     * stayed blank; a recording of the gesture is a black screen with the subtitle still floating
+     * on it. A TextureView is composited from a hardware layer of its own, and an ancestor clip
+     * against a rounded outline is not something every driver applies to that layer.
+     *
+     * Painting four corner slivers over the children after they have drawn gives the same
+     * picture and clips nothing, so how the video layer is composited is never in question.
+     */
+    private val cornerMask = Path()
+    private val cornerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.BLACK }
+
+    /** Grows as the dismiss drag progresses; drives the painted corners. */
     private var cornerRadius = 0f
+        set(value) {
+            if (field == value) return
+            field = value
+            rebuildCornerMask()
+            invalidate()
+        }
 
     private enum class Mode { NONE, VERTICAL, SEEK, CLOSE }
 
-    init {
-        outlineProvider = object : ViewOutlineProvider() {
-            override fun getOutline(view: View, outline: Outline) {
-                outline.setRoundRect(0, 0, view.width, view.height, cornerRadius)
-            }
-        }
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        rebuildCornerMask()
+    }
+
+    /** The corners themselves: inside the view, outside its rounded rectangle. */
+    private fun rebuildCornerMask() {
+        cornerMask.reset()
+        if (cornerRadius <= 0f || width == 0 || height == 0) return
+        val w = width.toFloat()
+        val h = height.toFloat()
+        cornerMask.fillType = Path.FillType.EVEN_ODD
+        cornerMask.addRect(0f, 0f, w, h, Path.Direction.CW)
+        cornerMask.addRoundRect(0f, 0f, w, h, cornerRadius, cornerRadius, Path.Direction.CW)
+    }
+
+    override fun dispatchDraw(canvas: Canvas) {
+        super.dispatchDraw(canvas)
+        if (cornerRadius > 0f) canvas.drawPath(cornerMask, cornerPaint)
     }
 
     /**
@@ -281,7 +316,7 @@ class PlayerGestureLayout @JvmOverloads constructor(
         val farEnough = travelled > height * CLOSE_DISTANCE
         val fastEnough = speed > FLING_VELOCITY && travelled > touchSlop * 2
 
-        if (farEnough || fastEnough) animateOut() else springBack()
+        if (farEnough || fastEnough) animateOut(speed) else springBack()
     }
 
     /**
@@ -304,20 +339,30 @@ class PlayerGestureLayout @JvmOverloads constructor(
         // established early rather than still growing as the card leaves.
         cornerRadius = (progress * 4f).coerceAtMost(1f) *
             MAX_CORNER_DP * resources.displayMetrics.density
-        if (!clipToOutline) clipToOutline = true
-        invalidateOutline()
     }
 
-    /** Carries the card the rest of the way out, then hands over to the activity to finish. */
-    private fun animateOut() {
+    /**
+     * Carries the card the rest of the way out, then hands over to the activity to finish.
+     *
+     * How long that takes comes from how far is left and how fast the card is already moving,
+     * between a floor and a ceiling. A fixed duration was the other half of this gesture's
+     * trouble: a flick commits after a tenth of the screen, so the remaining nine tenths had to
+     * be covered in the same fifth of a second however gently it was thrown, which stops reading
+     * as movement at all - the card is simply gone. Speed decides *whether* to let the card go;
+     * it does not get to turn its leaving into a jump.
+     */
+    private fun animateOut(speed: Float) {
         animate().cancel()
+        val remaining = (height - translationY).coerceAtLeast(1f)
+        val fromThrow = if (speed > 1f) remaining / speed * 1000f else EXIT_MAX_MS.toFloat()
         animate()
             .translationY(height.toFloat())
             .scaleX(1f - DISMISS_SCALE)
             .scaleY(1f - DISMISS_SCALE)
-            .alpha(0f)
-            .setDuration(EXIT_MS)
-            .setInterpolator(AccelerateInterpolator(1.3f))
+            .setDuration(fromThrow.coerceIn(EXIT_MIN_MS.toFloat(), EXIT_MAX_MS.toFloat()).toLong())
+            // Carries on at the speed it was thrown and eases as it leaves, rather than starting
+            // from nothing: the first frames are where the movement has to be visible.
+            .setInterpolator(DecelerateInterpolator(1.25f))
             .withEndAction { listener?.onSwipeDownToClose() }
             .start()
     }
@@ -335,19 +380,14 @@ class PlayerGestureLayout @JvmOverloads constructor(
             .translationY(0f)
             .scaleX(1f)
             .scaleY(1f)
-            .alpha(1f)
             .setDuration(SPRING_MS)
             .setInterpolator(DecelerateInterpolator(1.6f))
             .setUpdateListener {
                 // Unround in step with the spring, so the corners do not snap square at the
                 // end of an otherwise smooth movement.
                 cornerRadius *= 0.82f
-                invalidateOutline()
             }
-            .withEndAction {
-                cornerRadius = 0f
-                clipToOutline = false
-            }
+            .withEndAction { cornerRadius = 0f }
             .start()
     }
 
@@ -359,8 +399,6 @@ class PlayerGestureLayout @JvmOverloads constructor(
         scaleY = 1f
         alpha = 1f
         cornerRadius = 0f
-        clipToOutline = false
-        invalidateOutline()
     }
 
     private companion object {
@@ -374,7 +412,9 @@ class PlayerGestureLayout @JvmOverloads constructor(
         const val DISMISS_SCALE = 0.14f
         /** Corner rounding once the shrink is fully established. */
         const val MAX_CORNER_DP = 22f
-        const val EXIT_MS = 210L
+        /** The floor and ceiling on how long the card takes to leave once committed. */
+        const val EXIT_MIN_MS = 260L
+        const val EXIT_MAX_MS = 430L
         const val SPRING_MS = 190L
     }
 }

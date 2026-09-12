@@ -42,6 +42,16 @@
         android:orientation="horizontal"
         android:visibility="gone">
 
+        <ImageButton
+            android:id="@+id/btn_shuffle"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/circle_control_bg"
+            android:contentDescription="@string/shuffle"
+            android:padding="12dp"
+            android:src="@drawable/ic_shuffle" />
+
         <!-- Text rather than an icon: the current speed is the useful information. -->
         <TextView
             android:id="@+id/btn_speed"
@@ -57,16 +67,6 @@
             android:textColor="#FFFFFFFF"
             android:textSize="13sp"
             android:textStyle="bold" />
-
-        <ImageButton
-            android:id="@+id/btn_shuffle"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/circle_control_bg"
-            android:contentDescription="@string/shuffle"
-            android:padding="12dp"
-            android:src="@drawable/ic_shuffle" />
 
         <ImageButton
             android:id="@+id/btn_resize"
