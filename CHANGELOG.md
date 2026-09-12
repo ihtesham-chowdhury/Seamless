@@ -9,6 +9,8 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.4] — 2026-09-12
+
 ### Added
 - **Three navigation bars, chosen in Settings.** Under Appearance, *Navigation bar* offers:
   - *Frosted glass*, the new default, after Orion Store's bar. A translucent capsule that blurs
@@ -480,6 +482,7 @@ First release. Everything below is new.
 - A watchdog catches the silent case where a clip decodes but never renders a frame
 - Decoder fallback enabled, so a decoder that refuses a clip is not the end of it
 
-[Unreleased]: https://github.com/ihtesham-chowdhury/Seamless/compare/v0.2.3...HEAD
+[Unreleased]: https://github.com/ihtesham-chowdhury/Seamless/compare/v0.2.4...HEAD
+[0.2.4]: https://github.com/ihtesham-chowdhury/Seamless/releases/tag/v0.2.4
 [0.2.3]: https://github.com/ihtesham-chowdhury/Seamless/releases/tag/v0.2.3
 [0.1.0]: https://github.com/ihtesham-chowdhury/Seamless/releases/tag/v0.1.0
