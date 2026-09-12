@@ -13,6 +13,7 @@ import android.graphics.RenderEffect
 import android.graphics.RenderNode
 import android.graphics.Shader
 import android.os.Build
+import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewOutlineProvider
@@ -22,30 +23,49 @@ import com.seamless.player.data.NavStyle
 import kotlin.math.roundToInt
 
 /**
- * The capsule's surface — what it is made of, as distinct from what sits on it.
+ * A piece of the app's glass — what a surface is made of, as distinct from what sits on it.
  *
- * For the two glass styles, on Android 12 and later, it is real frosted glass: the page behind is
- * drawn again inside the capsule through a blur and a little extra saturation, then veiled with a
- * tint and edged with a highlight. The page comes from [BackdropFrame], which records what the tabs
- * draw; see there for why that costs a reference rather than a repaint.
+ * Two shapes wear it. [Corners.CAPSULE] is the navigation bar: a floating pill. [Corners.BOTTOM]
+ * is a panel hung from the top of a screen, square across the top and rounded along its lower
+ * edge, which is what the Shorts tab's title and quick views sit on so that the wall of clips
+ * can slide underneath rather than stopping dead against them.
  *
- * The capsule is painted opaque with the window colour before anything else. The content behind is
- * full of transparent gaps — a list row is text on nothing — and without an opaque floor the real,
- * sharp content would show through those gaps beneath its own blurred copy. Below Android 12 there
- * is no blur, and the same floor plus the tint makes a plain solid capsule, which is the honest
- * fallback.
+ * For the two glass styles, on Android 12 and later, it is really frosted: the page behind is
+ * drawn again inside the shape through a blur and a little extra saturation, then veiled with a
+ * tint and edged with a highlight. The page comes from [BackdropFrame], which records what its
+ * children draw; see there for why that costs a reference rather than a repaint.
  *
- * The island style has no glass: its surface is the dark capsule from glass_nav_bg.xml.
+ * The shape is painted opaque with the window colour before anything else. The content behind is
+ * full of transparent gaps — a list row is text on nothing — and without an opaque floor the
+ * real, sharp content would show through those gaps beneath its own blurred copy. Below Android
+ * 12 there is no blur, and the same floor plus the tint makes a plain solid surface, which is the
+ * honest fallback.
+ *
+ * The island style is not glass at all: as a capsule it is the dark surface from
+ * glass_nav_bg.xml, and as a panel it is that surface's colours painted into this shape.
  */
-internal class GlassView(context: Context) : View(context) {
+class GlassView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+) : View(context, attrs) {
+
+    enum class Corners { CAPSULE, BOTTOM }
 
     var source: BackdropFrame? = null
+
+    var corners = Corners.CAPSULE
+        set(value) {
+            if (field == value) return
+            field = value
+            invalidateOutline()
+            invalidate()
+        }
 
     private val density = resources.displayMetrics.density
     private var look = NavStyle.GLASS
     private var blurring = false
     private var blurPad = 0
-    private val blurNode = RenderNode("navigation glass")
+    private val blurNode = RenderNode("glass")
     private val here = IntArray(2)
     private val there = IntArray(2)
 
@@ -64,7 +84,14 @@ internal class GlassView(context: Context) : View(context) {
     init {
         outlineProvider = object : ViewOutlineProvider() {
             override fun getOutline(view: View, outline: Outline) {
-                outline.setRoundRect(0, 0, view.width, view.height, view.height / 2f)
+                val h = view.height
+                if (corners == Corners.CAPSULE) {
+                    outline.setRoundRect(0, 0, view.width, h, h / 2f)
+                } else {
+                    // Rounded along the bottom only: the top corners are pushed off the top edge.
+                    val radius = PANEL_RADIUS * density
+                    outline.setRoundRect(0, -radius.roundToInt(), view.width, h, radius)
+                }
             }
         }
         clipToOutline = true
@@ -94,7 +121,14 @@ internal class GlassView(context: Context) : View(context) {
                 rimBottom = if (night) 0x17FFFFFF else 0x99FFFFFF.toInt()
                 hairline.color = if (night) 0x66000000 else 0x12000000
             }
-            NavStyle.ISLAND -> Unit
+            // The island's own surface, for when this is a panel rather than the capsule.
+            NavStyle.ISLAND -> {
+                veilTop = ContextCompat.getColor(context, R.color.nav_fill_top)
+                veilBottom = ContextCompat.getColor(context, R.color.nav_fill_bottom)
+                rimTop = if (night) 0x14FFFFFF else 0x0D000000
+                rimBottom = 0x00FFFFFF
+                hairline.color = ContextCompat.getColor(context, R.color.nav_stroke)
+            }
         }
         rim.strokeWidth = density * if (style == NavStyle.LIQUID) 1.3f else 1f
         hairline.strokeWidth = density * 0.75f
@@ -105,7 +139,7 @@ internal class GlassView(context: Context) : View(context) {
     /** Blur, then a touch more saturation — glass that greys everything out reads as fog. */
     private fun glassEffect(style: NavStyle): RenderEffect {
         val radius = density * if (style == NavStyle.LIQUID) 14f else 24f
-        // The recording reaches past the capsule by more than the blur's reach, so the edges are
+        // The recording reaches past the shape by more than the blur's reach, so the edges are
         // blurred from what really lies beyond them instead of from smeared edge pixels.
         blurPad = (radius * 1.5f).roundToInt()
         val saturate = ColorMatrix().apply { setSaturation(if (style == NavStyle.LIQUID) 1.6f else 1.3f) }
@@ -140,13 +174,15 @@ internal class GlassView(context: Context) : View(context) {
         val w = width
         val h = height
         if (w == 0 || h == 0) return
-        if (look == NavStyle.ISLAND) {
+        // The navigation capsule keeps the drawable it has always had, gradients and all.
+        if (look == NavStyle.ISLAND && corners == Corners.CAPSULE) {
             island?.setBounds(0, 0, w, h)
             island?.draw(canvas)
             return
         }
 
-        val radius = h / 2f
+        val capsule = corners == Corners.CAPSULE
+        val radius = if (capsule) h / 2f else PANEL_RADIUS * density
         shape.set(0f, 0f, w.toFloat(), h.toFloat())
         canvas.drawRoundRect(shape, radius, radius, floor)
 
@@ -169,12 +205,26 @@ internal class GlassView(context: Context) : View(context) {
 
         canvas.drawRoundRect(shape, radius, radius, veil)
 
-        val hair = hairline.strokeWidth / 2f
-        shape.set(hair, hair, w - hair, h - hair)
-        canvas.drawRoundRect(shape, radius - hair, radius - hair, hairline)
+        if (capsule) {
+            val hair = hairline.strokeWidth / 2f
+            shape.set(hair, hair, w - hair, h - hair)
+            canvas.drawRoundRect(shape, radius - hair, radius - hair, hairline)
 
-        val edge = hairline.strokeWidth + rim.strokeWidth / 2f
-        shape.set(edge, edge, w - edge, h - edge)
-        canvas.drawRoundRect(shape, radius - edge, radius - edge, rim)
+            val edge = hairline.strokeWidth + rim.strokeWidth / 2f
+            shape.set(edge, edge, w - edge, h - edge)
+            canvas.drawRoundRect(shape, radius - edge, radius - edge, rim)
+        } else {
+            // A panel's edge is the one along the bottom; the clip has already rounded it, so a
+            // line drawn inside the shape follows it without needing a second rounded path.
+            val hair = hairline.strokeWidth / 2f
+            canvas.drawLine(0f, h - hair, w.toFloat(), h - hair, hairline)
+            val top = rim.strokeWidth / 2f
+            canvas.drawLine(0f, top, w.toFloat(), top, rim)
+        }
+    }
+
+    private companion object {
+        /** How far a panel's lower corners are rounded. */
+        const val PANEL_RADIUS = 24f
     }
 }

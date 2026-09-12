@@ -8,6 +8,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import com.seamless.player.R
 import com.seamless.player.SeamlessApp
@@ -16,7 +19,6 @@ import com.seamless.player.databinding.ActivityMainBinding
 import com.seamless.player.ui.common.AppLock
 import com.seamless.player.ui.common.ThemeManager
 import com.seamless.player.util.applyBottomMarginInset
-import com.seamless.player.util.applyTopSystemInset
 import com.seamless.player.ui.library.FoldersFragment
 import com.seamless.player.ui.settings.SettingsFragment
 import com.seamless.player.ui.shorts.ShortsTabFragment
@@ -35,8 +37,17 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Android draws edge to edge from targetSdk 35 onwards. Handling the insets in the
-        // one container every tab lives in means no fragment has to think about it.
-        binding.content.applyTopSystemInset()
+        // one container every tab lives in means no fragment has to think about it - except
+        // the Shorts tab, whose wall of clips runs up under the status bar and holds that
+        // room itself, on the panel its title sits on.
+        ViewCompat.setOnApplyWindowInsetsListener(binding.content) { _, insets ->
+            systemTopInset = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            ).top
+            applyContentTopInset()
+            insets
+        }
+        ViewCompat.requestApplyInsets(binding.content)
         binding.navPill.applyBottomMarginInset()
 
         // The glass blurs what the tabs draw, so it is handed the frame they draw into.
@@ -53,6 +64,8 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             select(selectedTab)
         } else {
+            tabHoldsTopInset = selectedTab == R.id.nav_shorts
+            applyContentTopInset()
             binding.navPill.select(selectedTab, animate = false)
         }
     }
@@ -65,6 +78,14 @@ class MainActivity : AppCompatActivity() {
     /** Which tab the capsule is sitting on. */
     private var selectedTab: Int = R.id.nav_library
 
+    /** The status bar's room, and whether the tab on show would rather hold it itself. */
+    private var systemTopInset = 0
+    private var tabHoldsTopInset = false
+
+    private fun applyContentTopInset() {
+        binding.content.updatePadding(top = if (tabHoldsTopInset) 0 else systemTopInset)
+    }
+
     /** Settings calls this when a capsule style is picked, so the change is seen as it is made. */
     fun applyNavStyle(style: NavStyle) = binding.navPill.setStyle(style)
 
@@ -75,6 +96,8 @@ class MainActivity : AppCompatActivity() {
             return
         }
         selectedTab = id
+        tabHoldsTopInset = id == R.id.nav_shorts
+        applyContentTopInset()
         // The selection starts moving before the page is swapped. The capsule's motion is
         // stepped from the frame clock and never jumps ahead after a slow frame, so the new tab
         // being built reads as a moment's pause at most, not as a skip in the middle of the glide.

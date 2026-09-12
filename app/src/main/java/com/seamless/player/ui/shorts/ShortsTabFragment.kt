@@ -1,9 +1,17 @@
 package com.seamless.player.ui.shorts
 
+import android.content.res.ColorStateList
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,6 +19,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.seamless.player.R
 import com.seamless.player.SeamlessApp
 import com.seamless.player.data.MediaLibrary
+import com.seamless.player.data.NavStyle
 import com.seamless.player.data.Prefs
 import com.seamless.player.data.ShortsFilter
 import com.seamless.player.data.ShortsLayout
@@ -24,6 +33,7 @@ import com.seamless.player.ui.common.SortLabels
 import com.seamless.player.ui.common.ViewChoice
 import com.seamless.player.ui.common.ViewOptionsSheet
 import com.seamless.player.ui.library.VideoAdapter
+import com.seamless.player.ui.nav.GlassView
 import com.seamless.player.util.Background
 import com.seamless.player.util.applyFloatingNavInset
 
@@ -139,7 +149,101 @@ class ShortsTabFragment : Fragment() {
         // fragment was built in — changing the mode in Settings and coming back builds a
         // new one.
         if (wholeDevice) b.list.applyFloatingNavInset() else b.footer.applyFloatingNavInset()
+        dressTopPanel(b)
         return b.root
+    }
+
+    /**
+     * The panel the title and quick views sit on, and the room the list leaves for it.
+     *
+     * The wall runs the full height of the screen, so the status bar's room is the panel's to
+     * hold rather than the container's, and the list is padded by however tall the panel turns
+     * out to be. Measuring it rather than naming a number keeps the two in step through a
+     * rotation, a larger font, and the quick views coming and going with the mode.
+     */
+    private fun dressTopPanel(b: FragmentShortsBinding) {
+        val night = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
+            Configuration.UI_MODE_NIGHT_YES
+        val style = prefs.navStyle
+        b.backdrop.capturing = style != NavStyle.ISLAND
+        b.topGlass.corners = GlassView.Corners.BOTTOM
+        b.topGlass.source = b.backdrop
+        b.topGlass.configure(style, night)
+        b.backdrop.onBackdropChanged = { binding?.topGlass?.invalidate() }
+        styleChips(style, night)
+
+        ViewCompat.setOnApplyWindowInsetsListener(b.topPanel) { panel, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            panel.updatePadding(top = bars.top)
+            insets
+        }
+        b.topPanel.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            if (bottom - top != oldBottom - oldTop) binding?.list?.updatePadding(top = bottom - top)
+        }
+    }
+
+    /**
+     * The quick views, coloured from the navigation style, so both ends of the screen agree
+     * about what the app is made of: the accent pill of the frosted bar, the island's filled
+     * capsule on a hairline, or liquid glass's clear chip with accent lettering.
+     */
+    private fun styleChips(style: NavStyle, night: Boolean) {
+        val b = binding ?: return
+        val context = requireContext()
+        val density = resources.displayMetrics.density
+        val selection = ContextCompat.getColor(context, R.color.nav_island)
+        val onSelection = ContextCompat.getColor(context, R.color.nav_on_island)
+        val muted = ContextCompat.getColor(context, R.color.nav_ink_muted)
+        val ink = ContextCompat.getColor(context, R.color.nav_ink)
+        val accent = ContextCompat.getColor(context, R.color.nav_accent)
+
+        val look = when (style) {
+            NavStyle.GLASS -> ChipLook(
+                fillOn = selection,
+                fillOff = ColorUtils.setAlphaComponent(ink, if (night) 0x1F else 0x12),
+                textOn = onSelection,
+                textOff = muted,
+                strokeOn = Color.TRANSPARENT,
+                strokeOff = Color.TRANSPARENT,
+                strokeWidth = 0f,
+            )
+            NavStyle.ISLAND -> ChipLook(
+                fillOn = selection,
+                fillOff = Color.TRANSPARENT,
+                textOn = onSelection,
+                textOff = muted,
+                strokeOn = Color.TRANSPARENT,
+                strokeOff = ColorUtils.setAlphaComponent(muted, 0x4D),
+                strokeWidth = density,
+            )
+            NavStyle.LIQUID -> ChipLook(
+                fillOn = ColorUtils.setAlphaComponent(Color.WHITE, if (night) 0x2E else 0xB8),
+                fillOff = ColorUtils.setAlphaComponent(Color.WHITE, if (night) 0x14 else 0x59),
+                // Light glass is nearly white, so the accent is taken a step darker on it.
+                textOn = if (night) accent else ColorUtils.blendARGB(accent, Color.BLACK, 0.18f),
+                textOff = ColorUtils.setAlphaComponent(ink, 0xCC),
+                strokeOn = ColorUtils.setAlphaComponent(Color.WHITE, if (night) 0x5C else 0xE6),
+                strokeOff = ColorUtils.setAlphaComponent(Color.WHITE, if (night) 0x1F else 0x80),
+                strokeWidth = 1.2f * density,
+            )
+        }
+
+        val states = arrayOf(
+            intArrayOf(android.R.attr.state_checked),
+            intArrayOf(-android.R.attr.state_checked),
+        )
+        listOf(b.chipAll, b.chipRecent, b.chipFavourites, b.chipLongest).forEach { chip ->
+            chip.chipBackgroundColor = ColorStateList(states, intArrayOf(look.fillOn, look.fillOff))
+            chip.setTextColor(ColorStateList(states, intArrayOf(look.textOn, look.textOff)))
+            chip.chipStrokeColor = ColorStateList(states, intArrayOf(look.strokeOn, look.strokeOff))
+            chip.chipStrokeWidth = look.strokeWidth
+            // The selection is said by the fill, as it is in the navigation bar; a tick as well
+            // is one answer too many, and it makes the chip jump wider when it is chosen.
+            chip.isCheckedIconVisible = false
+            chip.rippleColor = ColorStateList.valueOf(ColorUtils.setAlphaComponent(ink, 0x1F))
+        }
     }
 
     override fun onStart() {
@@ -414,3 +518,14 @@ class ShortsTabFragment : Fragment() {
         const val COLUMNS = 2
     }
 }
+
+/** One navigation style's answer for a quick-view chip, checked and unchecked. */
+private class ChipLook(
+    val fillOn: Int,
+    val fillOff: Int,
+    val textOn: Int,
+    val textOff: Int,
+    val strokeOn: Int,
+    val strokeOff: Int,
+    val strokeWidth: Float,
+)

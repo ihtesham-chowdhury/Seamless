@@ -7,164 +7,24 @@
   backing out of the feed landed here and was immediately sent back in.
 
   Folder mode is the checklist it has always been, because there the choosing is the point.
+
+  The wall runs the full height of the screen and passes *under* the title and the quick views,
+  which sit on a panel of the same glass as the navigation capsule at the other end of the
+  screen. Before, the two ended flush against each other and the wall simply stopped, with
+  nothing to say why; now the clips slide under the panel and the two ends of the screen are
+  made of the same thing. The list is padded to start below the panel, so nothing begins life
+  hidden — see ShortsTabFragment, which measures the panel and pads the list to match.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <!--
-      The title and the count, as ordinary text rather than a toolbar's title and subtitle.
-
-      A MaterialToolbar was the obvious way to match the library's header, and it is what
-      this was. It does not survive a subtitle at this height: Toolbar measures its title and
-      subtitle as one vertical group and centres that group in its own bounds, and the group
-      is taller than ?attr/actionBarSize once both are present at Material 3's sizes. The
-      overflow goes half above the top edge, which clipped "Shorts" away entirely and left
-      the count sitting alone where the title should have been. Nothing about that gets safer
-      at a larger font scale, and there is no title-and-subtitle behaviour here worth
-      inheriting, so the two lines are laid out directly.
-    -->
-    <LinearLayout
-        android:id="@+id/header"
+    <!-- What the glass above is a view of. -->
+    <com.seamless.player.ui.nav.BackdropFrame
+        android:id="@+id/backdrop"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="?attr/actionBarSize"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="10dp">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <!-- Always "Shorts", in both source modes. Which clips the tab is drawing from
-                 is a detail of the tab; it is not a different screen. -->
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tab_shorts"
-                android:textAppearance="?attr/textAppearanceTitleLarge" />
-
-            <TextView
-                android:id="@+id/count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:alpha="0.7"
-                android:textAppearance="?attr/textAppearanceBodySmall" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/toolbar_actions"
-            android:layout_width="wrap_content"
-            android:layout_height="44dp"
-            android:background="@drawable/glass_pill_bg"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="3dp"
-            android:paddingEnd="3dp">
-
-            <!--
-              This one carries the current layout's own glyph rather than the library's
-              sliders, because here there are three layouts rather than two and which one you
-              are in is worth saying without opening anything.
-            -->
-            <ImageButton
-                android:id="@+id/btn_view_options"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:background="@drawable/ripple_toolbar_icon"
-                android:contentDescription="@string/view_options"
-                android:padding="8dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_view_masonry" />
-
-            <ImageButton
-                android:id="@+id/btn_shuffle_all"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:background="@drawable/ripple_toolbar_icon"
-                android:contentDescription="@string/shorts_play"
-                android:padding="8dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_shuffle" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <!--
-      The quick views. Scrolls sideways rather than wrapping, so the row is always one line
-      tall whatever it ends up holding, and the title above it never moves.
-    -->
-    <HorizontalScrollView
-        android:id="@+id/filter_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clipToPadding="false"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:paddingBottom="4dp"
-        android:scrollbars="none">
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/filters"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:chipSpacingHorizontal="8dp"
-            app:selectionRequired="true"
-            app:singleLine="true"
-            app:singleSelection="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_all"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/filter_all" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_recent"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/filter_recent" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_favourites"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/filter_favourites" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_longest"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/filter_longest" />
-        </com.google.android.material.chip.ChipGroup>
-    </HorizontalScrollView>
-
-    <TextView
-        android:id="@+id/sources_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="4dp"
-        android:text="@string/shorts_sources_title"
-        android:textAppearance="?attr/textAppearanceTitleSmall" />
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list"
@@ -218,7 +78,7 @@
                 android:text="@string/shorts_empty_body"
                 android:textAppearance="?attr/textAppearanceBodyMedium" />
         </LinearLayout>
-    </FrameLayout>
+    </com.seamless.player.ui.nav.BackdropFrame>
 
     <!-- Folder mode only. Grouped so the room left for the floating navigation capsule can
          be given to the whole footer rather than to each piece of it. -->
@@ -226,6 +86,7 @@
         android:id="@+id/footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:orientation="vertical"
         android:paddingBottom="8dp">
 
@@ -238,4 +99,178 @@
             android:layout_marginEnd="16dp"
             android:text="@string/shorts_play" />
     </LinearLayout>
-</LinearLayout>
+
+    <!--
+      The panel: the status bar's room, the title, and the quick views, on one piece of glass.
+      Its height is whatever those need, and the fragment pads the list by exactly that much.
+    -->
+    <FrameLayout
+        android:id="@+id/top_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:paddingBottom="6dp">
+
+        <com.seamless.player.ui.nav.GlassView
+            android:id="@+id/top_glass"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!--
+              The title and the count, as ordinary text rather than a toolbar's title and
+              subtitle.
+
+              A MaterialToolbar was the obvious way to match the library's header, and it is
+              what this was. It does not survive a subtitle at this height: Toolbar measures
+              its title and subtitle as one vertical group and centres that group in its own
+              bounds, and the group is taller than ?attr/actionBarSize once both are present at
+              Material 3's sizes. The overflow goes half above the top edge, which clipped
+              "Shorts" away entirely and left the count sitting alone where the title should
+              have been. Nothing about that gets safer at a larger font scale, and there is no
+              title-and-subtitle behaviour here worth inheriting, so the two lines are laid out
+              directly.
+            -->
+            <LinearLayout
+                android:id="@+id/header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="?attr/actionBarSize"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="10dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <!-- Always "Shorts", in both source modes. Which clips the tab is drawing
+                         from is a detail of the tab; it is not a different screen. -->
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tab_shorts"
+                        android:textAppearance="?attr/textAppearanceTitleLarge" />
+
+                    <TextView
+                        android:id="@+id/count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.7"
+                        android:textAppearance="?attr/textAppearanceBodySmall" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/toolbar_actions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:background="@drawable/glass_pill_bg"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="3dp"
+                    android:paddingEnd="3dp">
+
+                    <!--
+                      This one carries the current layout's own glyph rather than the library's
+                      sliders, because here there are three layouts rather than two and which
+                      one you are in is worth saying without opening anything.
+                    -->
+                    <ImageButton
+                        android:id="@+id/btn_view_options"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/ripple_toolbar_icon"
+                        android:contentDescription="@string/view_options"
+                        android:padding="8dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_view_masonry" />
+
+                    <ImageButton
+                        android:id="@+id/btn_shuffle_all"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/ripple_toolbar_icon"
+                        android:contentDescription="@string/shorts_play"
+                        android:padding="8dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_shuffle" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!--
+              The quick views. Scrolls sideways rather than wrapping, so the row is always one
+              line tall whatever it ends up holding, and the title above it never moves. The
+              chips are coloured from the chosen navigation style, so the two ends of the
+              screen agree about what the app is made of.
+            -->
+            <HorizontalScrollView
+                android:id="@+id/filter_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="4dp"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/filters"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:chipSpacingHorizontal="8dp"
+                    app:selectionRequired="true"
+                    app:singleLine="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_all"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="@string/filter_all" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_recent"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_recent" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_favourites"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_favourites" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_longest"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_longest" />
+                </com.google.android.material.chip.ChipGroup>
+            </HorizontalScrollView>
+
+            <TextView
+                android:id="@+id/sources_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="4dp"
+                android:text="@string/shorts_sources_title"
+                android:textAppearance="?attr/textAppearanceTitleSmall" />
+        </LinearLayout>
+    </FrameLayout>
+</FrameLayout>
