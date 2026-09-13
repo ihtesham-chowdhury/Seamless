@@ -51,6 +51,19 @@
             android:padding="12dp"
             android:src="@drawable/ic_heart_outline" />
 
+        <!-- Share this clip, beside the heart because the two are the things you do *about*
+             a clip rather than to the player. The file itself goes to whatever you pick, with
+             a read grant; nothing is copied and this app uploads nothing. -->
+        <ImageButton
+            android:id="@+id/btn_share"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/circle_control_bg"
+            android:contentDescription="@string/action_share"
+            android:padding="12dp"
+            android:src="@drawable/ic_share" />
+
         <ImageButton
             android:id="@+id/btn_resize"
             android:layout_width="48dp"

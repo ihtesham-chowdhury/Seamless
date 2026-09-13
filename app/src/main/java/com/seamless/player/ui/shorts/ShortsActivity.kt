@@ -141,6 +141,11 @@ class ShortsActivity : AppCompatActivity(), ShortsAdapter.Host {
             }
         }
 
+        binding.btnShare.setOnClickListener {
+            val position = binding.pager.currentItem
+            if (position in videos.indices) shareClip(videos[position])
+        }
+
         binding.btnSubtitles.setOnClickListener { showSubtitleSheet() }
 
         binding.btnLock.setOnClickListener {
@@ -381,6 +386,22 @@ class ShortsActivity : AppCompatActivity(), ShortsAdapter.Host {
             binding.root.postDelayed(hideOverlay, OVERLAY_LINGER_MS)
         })
         updateSubtitleButton()
+    }
+
+    /**
+     * Hands the clip itself to whatever the user picks: a chat, a mail, a drive.
+     *
+     * The same intent as the ordinary player's Share. The file's own content URI goes with a
+     * read grant, so nothing is copied out first and this app uploads nothing itself; the
+     * receiving app reads the file for as long as it holds the grant.
+     */
+    private fun shareClip(video: Video) {
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "video/*"
+            putExtra(Intent.EXTRA_STREAM, video.uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(Intent.createChooser(send, getString(R.string.share_video)))
     }
 
     /** Filled when this clip is a favourite, outlined when it is not. */

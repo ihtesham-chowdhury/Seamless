@@ -315,7 +315,14 @@ class TimelineBar @JvmOverloads constructor(
      */
     private fun drawThread(canvas: Canvas, centreY: Float, played: Float) {
         val touched = if (scrubbing) 1f else 0f
-        val lift = (THREAD_LIFT_DP + THREAD_LIFT_TOUCHED_DP * touched) * density
+        val bead = (THREAD_BEAD_DP + THREAD_BEAD_TOUCHED_DP * touched) * density
+        val halo = if (scrubbing) bead * THREAD_HALO else bead
+        // The hill may rise into the room the controls bar leaves above the timeline, and no
+        // further. It used to rise past it, and the bead's halo was cut flat along the top of
+        // the bar the moment a finger touched it - the bar is only 30dp tall.
+        val ceiling = -THREAD_OVERFLOW_DP * density
+        val lift = ((THREAD_LIFT_DP + THREAD_LIFT_TOUCHED_DP * touched) * density)
+            .coerceAtMost(centreY - halo - ceiling)
         val span = (THREAD_SPAN_DP + THREAD_SPAN_TOUCHED_DP * touched) * density
         val weight = (THREAD_WIDTH_DP + 0.8f * touched) * density
         val start = (played - span / 2f).coerceAtLeast(trackLeft)
@@ -347,11 +354,10 @@ class TimelineBar @JvmOverloads constructor(
         canvas.drawPath(threadPath, wavePaint)
         canvas.restore()
 
-        val bead = (THREAD_BEAD_DP + THREAD_BEAD_TOUCHED_DP * touched) * density
         if (scrubbing) {
             fillPaint.color = PLAYED_COLOR
             fillPaint.alpha = 0x33
-            canvas.drawCircle(played, centreY - lift, bead * 2.1f, fillPaint)
+            canvas.drawCircle(played, centreY - lift, halo, fillPaint)
             fillPaint.alpha = 255
         }
         thumbPaint.color = PLAYED_COLOR
@@ -708,6 +714,10 @@ class TimelineBar @JvmOverloads constructor(
         const val THREAD_SPAN_TOUCHED_DP = 22f
         const val THREAD_BEAD_DP = 4.5f
         const val THREAD_BEAD_TOUCHED_DP = 2.5f
+        /** The halo's radius under a finger, as a multiple of the bead's. */
+        const val THREAD_HALO = 1.9f
+        /** How far above its own top edge the thread may draw, into the bar's padding. */
+        const val THREAD_OVERFLOW_DP = 10f
 
         const val SOFT_HEIGHT_DP = 12f
         const val SOFT_KNOB_DP = 9f

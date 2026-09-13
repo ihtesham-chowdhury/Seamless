@@ -207,7 +207,8 @@ enum class SeekBarStyle {
 enum class NavStyle {
     /**
      * Frosted glass: a translucent capsule that blurs what scrolls behind it, with the selected tab
-     * as a solid pill in the accent colour that carries its name. The default.
+     * as a solid pill in the accent colour that carries its name. What an install that has never
+     * chosen falls back to, which is every install from before the choice existed.
      */
     GLASS,
 
@@ -216,7 +217,8 @@ enum class NavStyle {
 
     /**
      * Liquid glass: a clear capsule with a drop of glass under the selected tab that lifts when
-     * touched, stretches as it travels and settles with a little give.
+     * touched, stretches as it travels and settles with a little give. A new install's starting
+     * point, written down by [Prefs.settleDefaults].
      */
     LIQUID;
 
@@ -327,7 +329,7 @@ class Prefs(context: Context) {
     /**
      * Writes where a new install starts, exactly once.
      *
-     * A new install starts dark, in amber, with the library as a grid in name order, the shorts tab
+     * A new install starts dark, in amber, in liquid glass, with the library as a grid in name order, the shorts tab
      * scanning the whole device for portrait clips and the player's lock opened by sliding. Those
      * are written out as ordinary stored values rather than made the getters' fallbacks, and that
      * is the point. A fallback is what everyone who installed an earlier version has been living
@@ -346,7 +348,7 @@ class Prefs(context: Context) {
             if (startFresh) {
                 putString(KEY_THEME_MODE, ThemeMode.DARK.name)
                 putString(KEY_ACCENT_COLOR, AccentColor.AMBER.name)
-                putString(KEY_NAV_STYLE, NavStyle.GLASS.name)
+                putString(KEY_NAV_STYLE, NavStyle.LIQUID.name)
                 putString(KEY_LIBRARY_VIEW, LibraryView.GRID.name)
                 putBoolean(KEY_NAME_ORDER, true)
                 putString(KEY_SHORTS_SOURCE, ShortsSource.WHOLE_DEVICE.name)

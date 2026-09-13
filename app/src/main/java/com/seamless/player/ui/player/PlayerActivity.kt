@@ -838,9 +838,13 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
     }
 
     /**
-     * A tap while the chrome is up dismisses it. A tap while it is down does nothing here:
-     * the same tap goes on to reach PlayerView, which raises the controller, and the
-     * visibility listener animates it in.
+     * A tap on the picture, confirmed as a single tap rather than half of a double one: it
+     * dismisses the chrome if the chrome is up, and brings it up if not.
+     *
+     * PlayerView used to raise the controller itself, on the release, and this handled only
+     * dismissal. That made the first tap of every double tap open the controls as well. The
+     * gesture layout keeps taps on the picture away from PlayerView now, so both directions
+     * are decided here.
      */
     override fun onSingleTap() {
         when {
@@ -849,6 +853,8 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
             // concerned the controller is still up — so catch it here and bring it back
             // rather than leaving a fifth of a second where taps do nothing.
             binding.playerView.isControllerFullyVisible -> showChrome()
+            // Down: raise the controller, and its visibility listener animates the chrome in.
+            else -> binding.playerView.showController()
         }
     }
 
@@ -878,10 +884,8 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
     /** Same idea as the feed: tap either side to jump, wherever the screen is rotated to. */
     override fun onDoubleTapSeek(rightHalf: Boolean) {
         val exo = player ?: return
-        // The first of the two taps reached PlayerView and opened the controls. Put them
-        // away again so a seek gesture does not drag the whole transport bar on screen —
-        // and without a fade, which at this length would only register as a flicker.
-        hideChrome(animate = false)
+        // Nothing to put away. The first tap no longer reaches PlayerView, so a double tap
+        // leaves the controls exactly as they were and shows only the jump.
         val target = exo.currentPosition + if (rightHalf) DOUBLE_TAP_SEEK_MS else -DOUBLE_TAP_SEEK_MS
         val duration = exo.duration
         exo.seekTo(target.coerceIn(0L, if (duration > 0) duration else Long.MAX_VALUE))

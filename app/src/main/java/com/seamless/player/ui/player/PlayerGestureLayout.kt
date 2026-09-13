@@ -205,15 +205,18 @@ class PlayerGestureLayout @JvmOverloads constructor(
         override fun onDown(e: MotionEvent) = true
 
         /**
-         * onSingleTapUp rather than onSingleTapConfirmed: confirmed waits out the
-         * double-tap window, which would put a visible delay on summoning the controls.
-         * The cost is that the first tap of a double tap reports too — handled by
-         * onDoubleTapSeek putting the controls away again.
+         * onSingleTapConfirmed, which waits out the double-tap window before reporting.
+         *
+         * This was onSingleTapUp, chosen so the controls came up without that wait, and the
+         * price was that the first tap of every double tap counted as a single tap as well:
+         * the controls appeared and were put away again when the second tap landed, so a
+         * seek flashed the whole transport bar. A third of a second before a lone tap counts
+         * is the smaller cost, and it is the one every player with double-tap seeking pays.
          */
-        override fun onSingleTapUp(e: MotionEvent): Boolean {
+        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
             if (!gesturesEnabled || overControl(e)) return false
             listener?.onSingleTap()
-            return false
+            return true
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
@@ -264,6 +267,16 @@ class PlayerGestureLayout @JvmOverloads constructor(
             // lifted off a hold. Intercepting here sends PlayerView a cancel instead, so a hold
             // shows the 2x badge while held and nothing at all when released.
             if (claimed) return true
+
+            // A tap on the picture is this layout's, not PlayerView's. Left to PlayerView, the
+            // first tap of a double tap raised the controller at once; taking the release here
+            // hands it a cancel instead, and the tap is answered from onSingleTapConfirmed
+            // once it is known not to be half of a double tap. Buttons are not the picture.
+            if (ev.actionMasked == MotionEvent.ACTION_UP && mode == Mode.NONE && !overControl(ev)) {
+                velocity?.recycle()
+                velocity = null
+                return true
+            }
         }
 
         if (claimedByDetector) return true
@@ -296,7 +309,7 @@ class PlayerGestureLayout @JvmOverloads constructor(
                 }
             }
         }
-        // Taps are left alone so PlayerView can toggle its own controls.
+        // Everything else goes to the children until it turns out to be a gesture.
         return false
     }
 
