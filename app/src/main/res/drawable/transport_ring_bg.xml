@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A dark disc inside a turned metal ring, for the film strip's transport. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#33FFFFFF">
+    <item android:id="@android:id/mask">
+        <shape android:shape="oval">
+            <solid android:color="#FFFFFFFF" />
+        </shape>
+    </item>
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="oval">
+                    <gradient
+                        android:angle="270"
+                        android:endColor="#D91A1A1F"
+                        android:startColor="#D93A3A44" />
+                </shape>
+            </item>
+            <item>
+                <shape android:shape="oval">
+                    <stroke
+                        android:width="1.5dp"
+                        android:color="#8C9A9AA6" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</ripple>

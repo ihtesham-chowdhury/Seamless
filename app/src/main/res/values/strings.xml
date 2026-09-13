@@ -86,8 +86,10 @@
     <string name="settings_seek_bar_title">Seek bar</string>
     <string name="seek_bar_wave">Waveform</string>
     <string name="seek_bar_thread">Thread</string>
-    <string name="seek_bar_bold">Bold</string>
     <string name="seek_bar_soft">Soft</string>
+    <string name="seek_bar_minimal">Minimal</string>
+    <string name="seek_bar_highlight">Highlight</string>
+    <string name="seek_bar_film">Film strip</string>
     <string name="settings_player_resize_title">Player aspect ratio</string>
 
     <!-- library view and sorting -->

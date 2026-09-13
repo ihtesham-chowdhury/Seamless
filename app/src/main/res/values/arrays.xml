@@ -48,14 +48,18 @@
     <string-array name="seek_bar_entries">
         <item>@string/seek_bar_wave</item>
         <item>@string/seek_bar_thread</item>
-        <item>@string/seek_bar_bold</item>
         <item>@string/seek_bar_soft</item>
+        <item>@string/seek_bar_minimal</item>
+        <item>@string/seek_bar_highlight</item>
+        <item>@string/seek_bar_film</item>
     </string-array>
     <string-array name="seek_bar_values">
         <item>WAVE</item>
         <item>THREAD</item>
-        <item>BOLD</item>
         <item>SOFT</item>
+        <item>MINIMAL</item>
+        <item>HIGHLIGHT</item>
+        <item>FILM</item>
     </string-array>
 
     <!-- Navigation bar style. Values match the NavStyle enum's constant names. -->

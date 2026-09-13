@@ -170,21 +170,28 @@ enum class AccentColor {
 /**
  * How the player's timeline is drawn.
  *
- * Four hands for the same bar. Everything about scrubbing, buffering and position is
- * shared; the difference is what is under the finger.
+ * Six hands for the same bar. Everything about scrubbing, buffering and position is
+ * shared; the difference is what is under the finger, and what the transport buttons
+ * beside it are made of.
  */
 enum class SeekBarStyle {
     /** A waveform for what has been watched, a flat line for what is left. The default. */
     WAVE,
 
-    /** A hairline that lifts into a smooth hill under the play position, with a bead. */
+    /** A hairline that lifts into a hill under the play position, with a bead at its crest. */
     THREAD,
 
-    /** A thick rounded bar with a standing pill, both growing under the finger. */
-    BOLD,
+    /** Pressed into the surface: a recessed track, a blue fill and a pale knob. */
+    SOFT,
 
-    /** Pressed into the surface: a recessed track, a soft fill and a glowing pill. */
-    SOFT;
+    /** A slim line, red for what has been watched, with the times at either end. */
+    MINIMAL,
+
+    /** A thick amber bar carrying the elapsed and total times inside it. */
+    HIGHLIGHT,
+
+    /** A strip of film, sprocket holes and all, with a turned knob for a thumb. */
+    FILM;
 
     companion object {
         fun from(value: String?) = entries.firstOrNull { it.name == value } ?: WAVE

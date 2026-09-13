@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The same raised button in a dark room: the shadow deepens and the face is lit far less. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#26FFFFFF">
+    <item android:id="@android:id/mask">
+        <shape android:shape="oval">
+            <solid android:color="#FFFFFFFF" />
+        </shape>
+    </item>
+    <item>
+        <layer-list>
+            <item android:top="3dp">
+                <shape android:shape="oval">
+                    <solid android:color="#73000000" />
+                </shape>
+            </item>
+            <item android:bottom="3dp">
+                <shape android:shape="oval">
+                    <gradient
+                        android:angle="270"
+                        android:endColor="#FF1C1C22"
+                        android:startColor="#FF2E2E36" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</ripple>
