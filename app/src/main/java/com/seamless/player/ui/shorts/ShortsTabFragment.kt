@@ -172,15 +172,23 @@ class ShortsTabFragment : Fragment() {
         b.backdrop.onBackdropChanged = { binding?.topGlass?.invalidate() }
         styleChips(style, night)
 
-        ViewCompat.setOnApplyWindowInsetsListener(b.topPanel) { panel, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(b.panelContent) { content, insets ->
             val bars = insets.getInsets(
                 WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
             )
-            panel.updatePadding(top = bars.top)
+            content.updatePadding(top = bars.top)
             insets
         }
         b.topPanel.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
-            if (bottom - top != oldBottom - oldTop) binding?.list?.updatePadding(top = bottom - top)
+            if (bottom - top == oldBottom - oldTop) return@addOnLayoutChangeListener
+            val list = binding?.list ?: return@addOnLayoutChangeListener
+            // Half the screen is more panel than any title and one row of chips can honestly
+            // need, so anything beyond that is a measuring mistake rather than a tall header,
+            // and padding the list by it would put every clip below the fold. It did exactly
+            // that once; the cap means a mistake costs a gap rather than an empty screen.
+            val most = list.height / 2
+            val room = bottom - top
+            list.updatePadding(top = if (most > 0) room.coerceAtMost(most) else room)
         }
     }
 

@@ -101,25 +101,43 @@
     </LinearLayout>
 
     <!--
-      The panel: the status bar's room, the title, and the quick views, on one piece of glass.
-      Its height is whatever those need, and the fragment pads the list by exactly that much.
+      The panel: the status bar's room, the title, and the quick views, on one piece of
+      glass. The fragment pads the list by exactly its height.
+
+      A ConstraintLayout rather than a frame, and that is a fix rather than a preference.
+      A plain View asked to measure itself against an AT_MOST spec returns the whole of it,
+      whatever its layout_height says, so a match_parent glass inside a wrap_content frame
+      measured to the full screen and took the panel with it: a screen of blur, and a list
+      padded by a screen height with every clip below the fold. Here the glass is tied to
+      the content's own bounds, so the content decides how tall the panel is and the glass
+      follows.
     -->
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/top_panel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:paddingBottom="6dp">
+        android:layout_gravity="top">
 
         <com.seamless.player.ui.nav.GlassView
             android:id="@+id/top_glass"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/panel_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- The status bar's room is this view's padding, so the glass above, which is tied
+             to the bottom of it, covers that room as well. -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/panel_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <!--
               The title and the count, as ordinary text rather than a toolbar's title and
@@ -272,5 +290,5 @@
                 android:text="@string/shorts_sources_title"
                 android:textAppearance="?attr/textAppearanceTitleSmall" />
         </LinearLayout>
-    </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

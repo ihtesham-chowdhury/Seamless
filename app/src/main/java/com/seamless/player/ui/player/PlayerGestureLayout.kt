@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -110,14 +111,23 @@ class PlayerGestureLayout @JvmOverloads constructor(
      *
      * Painting four corner slivers over the children after they have drawn gives the same
      * picture and clips nothing, so how the video layer is composited is never in question.
+     *
+     * Four separate slivers, not one rounded rectangle subtracted from the bounds. The
+     * subtraction is the same picture and costs a great deal more: a path's rasterisation is
+     * charged over its bounding box, and that one's box is the whole screen, so every frame of
+     * a drag paid full-screen coverage to tint four corners. It did not show on a flick, which
+     * draws a handful of frames; it showed on a slow drag, which draws hundreds.
      */
     private val cornerMask = Path()
+    private val corner = RectF()
     private val cornerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.BLACK }
 
     /** Grows as the dismiss drag progresses; drives the painted corners. */
     private var cornerRadius = 0f
         set(value) {
-            if (field == value) return
+            // Half a pixel is not a corner anyone can see, and a drag delivers a value per
+            // frame; redrawing for changes below that is work with nothing to show for it.
+            if (abs(field - value) < CORNER_EPSILON && value != 0f) return
             field = value
             rebuildCornerMask()
             invalidate()
@@ -130,15 +140,42 @@ class PlayerGestureLayout @JvmOverloads constructor(
         rebuildCornerMask()
     }
 
-    /** The corners themselves: inside the view, outside its rounded rectangle. */
+    /** The corners themselves: four slivers, each the size of one corner and no larger. */
     private fun rebuildCornerMask() {
         cornerMask.reset()
         if (cornerRadius <= 0f || width == 0 || height == 0) return
         val w = width.toFloat()
         val h = height.toFloat()
-        cornerMask.fillType = Path.FillType.EVEN_ODD
-        cornerMask.addRect(0f, 0f, w, h, Path.Direction.CW)
-        cornerMask.addRoundRect(0f, 0f, w, h, cornerRadius, cornerRadius, Path.Direction.CW)
+        val r = cornerRadius
+        val d = r * 2f
+
+        // Top left.
+        corner.set(0f, 0f, d, d)
+        cornerMask.moveTo(0f, 0f)
+        cornerMask.lineTo(0f, r)
+        cornerMask.arcTo(corner, 180f, 90f)
+        cornerMask.close()
+
+        // Top right.
+        corner.set(w - d, 0f, w, d)
+        cornerMask.moveTo(w, 0f)
+        cornerMask.lineTo(w - r, 0f)
+        cornerMask.arcTo(corner, 270f, 90f)
+        cornerMask.close()
+
+        // Bottom right.
+        corner.set(w - d, h - d, w, h)
+        cornerMask.moveTo(w, h)
+        cornerMask.lineTo(w, h - r)
+        cornerMask.arcTo(corner, 0f, 90f)
+        cornerMask.close()
+
+        // Bottom left.
+        corner.set(0f, h - d, d, h)
+        cornerMask.moveTo(0f, h)
+        cornerMask.lineTo(r, h)
+        cornerMask.arcTo(corner, 90f, 90f)
+        cornerMask.close()
     }
 
     override fun dispatchDraw(canvas: Canvas) {
@@ -416,5 +453,7 @@ class PlayerGestureLayout @JvmOverloads constructor(
         const val EXIT_MIN_MS = 260L
         const val EXIT_MAX_MS = 430L
         const val SPRING_MS = 190L
+        /** Below this, a change in the corner radius is not worth a redraw. */
+        const val CORNER_EPSILON = 0.5f
     }
 }
