@@ -10,11 +10,16 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
-- **Four timelines, chosen in Settings.** The waveform is unchanged and stays the default.
-  Beside it now: *Thread*, a hairline that lifts into a smooth hill under the play position with
-  a bead at its crest; *Bold*, a thick rounded bar with a standing pill, both growing under the
-  finger; and *Soft*, a track pressed into the surface with a glowing pill in it. Only the wave
-  animates; the others are redrawn when the position moves and at no other time.
+- **Six timelines, chosen in Settings, and transport buttons dressed to match.** The waveform
+  is unchanged and stays the default. Beside it: *Thread*, a hairline that lifts into a hill
+  under the play position and reacts when you touch it; *Soft*, a track pressed into the
+  surface with a blue fill and a pale knob, which follows your light or dark theme;
+  *Minimal*, a slim red line with the times at either end; *Highlight*, a thick amber bar
+  carrying those times inside it; and *Film strip*, sprocket holes and all, with a turned
+  knob for a thumb. Previous, play and next change with the timeline — glass discs, bare
+  glyphs, raised pale buttons or turned metal rings — and the two styles that write the
+  times into the bar hide the labels underneath rather than saying the same thing twice.
+  Only the waveform animates; the rest redraw when the position moves and at no other time.
 - **Settings can be exported and put back.** Everything the app remembers about how you like it
   — settings, hidden and locked folders, pins, favourites, the thumbnails you chose, each
   screen's order, the hints you have seen and your saved playback positions — written as one
