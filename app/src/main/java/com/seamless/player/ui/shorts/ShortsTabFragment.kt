@@ -1,5 +1,8 @@
 package com.seamless.player.ui.shorts
 
+import kotlin.math.roundToInt
+import androidx.recyclerview.widget.RecyclerView
+import android.graphics.drawable.GradientDrawable
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
@@ -154,23 +157,30 @@ class ShortsTabFragment : Fragment() {
     }
 
     /**
-     * The panel the title and quick views sit on, and the room the list leaves for it.
+     * The canopy the title and quick views hang in, and the room the list leaves for it.
      *
      * The wall runs the full height of the screen, so the status bar's room is the panel's to
-     * hold rather than the container's, and the list is padded by however tall the panel turns
-     * out to be. Measuring it rather than naming a number keeps the two in step through a
-     * rotation, a larger font, and the quick views coming and going with the mode.
+     * hold rather than the container's. The list is padded by the content's height and not the
+     * canopy's: the canopy runs on past the quick views so its lower edge can dissolve over the
+     * first row of clips, instead of ending in a line above them.
+     *
+     * The canopy's material follows the navigation style, and so do the shortcut capsule and
+     * the quick views, so choosing a style for the bar is choosing a personality for the tab.
      */
     private fun dressTopPanel(b: FragmentShortsBinding) {
         val night = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
             Configuration.UI_MODE_NIGHT_YES
         val style = prefs.navStyle
-        b.backdrop.capturing = style != NavStyle.ISLAND
-        b.topGlass.corners = GlassView.Corners.BOTTOM
+        // Every style's canopy is a view of the wall, the island's included; it only blurs less.
+        b.backdrop.capturing = true
+        b.topGlass.corners = GlassView.Corners.CANOPY
         b.topGlass.source = b.backdrop
         b.topGlass.configure(style, night)
         b.backdrop.onBackdropChanged = { binding?.topGlass?.invalidate() }
+        styleShortcuts(style, night)
         styleChips(style, night)
+        // Secondary to the title, but read rather than glanced at.
+        b.count.alpha = COUNT_ALPHA
 
         ViewCompat.setOnApplyWindowInsetsListener(b.panelContent) { content, insets ->
             val bars = insets.getInsets(
@@ -179,16 +189,50 @@ class ShortsTabFragment : Fragment() {
             content.updatePadding(top = bars.top)
             insets
         }
-        b.topPanel.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+        b.panelContent.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
             if (bottom - top == oldBottom - oldTop) return@addOnLayoutChangeListener
             val list = binding?.list ?: return@addOnLayoutChangeListener
-            // Half the screen is more panel than any title and one row of chips can honestly
+            // Half the screen is more header than any title and one row of chips can honestly
             // need, so anything beyond that is a measuring mistake rather than a tall header,
             // and padding the list by it would put every clip below the fold. It did exactly
             // that once; the cap means a mistake costs a gap rather than an empty screen.
             val most = list.height / 2
             val room = bottom - top
             list.updatePadding(top = if (most > 0) room.coerceAtMost(most) else room)
+        }
+
+        // Lighter while the wall rests at the top, firmer once clips pass beneath the title, so
+        // the title stays readable over whatever is under it. A paint alpha on a view the scroll
+        // is already redrawing.
+        b.list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val settle = CANOPY_SETTLE_DP * resources.displayMetrics.density
+                binding?.topGlass?.strength = recyclerView.computeVerticalScrollOffset() / settle
+            }
+        })
+    }
+
+    /**
+     * The shortcut capsule, in the canopy's own material and one step quieter than the chosen
+     * quick view: frosted and a touch brighter than the canopy, a dark neutral pebble beside the
+     * accent island, or clear glass with a hairline of light along its edge.
+     */
+    private fun styleShortcuts(style: NavStyle, night: Boolean) {
+        val b = binding ?: return
+        val density = resources.displayMetrics.density
+        val (fill, edge) = when (style) {
+            NavStyle.GLASS ->
+                (if (night) 0x24FFFFFF else 0x99FFFFFF.toInt()) to (if (night) 0x2EFFFFFF else 0x14000000)
+            NavStyle.ISLAND ->
+                (if (night) 0x61000000 else 0x8CFFFFFF.toInt()) to (if (night) 0x14FFFFFF else 0x0F000000)
+            NavStyle.LIQUID ->
+                (if (night) 0x12FFFFFF else 0x4DFFFFFF) to (if (night) 0x47FFFFFF else 0xB3FFFFFF.toInt())
+        }
+        b.toolbarActions.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = CAPSULE_RADIUS_DP * density
+            setColor(fill)
+            setStroke(density.roundToInt().coerceAtLeast(1), edge)
         }
     }
 
@@ -208,32 +252,37 @@ class ShortsTabFragment : Fragment() {
         val accent = ContextCompat.getColor(context, R.color.nav_accent)
 
         val look = when (style) {
+            // Quiet chips and one modest accent pill, as on the frosted bar.
             NavStyle.GLASS -> ChipLook(
                 fillOn = selection,
-                fillOff = ColorUtils.setAlphaComponent(ink, if (night) 0x1F else 0x12),
+                fillOff = ColorUtils.setAlphaComponent(ink, if (night) 0x17 else 0x0F),
                 textOn = onSelection,
                 textOff = muted,
                 strokeOn = Color.TRANSPARENT,
                 strokeOff = Color.TRANSPARENT,
                 strokeWidth = 0f,
             )
+            // The strongest accent of the three on the chosen chip, and the rest almost nothing:
+            // one island of colour in a neutral row, which is the bar's own idea.
             NavStyle.ISLAND -> ChipLook(
                 fillOn = selection,
                 fillOff = Color.TRANSPARENT,
                 textOn = onSelection,
                 textOff = muted,
                 strokeOn = Color.TRANSPARENT,
-                strokeOff = ColorUtils.setAlphaComponent(muted, 0x4D),
+                strokeOff = ColorUtils.setAlphaComponent(muted, 0x2E),
                 strokeWidth = density,
             )
+            // Barely-there glass, and a chosen chip that reads as a lens: brighter glass with the
+            // accent in its lettering and along its edge, rather than a solid fill.
             NavStyle.LIQUID -> ChipLook(
                 fillOn = ColorUtils.setAlphaComponent(Color.WHITE, if (night) 0x2E else 0xB8),
-                fillOff = ColorUtils.setAlphaComponent(Color.WHITE, if (night) 0x14 else 0x59),
+                fillOff = ColorUtils.setAlphaComponent(Color.WHITE, if (night) 0x12 else 0x52),
                 // Light glass is nearly white, so the accent is taken a step darker on it.
                 textOn = if (night) accent else ColorUtils.blendARGB(accent, Color.BLACK, 0.18f),
                 textOff = ColorUtils.setAlphaComponent(ink, 0xCC),
-                strokeOn = ColorUtils.setAlphaComponent(Color.WHITE, if (night) 0x5C else 0xE6),
-                strokeOff = ColorUtils.setAlphaComponent(Color.WHITE, if (night) 0x1F else 0x80),
+                strokeOn = ColorUtils.setAlphaComponent(accent, if (night) 0x99 else 0xB3),
+                strokeOff = ColorUtils.setAlphaComponent(Color.WHITE, if (night) 0x29 else 0x99),
                 strokeWidth = 1.2f * density,
             )
         }
@@ -537,3 +586,12 @@ private class ChipLook(
     val strokeOff: Int,
     val strokeWidth: Float,
 )
+
+/** The count under the title: secondary, but read rather than glanced at. */
+private const val COUNT_ALPHA = 0.8f
+
+/** How far the wall scrolls under the canopy before the canopy is at full strength. */
+private const val CANOPY_SETTLE_DP = 72f
+
+/** The shortcut capsule's corners: fully round at its 44dp height. */
+private const val CAPSULE_RADIUS_DP = 22f

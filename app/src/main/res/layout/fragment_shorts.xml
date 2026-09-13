@@ -122,7 +122,7 @@
             android:id="@+id/top_glass"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/panel_content"
+            app:layout_constraintBottom_toBottomOf="@id/panel_fade"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -290,5 +290,16 @@
                 android:text="@string/shorts_sources_title"
                 android:textAppearance="?attr/textAppearanceTitleSmall" />
         </LinearLayout>
+
+        <!-- Room past the quick views for the canopy to dissolve over the first row of clips.
+             The list is padded by the content's height, not the canopy's, so this room is
+             over the wall rather than above it. -->
+        <Space
+            android:id="@+id/panel_fade"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/shorts_canopy_fade"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/panel_content" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

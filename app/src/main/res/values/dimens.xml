@@ -51,4 +51,9 @@
     <!-- Where the subtitle notice floats: centred, and high enough to clear the transport
          controls, which are about 96dp tall with their padding. -->
     <dimen name="notice_bottom_margin">116dp</dimen>
+
+    <!-- How far the Shorts canopy runs on past its quick views, dissolving as it goes. Long
+         enough for the edge to be felt rather than seen; short enough to cover only the top
+         of the first row. -->
+    <dimen name="shorts_canopy_fade">32dp</dimen>
 </resources>

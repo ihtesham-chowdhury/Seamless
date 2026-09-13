@@ -10,11 +10,14 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- **Share from the Shorts feed.** A Share button sits beside the heart and hands the clip to
+  whatever you pick — a chat, a mail, a drive — the same way the ordinary player's menu does.
+  The file itself goes, with a read grant; nothing is copied or uploaded by Seamless.
 - **Six timelines, chosen in Settings, and transport buttons dressed to match.** The waveform
   is unchanged and stays the default. Beside it: *Thread*, a hairline that lifts into a hill
-  under the play position and reacts when you touch it; *Soft*, a track pressed into the
+  under the play position and reacts when you touch it; *Neumorphic Blue*, a track pressed into the
   surface with a blue fill and a pale knob, which follows your light or dark theme;
-  *Minimal*, a slim red line with the times at either end; *Highlight*, a thick amber bar
+  *Red Hairline*, a slim red line with the times at either end; *Immersive Yellow*, a thick amber bar
   carrying those times inside it; and *Film strip*, sprocket holes and all, with a turned
   knob for a thumb. Previous, play and next change with the timeline — glass discs, bare
   glyphs, raised pale buttons or turned metal rings — and the two styles that write the
@@ -30,12 +33,14 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   there and asks first, in those words.
 
 ### Changed
-- **The Shorts tab's wall runs under glass.** The tab used to stop dead at its quick views: a
-  wall of clips ending flush against a header with nothing in common with the capsule at the
-  other end of the screen. The list runs the full height now and passes under a panel of the
-  same glass — blurred on Android 12 and later, solid before that — with the title and quick
-  views on it. The quick-view chips take their colours from the navigation style you chose, so
-  both ends of the screen agree about what the app is made of.
+- **The Shorts tab's header is a canopy over the wall, and it wears your navigation style.** The
+  tab used to stop dead at its quick views. The wall runs the full height now and passes under
+  the title and quick views, and the canopy they hang in has no edge at all: its lower part
+  dissolves into the first row of clips. What it is made of follows the bar you chose — frosted
+  glass blurs the most and veils calmly; the accent island blurs lightly, lets more of the wall
+  through and saves its colour for the chosen quick view; liquid glass is nearly clear, catches
+  a band of light and dissolves over the longest distance. The shortcut capsule and the quick
+  views change with it, and the canopy firms up a little once clips scroll under the title.
 - **Swiping down to close no longer blanks the picture.** The gesture could leave a black screen
   with the subtitle still floating on it, the video simply gone. The card is rounded as it
   travels, and rounding it by clipping to an outline is not something every GPU applies to the
@@ -46,10 +51,15 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   covered the remaining nine tenths in a fixed fifth of a second from a standing start, which
   reads as absence rather than movement. It now takes as long as the distance left and the speed
   of the throw ask for, easing out of the throw.
+- **A double tap in the player shows only the jump.** The first tap of a double tap used to
+  bring the controls up for a moment before the seek put them away again. A single tap now waits
+  out the double-tap window before the controls appear — the same brief pause every player
+  with double-tap seeking has — and a double tap leaves them exactly as they were.
 - **Shuffle and speed swap places** in the player's top row: shuffle sits outermost, with speed
   beside it.
-- **A new install writes down frosted glass** as its navigation bar, so Settings shows what is
-  really in effect from the first launch.
+- **A new install starts in liquid glass**, written down as its navigation bar so Settings shows
+  what is really in effect from the first launch. Installs from before the choice existed keep
+  falling back to frosted glass.
 
 ## [0.2.4] — 2026-09-12
 
