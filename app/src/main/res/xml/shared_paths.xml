@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  What the share provider may serve: the phone's shared storage, and only through a grant that
+  VideoShare makes for one file. A file path on a memory card is found through MediaStore
+  instead, which covers every card the system has indexed.
+-->
+<paths>
+    <external-path
+        name="storage"
+        path="." />
+</paths>

@@ -357,7 +357,6 @@
             android:key="version"
             android:icon="@drawable/ic_info"
             android:layout="@layout/pref_row_bottom"
-            android:selectable="false"
-            android:title="@string/settings_version_title" />
+            android:title="@string/settings_about_title" />
     </PreferenceCategory>
 </PreferenceScreen>

@@ -33,6 +33,7 @@ import com.seamless.player.ui.common.ResizeModes
 import com.seamless.player.ui.common.ControlStyle
 import com.seamless.player.ui.common.SubtitleStyles
 import com.seamless.player.ui.common.Tips
+import com.seamless.player.ui.common.VideoShare
 import com.seamless.player.ui.player.SubtitleTracks
 import com.seamless.player.ui.player.TrackSheet
 import com.seamless.player.util.Background
@@ -396,12 +397,7 @@ class ShortsActivity : AppCompatActivity(), ShortsAdapter.Host {
      * receiving app reads the file for as long as it holds the grant.
      */
     private fun shareClip(video: Video) {
-        val send = Intent(Intent.ACTION_SEND).apply {
-            type = "video/*"
-            putExtra(Intent.EXTRA_STREAM, video.uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        startActivity(Intent.createChooser(send, getString(R.string.share_video)))
+        VideoShare.share(this, video.uri)
     }
 
     /** Filled when this clip is a favourite, outlined when it is not. */

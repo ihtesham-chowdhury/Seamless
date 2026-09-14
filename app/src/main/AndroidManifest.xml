@@ -107,5 +107,22 @@
                 <data android:mimeType="video/*" />
             </intent-filter>
         </activity>
+
+        <!--
+          Lets a video that a file manager handed over as a bare file path be shared on. A path
+          cannot leave the app (Android throws the moment one is put in an outgoing intent), so
+          when the library has no entry for the file, the share goes out through this provider
+          instead. It serves only what Seamless grants, one file at a time, and is not exported.
+          See ui/common/VideoShare and res/xml/shared_paths.xml.
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.share"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/shared_paths" />
+        </provider>
     </application>
 </manifest>

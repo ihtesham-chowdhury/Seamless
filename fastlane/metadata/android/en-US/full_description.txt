@@ -1,47 +1,38 @@
-Seamless turns a folder of short vertical videos into a continuous, swipeable feed — and
-still plays ordinary long-form video properly.
+Seamless is an offline video player built around two ideas: short videos deserve an immersive, swipeable feed, and everything else deserves to open fast, in a player that is a pleasure to look at.
 
-<b>Why it exists</b>
+<b>Why Seamless</b>
 
-Offline short-form video is badly served. Fast players tend to open only one file at a
-time; folder players tend to show a black frame between every clip.
-
-That gap is not a tuning problem. A conventional player owns a single decoder and, for
-every file, tears it down and sets it up again. That costs a fraction of a second even
-from local storage, and no amount of cache tweaking removes it.
-
-Seamless keeps several players alive at once and prepares the neighbouring clips while the
-current one is still playing, so swiping simply changes which one you see.
+• <b>Every short video on your phone, in one feed.</b> Seamless gathers the short clips from across the whole device and plays them full screen, one swipe apart. The next clip is already decoded and waiting, so there is no black frame and no spinner between them.
+• <b>Made to be looked at.</b> Liquid glass, frosted glass or an accent island for the navigation bar. Six timelines, from a live waveform to a film strip. Dark or light, in the accent colour you choose.
+• <b>Fast, whatever you open.</b> Films and landscape clips go straight into playback, and a video handed over by your gallery or file manager opens in the same player.
+• <b>Subtitles, found for you.</b> Tap Find subtitles and Seamless looks the video up on OpenSubtitles. An exact match can be applied without asking, and it is kept, so it plays offline from then on.
 
 <b>The feed</b>
 
-* Swipe up and down between clips with no perceptible gap
-* True shuffle — nothing repeats until everything has played, and the order differs next time
-* Play from folders you choose, or scan the whole device and filter by shape and length
-* Brightness and volume by dragging sideways, double tap to skip, hold for double speed
+• Swipe between clips with no perceptible gap
+• True shuffle: nothing repeats until everything has played
+• The whole device, or only the folders you choose
+• A wall of clips to pick from, as masonry, grid or list
+• Double tap to skip or to mark a favourite, hold for double speed, share any clip
 
 <b>The player</b>
 
-* Clean floating controls, with elapsed and remaining time
-* Portrait clips roll into the next one; landscape and long videos return to the list
-* Fit, crop or stretch
-* Resume where you left off, for long videos only
-* Screen lock, so a phone in a pocket cannot skip ahead
-* Drag down from the top to close
-* Opening a video from another app returns you to that app
+• Floating controls, with six timeline styles and buttons to match
+• Drag for brightness and volume, with volume past 100% when you need it
+• Double tap to jump ten seconds, hold for 2x
+• Subtitles inside the file or beside it, sized and placed the way you like
+• Resume where you left off, lock the screen, drag down to close
+• Fit, crop or stretch
 
 <b>The library</b>
 
-* Grid or list, with search and sorting
-* Rename, move, delete and share
-* Hide folders you would rather not see
-* Lock folders behind your fingerprint, face or device PIN — a locked folder shows no
-  preview and is kept out of the feed
+• Grid or list, with search, and an order of its own for every folder
+• Rename, move, delete, pin and share
+• Hide folders, or lock them behind your fingerprint, face or PIN
+• Export your settings to a file, or to Google Drive through the system picker, and bring them back
 
 <b>Privacy</b>
 
-Seamless has no internet permission at all. It cannot send anything anywhere, so there is
-no analytics, no advertising, no accounts and no tracking. It reads your videos for the
-only reason a video player would: to list them and play them.
+No ads, no analytics, no accounts, no tracking. Seamless uses the internet for one thing only: looking up a subtitle when you ask it to. That is off until you switch it on and add your own free OpenSubtitles key, and your videos are never uploaded.
 
-Free software, licensed under the GPLv3.
+Free and open source, licensed under the GPLv3.

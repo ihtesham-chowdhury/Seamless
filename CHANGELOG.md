@@ -10,6 +10,9 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- **The story behind Seamless, behind the version.** The last row in Settings is now *About
+  Seamless*. Tap it for why the app exists, in its developer's words, and the four things it
+  does that other players do not.
 - **Share from the Shorts feed.** A Share button sits beside the heart and hands the clip to
   whatever you pick — a chat, a mail, a drive — the same way the ordinary player's menu does.
   The file itself goes, with a read grant; nothing is copied or uploaded by Seamless.
@@ -60,6 +63,16 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **A new install starts in liquid glass**, written down as its navigation bar so Settings shows
   what is really in effect from the first launch. Installs from before the choice existed keep
   falling back to frosted glass.
+
+### Fixed
+- **Sharing a video opened from another app no longer closes the player.** A gallery or file
+  manager hands over an address that belongs to it, and sometimes a bare file path, and
+  neither can simply be passed on: Android refuses a file path outright, and refuses a borrowed
+  grant when its owner does not allow it to travel further. Both refusals were crashes. Share
+  now swaps the address for the same file's entry in your library, found by its path or by its
+  name and size, uses Seamless's own share provider for a file the library does not know, and
+  says so in a message if nothing can be sent.
+
 
 ## [0.2.4] — 2026-09-12
 

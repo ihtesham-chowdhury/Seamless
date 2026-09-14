@@ -171,6 +171,7 @@
     <string name="info_frame_rate">Frame rate</string>
     <string name="info_bitrate">Bitrate</string>
     <string name="share_video">Share video</string>
+    <string name="share_unavailable">The app that opened this video does not let it be passed on. Share it from that app instead.</string>
 
     <!-- gestures / external playback -->
     <string name="settings_shorts">Shorts feed</string>
@@ -212,7 +213,23 @@
     <string name="settings_help_summary">Everything the player can do, and how to reach it</string>
     <string name="settings_reset_tips">Show first-run tips again</string>
     <string name="settings_reset_tips_done">Tips will appear again</string>
-    <string name="settings_version_title">Version</string>
+    <string name="settings_about_title">About Seamless</string>
+    <string name="settings_about_summary">Version %1$s · The story behind it</string>
+
+    <!-- The story behind the app, in the developer's words. -->
+    <string name="story_title">Why Seamless exists</string>
+    <string name="story_body">Seamless began with a problem of my own. No player on the Play Store could show short videos beautifully and also open a landscape video without making me wait. The iPhone already had a video player that looked phenomenal and felt modern. Android was missing one.\n\nSo that became the mission. Countless sleepless nights, a lot of tinkering and hundreds of improvements later, we have finally done it: the most beautiful and the fastest video player on Android, and one that plays short videos in the most immersive way.</string>
+    <string name="story_signature">— Ihtesham Chowdhury, developer</string>
+    <string name="story_points_title">What sets it apart</string>
+    <string name="story_point_shorts_title">Every short video on your phone, in one feed</string>
+    <string name="story_point_shorts_body">Seamless gathers the short clips from across the whole device and plays them full screen, one swipe apart, with the next one already decoded and waiting.</string>
+    <string name="story_point_beauty_title">Made to be looked at</string>
+    <string name="story_point_beauty_body">Liquid glass, frosted glass or an accent island. Six timelines. Your theme, in your colour.</string>
+    <string name="story_point_speed_title">Fast, whatever you open</string>
+    <string name="story_point_speed_body">Films and landscape clips go straight into playback, and short ones never keep you waiting between swipes.</string>
+    <string name="story_point_subtitles_title">Subtitles, found for you</string>
+    <string name="story_point_subtitles_body">Tap Find subtitles and Seamless looks the video up on OpenSubtitles. An exact match can be applied without asking, and it is kept, so it plays offline from then on.</string>
+    <string name="story_close">Close</string>
 
     <string name="help_title">Gestures and tips</string>
     <string name="help_player_title">In a video</string>

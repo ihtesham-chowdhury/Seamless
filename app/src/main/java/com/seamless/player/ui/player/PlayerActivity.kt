@@ -44,6 +44,7 @@ import com.seamless.player.ui.common.LevelHudView
 import com.seamless.player.ui.common.MediaInfo
 import com.seamless.player.ui.common.ResizeModes
 import com.seamless.player.ui.common.Tips
+import com.seamless.player.ui.common.VideoShare
 import com.seamless.player.util.Background
 import com.seamless.player.util.Log
 import com.seamless.player.util.ScreenControls
@@ -684,14 +685,14 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
         return if (detail.isBlank()) label else "$label · $detail"
     }
 
+    /**
+     * The library's video, or the one another app handed over. The second kind cannot always
+     * be passed on as it came, and used to close the player when it could not; VideoShare
+     * finds an address that can be, or says why not.
+     */
     private fun shareCurrent() {
         val uri = current?.uri ?: intent.data ?: return
-        val send = Intent(Intent.ACTION_SEND).apply {
-            type = "video/*"
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        startActivity(Intent.createChooser(send, getString(R.string.share_video)))
+        VideoShare.share(this, uri)
     }
 
     // "Open folder" used to live here. It is gone on purpose: Android has no standard
