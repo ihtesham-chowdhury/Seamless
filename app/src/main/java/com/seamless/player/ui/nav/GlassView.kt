@@ -18,6 +18,7 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewOutlineProvider
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import com.seamless.player.R
@@ -209,6 +210,7 @@ class GlassView @JvmOverloads constructor(
     }
 
     /** Blur, then a touch more saturation — glass that greys everything out reads as fog. */
+    @RequiresApi(Build.VERSION_CODES.S)
     private fun capsuleEffect(style: NavStyle): RenderEffect {
         val radius = density * if (style == NavStyle.LIQUID) 14f else 24f
         // The recording reaches past the shape by more than the blur's reach, so the edges are
@@ -228,6 +230,7 @@ class GlassView @JvmOverloads constructor(
      * fades over exactly the curve the floor and the veil fade over. The node spans the view and
      * the pad around it, so the view's own top edge sits [blurPad] down in the node's space.
      */
+    @RequiresApi(Build.VERSION_CODES.S)
     private fun canopyEffect(): RenderEffect {
         val radius = (density * canopyBlurDp).coerceAtLeast(1f)
         blurPad = (radius * 1.5f).roundToInt()
