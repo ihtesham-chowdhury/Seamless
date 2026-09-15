@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Lint configuration for the app module.
+
+  Media3 marks much of what this player relies on (the preload manager, renderer and buffer
+  tuning, track details) as @UnstableApi. The project opts in once, for the whole module, with the
+  compiler's opt-in flag in app/build.gradle.kts, which is what Kotlin reads. Lint's
+  UnsafeOptInUsageError check does not read compiler flags and wants the same opt-in repeated at
+  every call site, so this is the suppression Media3's own troubleshooting guide gives: it ignores
+  that check for UnstableApi alone, and every other opt-in marker is still enforced.
+-->
+<lint>
+    <issue id="UnsafeOptInUsageError">
+        <ignore regexp="\(markerClass = androidx\.media3\.common\.util\.UnstableApi\.class\)" />
+    </issue>
+</lint>

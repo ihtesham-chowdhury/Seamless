@@ -54,6 +54,34 @@ jobs:
       - name: Lint
         run: ./gradlew --no-daemon lintDebug
 
+      # A failing lint run prints only its first few problems, so each fix used to reveal the
+      # next few. List every error on the run's summary page, and as annotations, so a red build
+      # says everything that is wrong at once.
+      - name: Summarise lint errors
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+
+          path = "app/build/reports/lint-results-debug.xml"
+          if not os.path.exists(path):
+              raise SystemExit(0)
+          issues = [i for i in ET.parse(path).getroot().iter("issue")
+                    if i.get("severity") in ("Error", "Fatal")]
+          lines = ["### Lint: %d error(s)" % len(issues), ""]
+          for n, issue in enumerate(issues):
+              loc = issue.find("location")
+              file = os.path.relpath(loc.get("file"), os.getcwd()) if loc is not None else "?"
+              line = loc.get("line", "1") if loc is not None else "1"
+              message = issue.get("message", "").replace("\n", " ")
+              lines.append("- `%s:%s` **%s** %s" % (file, line, issue.get("id"), message))
+              level = "error" if n < 10 else "warning" if n < 20 else "notice"
+              print("::%s file=%s,line=%s::[%s] %s" % (level, file, line, issue.get("id"), message))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as out:
+              out.write("\n".join(lines) + "\n")
+          PY
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
