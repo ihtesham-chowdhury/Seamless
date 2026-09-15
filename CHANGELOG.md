@@ -10,9 +10,10 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
-- **The story behind Seamless, behind the version.** The last row in Settings is now *About
-  Seamless*. Tap it for why the app exists, in its developer's words, and the four things it
-  does that other players do not.
+- **About Seamless is a page of its own.** The last row in Settings opens the story behind the
+  app, in its developer's words, on a quiet full-screen page — near black in dark mode, a soft
+  paper in light — with the version, what it is built with, the licence and a link to the source
+  underneath. One close button, top left, in the players' shape.
 - **Share from the Shorts feed.** A Share button sits beside the heart and hands the clip to
   whatever you pick — a chat, a mail, a drive — the same way the ordinary player's menu does.
   The file itself goes, with a read grant; nothing is copied or uploaded by Seamless.
@@ -36,6 +37,17 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   there and asks first, in those words.
 
 ### Changed
+- **Gestures and tips reads as a guide, not a wall of text.** Each part — the video player, the
+  Shorts feed, the library — says in one line what it is for, then gives one row per gesture or
+  control: what you do, then what happens, with the button's own glyph beside the few rows that
+  are about a button. What makes each part different is said there, in passing, instead of in a
+  list of features on the About page. Several descriptions had fallen behind the app: the guide
+  sent you to a Subtitles entry in the ⋮ menu that no longer exists (the CC button is always
+  there now), volume above 100% showed as "100%%", and the Shorts padlock, favourite
+  and auto-advance were missing.
+- **Wording brought in line with the app.** An empty Shorts feed no longer points to an
+  "All portrait videos" switch that was renamed long ago, and Swipe down to close now says the
+  drag starts at the top, as the player's tip and the guide do.
 - **The Shorts tab's header is a canopy over the wall, and it wears your navigation style.** The
   tab used to stop dead at its quick views. The wall runs the full height now and passes under
   the title and quick views, and the canopy they hang in has no edge at all: its lower part

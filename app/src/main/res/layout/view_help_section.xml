@@ -1,23 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One titled block of the guide. Included three times, filled in by HelpActivity. -->
+<!--
+  One part of the guide. Included three times, filled in by HelpActivity.
+
+      VIDEO PLAYER ────────────
+      In a video
+      One line on what this part of the app is for.
+      ┌─────────────────────────┐
+      │ Tap                      │
+      │ Show the controls. …     │
+      │ ─────────────────────── │
+      │ Drag up or down          │
+      └─────────────────────────┘
+
+  The label and its fading rule are the settings screen's own section heading, so the guide is
+  plainly part of Settings. The title and the line under it are what make it a guide rather than
+  another group of switches, and the rows share one card so a part reads as one thing, not as a
+  stack of boxes. Text insets are 34dp to line up with the card's content, as on Settings.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="20dp">
+    android:paddingTop="26dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="34dp"
+        android:layout_marginEnd="34dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/section_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:letterSpacing="0.07"
+            android:textAllCaps="true"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="?attr/colorPrimary" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:alpha="0.85"
+            android:background="@drawable/pref_category_line" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/section_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
-        android:textColor="?attr/colorPrimary" />
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="34dp"
+        android:accessibilityHeading="true"
+        android:textAppearance="?attr/textAppearanceHeadlineSmall" />
 
     <TextView
-        android:id="@+id/section_body"
+        android:id="@+id/section_intro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:lineSpacingExtra="4dp"
-        android:textAppearance="?attr/textAppearanceBodyMedium" />
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="34dp"
+        android:lineSpacingExtra="3dp"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="?attr/colorOnSurfaceVariant" />
+
+    <LinearLayout
+        android:id="@+id/section_points"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/help_card_bg"
+        android:orientation="vertical"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp" />
 </LinearLayout>

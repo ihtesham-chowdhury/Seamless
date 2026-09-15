@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The About page's close disc.
+
+  The players' circle_control_bg is a dark disc for sitting on film, and on a light page it would
+  be a black hole in the corner. This is the same object in the page's own glass: a faint fill
+  and a hairline edge that follow the theme, with the ripple clipped to the circle.
+-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?attr/colorControlHighlight">
+    <item android:id="@android:id/mask">
+        <shape android:shape="oval">
+            <solid android:color="#FFFFFFFF" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/page_close_fill" />
+            <stroke
+                android:width="1dp"
+                android:color="@color/page_close_stroke" />
+        </shape>
+    </item>
+</ripple>

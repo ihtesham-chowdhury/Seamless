@@ -32,10 +32,10 @@ import com.seamless.player.data.SettingsBackup
 import com.seamless.player.data.ShortsSource
 import com.seamless.player.data.ThemeMode
 import com.seamless.player.data.subtitle.SubtitleStore
-import com.seamless.player.databinding.DialogStoryBinding
 import com.seamless.player.databinding.DialogSubtitleAccountBinding
 import com.seamless.player.databinding.DialogSubtitleKeyBinding
 import com.seamless.player.ui.MainActivity
+import com.seamless.player.ui.about.AboutActivity
 import com.seamless.player.ui.common.AccentColors
 import com.seamless.player.ui.common.AppLock
 import com.seamless.player.ui.common.ThemeManager
@@ -175,7 +175,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<Preference>("version")?.apply {
             summary = getString(R.string.settings_about_summary, requireContext().appVersionName())
             setOnPreferenceClickListener {
-                showStory()
+                startActivity(AboutActivity.intent(requireContext()))
                 true
             }
         }
@@ -556,18 +556,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         applyEnabled()
-    }
-
-    /**
-     * Why Seamless exists, in its developer's words, and what it does that other players do not.
-     * Behind the version, because that is where people who wonder about an app go looking.
-     */
-    private fun showStory() {
-        AlertDialog.Builder(requireContext())
-            .setTitle(R.string.story_title)
-            .setView(DialogStoryBinding.inflate(layoutInflater).root)
-            .setPositiveButton(R.string.story_close, null)
-            .show()
     }
 
     private fun toast(text: String) =

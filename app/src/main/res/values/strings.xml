@@ -9,7 +9,7 @@
     <string name="grant_permission">Grant access</string>
 
     <string name="no_videos">No videos found on this device.</string>
-    <string name="no_shorts_sources">Pick at least one folder, or turn on “All portrait videos”.</string>
+    <string name="no_shorts_sources">Nothing to play yet. Choose where clips come from in Settings.</string>
 
     <string name="shorts_sources_title">Play from</string>
     <string name="shorts_play">Shuffle and play</string>
@@ -160,6 +160,7 @@
     <string name="info_copied">Details copied</string>
     <string name="action_more">More</string>
     <string name="action_close">Close</string>
+    <string name="action_back">Back</string>
     <string name="info_title">Video info</string>
     <string name="info_name">Name</string>
     <string name="info_folder">Folder</string>
@@ -210,39 +211,100 @@
     <string name="settings_restore_failed">That is not a Seamless backup</string>
 
     <string name="settings_help_title">Gestures and tips</string>
-    <string name="settings_help_summary">Everything the player can do, and how to reach it</string>
+    <string name="settings_help_summary">How the player, the Shorts feed and the library work</string>
     <string name="settings_reset_tips">Show first-run tips again</string>
     <string name="settings_reset_tips_done">Tips will appear again</string>
     <string name="settings_about_title">About Seamless</string>
-    <string name="settings_about_summary">Version %1$s · The story behind it</string>
+    <string name="settings_about_summary">Version %1$s · The story behind the player</string>
 
-    <!-- The story behind the app, in the developer's words. -->
-    <string name="story_title">Why Seamless exists</string>
-    <string name="story_body">Seamless began with a problem of my own. No player on the Play Store could show short videos beautifully and also open a landscape video without making me wait. The iPhone already had a video player that looked phenomenal and felt modern. Android was missing one.\n\nSo that became the mission. Countless sleepless nights, a lot of tinkering and hundreds of improvements later, we have finally done it: the most beautiful and the fastest video player on Android, and one that plays short videos in the most immersive way.</string>
-    <string name="story_signature">— Ihtesham Chowdhury, developer</string>
-    <string name="story_points_title">What sets it apart</string>
-    <string name="story_point_shorts_title">Every short video on your phone, in one feed</string>
-    <string name="story_point_shorts_body">Seamless gathers the short clips from across the whole device and plays them full screen, one swipe apart, with the next one already decoded and waiting.</string>
-    <string name="story_point_beauty_title">Made to be looked at</string>
-    <string name="story_point_beauty_body">Liquid glass, frosted glass or an accent island. Six timelines. Your theme, in your colour.</string>
-    <string name="story_point_speed_title">Fast, whatever you open</string>
-    <string name="story_point_speed_body">Films and landscape clips go straight into playback, and short ones never keep you waiting between swipes.</string>
-    <string name="story_point_subtitles_title">Subtitles, found for you</string>
-    <string name="story_point_subtitles_body">Tap Find subtitles and Seamless looks the video up on OpenSubtitles. An exact match can be applied without asking, and it is kept, so it plays offline from then on.</string>
-    <string name="story_close">Close</string>
+    <!--
+      About Seamless. The story is the developer's own words and is meant to stay that way: correct
+      a typo, but do not smooth it into product copy. The name, the licence and the library are
+      proper nouns and are not translated.
+    -->
+    <string name="about_heading">The story behind the player.</string>
+    <string name="about_story_problem">Seamless began with a problem of my own. I couldn’t find a player that made short videos feel effortless and also opened a landscape video without making me wait.</string>
+    <string name="about_story_iphone">The iPhone already had a video player that felt phenomenal and modern. Android was missing one.</string>
+    <string name="about_story_mission">So that became the mission. Countless sleepless nights, a lot of tinkering, and hundreds of small improvements later, Seamless became the player I wanted to exist: beautiful, fast, and one that plays short videos from your phone in the most immersive way.</string>
+    <string name="about_signature_dash" translatable="false">—</string>
+    <string name="about_signature_name" translatable="false">Ihtesham Chowdhury</string>
+    <string name="about_signature_role">developer</string>
+    <string name="about_version_label">Version</string>
+    <string name="about_built_label">Built with</string>
+    <string name="about_built_value" translatable="false">Media3</string>
+    <string name="about_licence_label">Licence</string>
+    <string name="about_licence_value" translatable="false">GPL-3.0</string>
+    <string name="about_source_link">View source</string>
+    <string name="about_source_url" translatable="false">https://github.com/ihtesham-chowdhury/Seamless</string>
+    <string name="about_privacy_label">Privacy</string>
+    <string name="about_privacy_value">Offline by default. Network access is only used when you ask Seamless to find subtitles.</string>
 
     <string name="help_title">Gestures and tips</string>
-    <string name="help_player_title">In a video</string>
-    <string name="help_shorts_title">In the shorts feed</string>
-    <string name="help_library_title">In the library</string>
 
-    <string name="help_player_body">Tap to show the controls; tap again to put them away.\n\nDrag up and down on the left for brightness, on the right for volume. Volume carries on past 100%% into amplification, marked in amber.\n\nDrag sideways to scrub. Nothing moves until you let go, so you can change your mind.\n\nDrag down from the top to close.\n\nDouble tap the left or right side to jump ten seconds.\n\nPress and hold anywhere for 2x while held. Press and hold the speed button to drop back to normal speed and stay there.\n\nThe CC button appears when a video has subtitles in it, or beside it. If it is not there, Subtitles in the ⋮ menu will go looking — including online, once you have switched that on in Settings. Size, position and everything else about how they look is on the same panel, under Appearance.</string>
-    <string name="help_shorts_body">The Shorts tab shows every clip it found. Masonry gives each one its own shape, Grid makes them all the same, and List brings back the names and sizes. Tap one to open the feed on it; everything else follows in a random order.\n\nSwipe up and down to move between clips. There is no gap: the next one is already decoded and waiting.\n\nDrag sideways for brightness on the left half and volume on the right.\n\nDouble tap the left or right side to jump five seconds; double tap the middle to mark a favourite. Tap once to pause.\n\nPress and hold for 2x.\n\nThe padlock locks the screen so a phone in a pocket cannot skip anything.</string>
-    <string name="help_library_body">Long press a folder or a video to select it. The toolbar becomes a menu of things you can do to what you picked.\n\nPin anything to keep it at the top, whatever the sort order says.\n\nA locked folder asks for your fingerprint, face or device PIN, shows no preview, and is left out of the shorts feed and out of search.\n\nSearch from the toolbar. In the library it finds videos anywhere, not only folder names.\n\nThe button beside it sets the layout and the order: grid or list, what to sort by, which way round, or no order at all. Each folder keeps its own, so the library can be by name while a camera roll is by date.</string>
+    <!--
+      The guide. Each part says in one line what it is for, then one row per gesture or control:
+      the lead is what you do, the body is what happens. Describe what the app does today, and
+      nothing it used to do.
+    -->
+    <string name="help_player_label">Video player</string>
+    <string name="help_player_title">In a video</string>
+    <string name="help_player_intro">The picture comes first. Controls stay out of the way until you need them, and almost everything is a gesture.</string>
+    <string name="help_player_tap_lead">Tap</string>
+    <string name="help_player_tap_body">Show the controls. Tap again to put them away.</string>
+    <string name="help_player_levels_lead">Drag up or down</string>
+    <string name="help_player_levels_body" formatted="false">Brightness on the left, volume on the right. Volume keeps going past 100% into amplification, marked in amber.</string>
+    <string name="help_player_scrub_lead">Drag sideways</string>
+    <string name="help_player_scrub_body">Scrub through the video. Nothing moves until you let go, so you can change your mind.</string>
+    <string name="help_player_close_lead">Drag down from the top</string>
+    <string name="help_player_close_body">Close the player. A video opened from another app takes you back there.</string>
+    <string name="help_player_jump_lead">Double tap a side</string>
+    <string name="help_player_jump_body">Jump ten seconds back or forward.</string>
+    <string name="help_player_hold_lead">Press and hold</string>
+    <string name="help_player_hold_body">Play at 2x for as long as you hold. Press and hold the speed button to go back to normal speed and stay there.</string>
+    <string name="help_player_cc_lead">The CC button</string>
+    <string name="help_player_cc_body">Always in the same place. It lists the subtitles in the video and beside it, lets you choose a file, and finds more online once you switch that on in Settings. Size, position and style are under Appearance.</string>
+    <string name="help_player_lock_lead">The padlock</string>
+    <string name="help_player_lock_body">Locks the screen so a phone in a pocket can’t skip anything. Slide to unlock, or tap the four corners if that’s what you chose in Settings.</string>
+    <string name="help_player_flow_lead">When a video ends</string>
+    <string name="help_player_flow_body">In a folder, a portrait clip rolls straight into the next one; a landscape video stops. Long videos open where you left them.</string>
+
+    <string name="help_shorts_title">In the Shorts feed</string>
+    <string name="help_shorts_intro">Every short clip on your phone, in one feed that never makes you wait.</string>
+    <string name="help_shorts_wall_lead">The Shorts tab</string>
+    <string name="help_shorts_wall_body">Masonry keeps each clip’s own shape, Grid makes them all the same size, and List brings back names and sizes. Recent, Favourites and Longest narrow it down.</string>
+    <string name="help_shorts_open_lead">Tap a clip</string>
+    <string name="help_shorts_open_body">The feed opens on it, and everything else follows in a random order. Shuffle plays the whole view in a new order.</string>
+    <string name="help_shorts_swipe_lead">Swipe up or down</string>
+    <string name="help_shorts_swipe_body">Next clip or previous. There is no gap and no spinner: the next one is already decoded and waiting.</string>
+    <string name="help_shorts_levels_lead">Drag sideways</string>
+    <string name="help_shorts_levels_body">Brightness on the left half, volume on the right.</string>
+    <string name="help_shorts_tap_lead">Tap once</string>
+    <string name="help_shorts_tap_body">Pause or play. Favourite, share, aspect ratio and the padlock come up with it, then leave on their own.</string>
+    <string name="help_shorts_double_lead">Double tap</string>
+    <string name="help_shorts_double_body">A side jumps five seconds. The middle marks a favourite, the same as the heart.</string>
+    <string name="help_shorts_hold_lead">Press and hold</string>
+    <string name="help_shorts_hold_body">Play at 2x while you hold.</string>
+    <string name="help_shorts_end_lead">When a clip ends</string>
+    <string name="help_shorts_end_body">The feed moves on by itself. Turn off Auto-advance in Settings to loop a clip instead.</string>
+
+    <string name="help_library_title">In the library</string>
+    <string name="help_library_intro">Your folders as they are on the phone, in the order you want, and private where it matters.</string>
+    <string name="help_library_select_lead">Long press</string>
+    <string name="help_library_select_body">Select a folder or a video. The toolbar becomes a menu of what you can do with it.</string>
+    <string name="help_library_pin_lead">Pin</string>
+    <string name="help_library_pin_body">Keeps anything at the top, whatever the order says.</string>
+    <string name="help_library_search_lead">Search</string>
+    <string name="help_library_search_body">Finds videos anywhere in the library, not just folder names.</string>
+    <string name="help_library_order_lead">Layout and order</string>
+    <string name="help_library_order_body">Grid or list, what to sort by and which way round, or random. Each folder keeps its own, so the library can be by name while a camera roll is by date.</string>
+    <string name="help_library_lock_lead">Lock a folder</string>
+    <string name="help_library_lock_body">It asks for your fingerprint, face or device PIN, shows no preview, and stays out of the Shorts feed and search.</string>
+    <string name="help_library_hide_lead">Hide a folder</string>
+    <string name="help_library_hide_body">Takes it out of the library. Settings → Hidden folders brings it back.</string>
 
     <string name="settings_gestures">Gestures</string>
     <string name="settings_swipe_close_title">Swipe down to close</string>
-    <string name="settings_swipe_close_summary">Drag down on the video to exit</string>
+    <string name="settings_swipe_close_summary">Drag down from the top of the video to close it</string>
     <string name="settings_external_portrait_title">Force portrait outside Seamless</string>
     <string name="settings_external_portrait_summary">Keep the screen upright for videos opened from other apps</string>
 

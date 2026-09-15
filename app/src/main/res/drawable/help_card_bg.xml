@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A guide card: the settings cards' surface and radius, rounded on all four corners because it is never split. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <corners android:radius="18dp" />
+    <solid android:color="?attr/colorSurfaceContainer" />
+</shape>

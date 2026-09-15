@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The About page's wash of accent, on a light page. Faint: it tints the corner, it is not a shape. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:alpha="0.10" android:color="?attr/colorPrimary" />
+</selector>

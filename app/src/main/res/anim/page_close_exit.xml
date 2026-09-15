@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A page leaving: a quicker fade than its arrival, kept on top so it fades off Settings rather than under it. -->
+<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="160"
+    android:fromAlpha="1"
+    android:interpolator="@android:interpolator/accelerate_quad"
+    android:toAlpha="0"
+    android:zAdjustment="top" />

@@ -34,4 +34,27 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
     </style>
+
+    <!--
+      A page you read rather than a place you go: Gestures and tips, and About.
+
+      They open with a short fade over Settings instead of the system's slide, which is the
+      navigation gesture for moving somewhere else. Both the arriving and the leaving animations
+      are taken from the page's own theme, so nothing else in the app changes how it moves.
+    -->
+    <style name="Theme.Seamless.Page" parent="Theme.Seamless">
+        <item name="android:windowAnimationStyle">@style/Animation.Seamless.Page</item>
+    </style>
+
+    <!-- About paints its own ground; the window matches it so nothing lighter shows first. -->
+    <style name="Theme.Seamless.Page.About" parent="Theme.Seamless.Page">
+        <item name="android:windowBackground">@color/page_ground</item>
+    </style>
+
+    <style name="Animation.Seamless.Page" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/page_open_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/page_hold</item>
+        <item name="android:activityCloseEnterAnimation">@anim/page_hold</item>
+        <item name="android:activityCloseExitAnimation">@anim/page_close_exit</item>
+    </style>
 </resources>

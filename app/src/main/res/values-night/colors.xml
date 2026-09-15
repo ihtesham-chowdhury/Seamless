@@ -13,4 +13,14 @@
 
     <!-- See values/colors.xml. Dark enough to sit back, light enough that the knob has an edge. -->
     <color name="switch_track_off">#FF3A3A3F</color>
+
+    <!-- See values/colors.xml. Near black, with the story a step below white so the page is calm
+         at night rather than glaring. -->
+    <color name="page_ground">#FF0A0A0D</color>
+    <color name="page_ink">#FFF3F3F5</color>
+    <color name="page_body">#FFCDCDD4</color>
+    <color name="page_muted">#FF8B8B94</color>
+    <color name="page_rule">#24FFFFFF</color>
+    <color name="page_close_fill">#1AFFFFFF</color>
+    <color name="page_close_stroke">#29FFFFFF</color>
 </resources>

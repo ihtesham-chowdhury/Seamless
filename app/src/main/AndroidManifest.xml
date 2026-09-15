@@ -74,7 +74,14 @@
 
         <activity
             android:name=".ui.help.HelpActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.Seamless.Page" />
+
+        <!-- The story behind the app: a page of its own, on its own ground. -->
+        <activity
+            android:name=".ui.about.AboutActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Seamless.Page.About" />
 
         <!-- The shorts feed. Locked to portrait, no landscape, immersive. -->
         <activity
