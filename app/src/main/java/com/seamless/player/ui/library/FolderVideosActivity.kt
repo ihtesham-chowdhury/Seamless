@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -135,6 +136,7 @@ class FolderVideosActivity : AppCompatActivity() {
                 else -> finish()
             }
         }
+        onBackPressedDispatcher.addCallback(this, selectionBack)
         binding.toolbar.setOnMenuItemClickListener { item -> onMenuItem(item.itemId) }
         wireToolbarActions()
 
@@ -176,6 +178,7 @@ class FolderVideosActivity : AppCompatActivity() {
 
     /** Swaps the toolbar between its normal menu and the selection menu. */
     private fun updateToolbarForSelection() {
+        selectionBack.isEnabled = adapter.inSelectionMode
         val count = adapter.selection.size
         binding.toolbar.menu.clear()
         if (count == 0) {
@@ -344,14 +347,15 @@ class FolderVideosActivity : AppCompatActivity() {
         ).show(this)
     }
 
-    override fun onBackPressed() {
-        // Back should leave the selection before it leaves the folder.
-        if (adapter.inSelectionMode) {
-            adapter.clearSelection()
-            return
-        }
-        @Suppress("DEPRECATION")
-        super.onBackPressed()
+    /**
+     * Back leaves a selection before it leaves the folder.
+     *
+     * A callback rather than an onBackPressed override, which Android 16 no longer consults for a
+     * back gesture. Enabled only while something is selected (see updateToolbarForSelection), so
+     * leaving the folder keeps the system's own back animation.
+     */
+    private val selectionBack = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() = adapter.clearSelection()
     }
 
     companion object {

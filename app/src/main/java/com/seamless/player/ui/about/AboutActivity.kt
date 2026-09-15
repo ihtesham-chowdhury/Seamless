@@ -1,18 +1,12 @@
 package com.seamless.player.ui.about
 
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
-import android.net.Uri
 import android.os.Bundle
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -25,7 +19,6 @@ import com.seamless.player.R
 import com.seamless.player.SeamlessApp
 import com.seamless.player.databinding.ActivityAboutBinding
 import com.seamless.player.ui.common.ThemeManager
-import com.seamless.player.util.appVersionName
 
 /**
  * Why Seamless exists, in its developer's words.
@@ -33,8 +26,11 @@ import com.seamless.player.util.appVersionName
  * A page rather than a dialog. The story used to sit in an AlertDialog with a list of features
  * under it, which made the most personal thing in the app look like a confirmation prompt, and
  * set the story beside a sales pitch. The features moved to the guide, where they explain how
- * the app behaves; this page says why, and who, and then the few facts a curious person looks
- * for at the foot of an about page.
+ * the app behaves; this page says why, and who.
+ *
+ * Nothing follows the story but its signature and one line at the foot of the page. A footer of
+ * version, library and licence was tried and taken out again: it turned the end of a personal
+ * note into a spec sheet, and the version is already on the Settings row that leads here.
  *
  * Its own ground rather than a settings surface: near black in dark mode, a soft paper in light.
  * One faint wash of the accent behind the heading is the only decoration, and there is one way
@@ -52,11 +48,10 @@ class AboutActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnClose.setOnClickListener { finish() }
-        binding.versionValue.text = appVersionName()
-        bindLicence()
         paintGlow()
         fitInsets()
-        // Only on arrival. Coming back from rotation or from the browser, the page is simply there.
+        keepClosingLineAtFoot()
+        // Only on arrival. Coming back from rotation, the page is simply there.
         if (savedInstanceState == null) reveal()
     }
 
@@ -87,27 +82,21 @@ class AboutActivity : AppCompatActivity() {
         }
     }
 
-    /** "GPL-3.0 · View source", the second half in the accent: the one thing here that goes somewhere. */
-    private fun bindLicence() {
-        val text = SpannableStringBuilder(getString(R.string.about_licence_value)).append(SEPARATOR)
-        val start = text.length
-        text.append(getString(R.string.about_source_link))
-        text.setSpan(
-            ForegroundColorSpan(ContextCompat.getColor(this, R.color.page_accent)),
-            start,
-            text.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-        )
-        binding.licenceValue.text = text
-        // The whole row, not the two words: a finger-sized target at the foot of a page.
-        binding.licenceRow.setOnClickListener { openSource() }
-    }
-
-    private fun openSource() {
-        try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.about_source_url))))
-        } catch (missing: ActivityNotFoundException) {
-            Toast.makeText(this, R.string.settings_link_no_browser, Toast.LENGTH_SHORT).show()
+    /**
+     * "Built with … in Bangladesh" belongs at the foot of the page, not wherever the story happens
+     * to end. The column is given at least the height of the screen and the space above that line
+     * takes what is left over, so on a tall phone the line rests on the bottom edge and on a short
+     * one it follows the signature after a gap.
+     *
+     * Posted rather than set inside the callback: a minimum height changed during layout would ask
+     * for a second layout pass in the middle of the first. The comparison stops it repeating.
+     */
+    private fun keepClosingLineAtFoot() {
+        binding.scroll.addOnLayoutChangeListener { scroll, _, top, _, bottom, _, _, _, _ ->
+            val height = bottom - top
+            if (height > 0 && binding.column.minimumHeight != height) {
+                scroll.post { binding.column.minimumHeight = height }
+            }
         }
     }
 
@@ -148,8 +137,6 @@ class AboutActivity : AppCompatActivity() {
     companion object {
         fun intent(context: Context): Intent = Intent(context, AboutActivity::class.java)
 
-        private const val SEPARATOR = "  ·  "
-
         private const val GLOW_RADIUS_DP = 420f
         private const val GLOW_CENTER_X = 0.12f
         private const val GLOW_CENTER_Y = 0.0f
@@ -157,7 +144,7 @@ class AboutActivity : AppCompatActivity() {
         private const val REVEAL_RISE_DP = 14f
         private const val REVEAL_MS = 340L
         private const val REVEAL_STAGGER_MS = 45L
-        /** The footer arrives with the rule rather than after it; the story is not kept waiting. */
+        /** The closing line arrives with the signature rather than after a pause. */
         private const val REVEAL_STEPS = 4
         private const val REVEAL_EASE = 1.8f
     }

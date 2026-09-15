@@ -26,13 +26,12 @@
     <!--
       The About page. Its own ground rather than a settings surface, because it is a page to read:
       a soft, cool paper here, and near black in values-night, like the players. Ink for the
-      heading and the name, body for the story, muted for labels, and a hairline rule.
+      heading and the name, body for the story, muted for the quieter lines.
     -->
     <color name="page_ground">#FFF6F6F8</color>
     <color name="page_ink">#FF141418</color>
     <color name="page_body">#FF2F2F36</color>
     <color name="page_muted">#FF73737C</color>
-    <color name="page_rule">#1A000000</color>
     <color name="page_close_fill">#0D000000</color>
     <color name="page_close_stroke">#14000000</color>
 </resources>

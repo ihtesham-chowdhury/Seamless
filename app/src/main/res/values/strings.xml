@@ -219,8 +219,7 @@
 
     <!--
       About Seamless. The story is the developer's own words and is meant to stay that way: correct
-      a typo, but do not smooth it into product copy. The name, the licence and the library are
-      proper nouns and are not translated.
+      a typo, but do not smooth it into product copy. The name is not translated.
     -->
     <string name="about_heading">The story behind the player.</string>
     <string name="about_story_problem">Seamless began with a problem of my own. I couldn’t find a player that made short videos feel effortless and also opened a landscape video without making me wait.</string>
@@ -229,15 +228,7 @@
     <string name="about_signature_dash" translatable="false">—</string>
     <string name="about_signature_name" translatable="false">Ihtesham Chowdhury</string>
     <string name="about_signature_role">developer</string>
-    <string name="about_version_label">Version</string>
-    <string name="about_built_label">Built with</string>
-    <string name="about_built_value" translatable="false">Media3</string>
-    <string name="about_licence_label">Licence</string>
-    <string name="about_licence_value" translatable="false">GPL-3.0</string>
-    <string name="about_source_link">View source</string>
-    <string name="about_source_url" translatable="false">https://github.com/ihtesham-chowdhury/Seamless</string>
-    <string name="about_privacy_label">Privacy</string>
-    <string name="about_privacy_value">Offline by default. Network access is only used when you ask Seamless to find subtitles.</string>
+    <string name="about_made_in">Built with 🩵 and passion in Bangladesh</string>
 
     <string name="help_title">Gestures and tips</string>
 

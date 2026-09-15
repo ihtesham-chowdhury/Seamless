@@ -20,7 +20,6 @@
     <color name="page_ink">#FFF3F3F5</color>
     <color name="page_body">#FFCDCDD4</color>
     <color name="page_muted">#FF8B8B94</color>
-    <color name="page_rule">#24FFFFFF</color>
     <color name="page_close_fill">#1AFFFFFF</color>
     <color name="page_close_stroke">#29FFFFFF</color>
 </resources>

@@ -17,10 +17,12 @@ fit for this project; Google Play asks for more paperwork.
       `fastlane/metadata/android/en-US/images/phoneScreenshots/` as `1.png`, `2.png`, …
 - [ ] Tag the commit: `git tag -a v0.1.0 -m "0.1.0"` and push the tag.
 
-Capturing a screenshot from a connected device:
+Capturing a screenshot from a connected device (on the phone, then pulled: PowerShell's `>`
+rewrites binary output and corrupts the PNG):
 
 ```bash
-adb exec-out screencap -p > 1.png
+adb shell screencap -p /sdcard/1.png
+adb pull /sdcard/1.png
 ```
 
 ---
@@ -90,9 +92,11 @@ Additional requirements beyond F-Droid:
 - **A developer account** — one-off registration fee, and identity verification.
 - **A privacy policy at a public URL.** [PRIVACY.md](../PRIVACY.md) is the text; it needs
   hosting somewhere linkable. GitHub Pages, or the raw file URL, both work.
-- **A Data safety declaration.** The honest answers here are short: no data collected, no
-  data shared, nothing leaves the device. The app requests one permission,
-  `READ_MEDIA_VIDEO`, purely to list and play the user's own videos.
+- **A Data safety declaration.** Short, but not empty. Nothing is collected in the
+  background; the optional subtitle lookup sends a video's title and a file fingerprint (and
+  an OpenSubtitles sign-in, if the user adds one) to OpenSubtitles when the user asks, and that
+  has to be declared. Media is read with `READ_MEDIA_VIDEO`, purely to list and play the user's
+  own videos, which also needs the Photo and video permissions declaration.
 - **Store assets** — a 512×512 icon, a 1024×500 feature graphic, and at least two
   phone screenshots. The launcher icon in this repository is an adaptive vector and will
   need exporting to PNG at 512×512.
@@ -103,5 +107,6 @@ Additional requirements beyond F-Droid:
 ### A note on the permission
 
 Both stores will ask why the app reads media. The answer is that it is a video player: it
-lists and plays videos already on the device. It has **no** `INTERNET` permission at all,
-which is unusually easy to defend and worth stating plainly in the listing.
+lists and plays videos already on the device. Since 0.2.0 it also holds `INTERNET`, used only
+for the optional subtitle lookup, which does nothing until the user switches it on and adds
+their own key. Say so plainly in the listing; [PRIVACY.md](../PRIVACY.md) has the detail.

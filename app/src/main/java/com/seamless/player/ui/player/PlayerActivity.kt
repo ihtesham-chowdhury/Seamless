@@ -14,6 +14,7 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
@@ -204,6 +205,7 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
             }
         )
 
+        onBackPressedDispatcher.addCallback(this, lockedBack)
         binding.btnBack.setOnClickListener { finish() }
         binding.btnMore.setOnClickListener { showMoreMenu(it) }
 
@@ -240,8 +242,10 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
             binding.playerView.useController = false
             binding.root.gesturesEnabled = false
             binding.lockOverlay.lock(prefs.unlockMethod)
+            lockedBack.isEnabled = true
         }
         binding.lockOverlay.onUnlocked = {
+            lockedBack.isEnabled = false
             binding.playerView.useController = true
             binding.root.gesturesEnabled = true
         }
@@ -973,11 +977,16 @@ class PlayerActivity : AppCompatActivity(), PlayerGestureLayout.Listener, Player
         }
     }
 
-    override fun onBackPressed() {
-        // Back must not escape the lock, or the lock would be pointless.
-        if (binding.lockOverlay.isLocked) return
-        @Suppress("DEPRECATION")
-        super.onBackPressed()
+    /**
+     * Back does nothing while the screen is locked, or the lock would be pointless.
+     *
+     * A callback rather than an onBackPressed override. An app targeting Android 16 receives back
+     * gestures through the dispatcher only, so the override was never asked about a swipe and a
+     * locked screen could be swiped away. Enabled only while locked, so the rest of the time Back
+     * keeps the system's own animation.
+     */
+    private val lockedBack = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() = Unit
     }
 
     private fun savePosition() {

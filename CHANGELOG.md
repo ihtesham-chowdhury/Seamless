@@ -9,11 +9,13 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-09-15
+
 ### Added
 - **About Seamless is a page of its own.** The last row in Settings opens the story behind the
   app, in its developer's words, on a quiet full-screen page — near black in dark mode, a soft
-  paper in light — with the version, what it is built with, the licence and a link to the source
-  underneath. One close button, top left, in the players' shape.
+  paper in light — signed, and closed with a single line at its foot. One close button, top
+  left, in the players' shape.
 - **Share from the Shorts feed.** A Share button sits beside the heart and hands the clip to
   whatever you pick — a chat, a mail, a drive — the same way the ordinary player's menu does.
   The file itself goes, with a read grant; nothing is copied or uploaded by Seamless.
@@ -77,6 +79,11 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   falling back to frosted glass.
 
 ### Fixed
+- **Back gestures respect the screen lock on Android 16.** An app built for Android 16 gets
+  back gestures through a newer route, and the player, the Shorts feed and a folder were
+  still listening on the old one: a back swipe could close a locked player, and in a folder it
+  left the folder instead of clearing the selection. All three use the new route now, which
+  is also what the build's lint check had been failing on.
 - **Sharing a video opened from another app no longer closes the player.** A gallery or file
   manager hands over an address that belongs to it, and sometimes a bare file path, and
   neither can simply be passed on: Android refuses a file path outright, and refuses a borrowed
@@ -559,7 +566,8 @@ First release. Everything below is new.
 - A watchdog catches the silent case where a clip decodes but never renders a frame
 - Decoder fallback enabled, so a decoder that refuses a clip is not the end of it
 
-[Unreleased]: https://github.com/ihtesham-chowdhury/Seamless/compare/v0.2.4...HEAD
+[Unreleased]: https://github.com/ihtesham-chowdhury/Seamless/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/ihtesham-chowdhury/Seamless/releases/tag/v0.3.0
 [0.2.4]: https://github.com/ihtesham-chowdhury/Seamless/releases/tag/v0.2.4
 [0.2.3]: https://github.com/ihtesham-chowdhury/Seamless/releases/tag/v0.2.3
 [0.1.0]: https://github.com/ihtesham-chowdhury/Seamless/releases/tag/v0.1.0

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  About Seamless: the story, who wrote it, and a quiet footer.
+  About Seamless: the story, who wrote it, and one closing line.
 
       [x]
       SEAMLESS
@@ -10,11 +10,10 @@
 
       —  Ihtesham Chowdhury
          developer
-      ─────────────────────────
-      VERSION     0.2.4
-      BUILT WITH  Media3
-      LICENCE     GPL-3.0 · View source
-      PRIVACY     Offline by default. …
+
+      (the rest of the screen)
+
+      Built with … and passion in Bangladesh
 
   The opening is deliberately modest — a small accent wordmark and a heading a size below a
   headline — so the story is the largest body of text on the page and the first thing read.
@@ -49,6 +48,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <!-- Its minimum height is set to the screen's by AboutActivity, which is what lets the
+                 space before the closing line push that line to the foot of the page. -->
             <LinearLayout
                 android:id="@+id/column"
                 android:layout_width="0dp"
@@ -57,7 +58,7 @@
                 android:paddingStart="30dp"
                 android:paddingTop="84dp"
                 android:paddingEnd="30dp"
-                android:paddingBottom="40dp"
+                android:paddingBottom="36dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -164,131 +165,21 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <View
-                    android:id="@+id/rule"
+                <!-- Takes whatever height is left, and never less than a clear gap. -->
+                <Space
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="48dp"
-                    android:background="@color/page_rule" />
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:minHeight="64dp" />
 
-                <!-- The footer: small capitals for the labels, and nothing louder than the story. -->
-                <LinearLayout
-                    android:id="@+id/footer"
+                <TextView
+                    android:id="@+id/closing_line"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp">
-
-                        <TextView
-                            android:layout_width="96dp"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-medium"
-                            android:letterSpacing="0.12"
-                            android:text="@string/about_version_label"
-                            android:textAllCaps="true"
-                            android:textColor="@color/page_muted"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:id="@+id/version_value"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textColor="@color/page_body"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp">
-
-                        <TextView
-                            android:layout_width="96dp"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-medium"
-                            android:letterSpacing="0.12"
-                            android:text="@string/about_built_label"
-                            android:textAllCaps="true"
-                            android:textColor="@color/page_muted"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/about_built_value"
-                            android:textColor="@color/page_body"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/licence_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:minHeight="48dp"
-                        android:orientation="horizontal"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp">
-
-                        <TextView
-                            android:layout_width="96dp"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-medium"
-                            android:letterSpacing="0.12"
-                            android:text="@string/about_licence_label"
-                            android:textAllCaps="true"
-                            android:textColor="@color/page_muted"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:id="@+id/licence_value"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textColor="@color/page_body"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp">
-
-                        <TextView
-                            android:layout_width="96dp"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-medium"
-                            android:letterSpacing="0.12"
-                            android:text="@string/about_privacy_label"
-                            android:textAllCaps="true"
-                            android:textColor="@color/page_muted"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:lineSpacingExtra="3dp"
-                            android:text="@string/about_privacy_value"
-                            android:textColor="@color/page_body"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </LinearLayout>
+                    android:text="@string/about_made_in"
+                    android:textColor="@color/page_muted"
+                    android:textSize="14sp"
+                    android:textStyle="italic" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

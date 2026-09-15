@@ -1,0 +1,7 @@
+About Seamless is now a page of its own, with the story behind the app, and Gestures and tips is a proper guide.
+
+Six seek bars with buttons to match. The Shorts header wears your navigation style, and new installs start in liquid glass.
+
+Export and import your settings. Share clips straight from the Shorts feed.
+
+Sharing a video opened from another app no longer crashes, and swiping down to close no longer blanks the picture.
